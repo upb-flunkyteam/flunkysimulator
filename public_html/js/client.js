@@ -6,49 +6,73 @@
 
 console.log("Starte Flunkyball-Simulator");
 jQuery(window).load(function () {
+    $("#aufbaubutton").click(function() {
+        preparing();
+    }); 
     $("#wurfbutton").click(function() {
         throwing();
     }); 
-    $("#treffervideo").on('ended',function(){
-        throwingend();
-    });
     $("#keintreffervideo").on('ended',function(){
-        throwingend();
+        nohitend();
+    });
+    $("#aufbauvideo").on('ended',function(){
+        preparingend();
     });
     hidevideos();
 });
 
+function preparing(){
+    playpreperation();
+}
+
+function preparingend(){
+    hidevideos();
+}
+
 function throwing(){
     console.log("Werfen!");
     if(Math.random()>0.5){
-        playtreffer();
+        playhit();
+        runningtime = Math.random() * 4 + 2 + 2.8;
+        setTimeout(() => { shoutstop(); }, runningtime * 1000);
     }else{
-        playkeintreffer();
+        playnohit();
     }
 };
 
-function throwingend(){
+function shoutstop(){
+    $("#treffervideo").trigger('stop');
+    $("#treffervideo").attr('currentTime', 0);
     hidevideos();
-    showbutton();
+    playstop();
+    setTimeout(() => { hidevideos(); }, 5000);
 }
 
-function playtreffer(){
-    $("#treffervideo").show();
-    $("#treffervideo").trigger('play');
+function nohitend(){
+    hidevideos();
 }
 
-function playkeintreffer(){
-    $("#keintreffervideo").show();
-    $("#keintreffervideo").trigger('play');
+function playhit(){
+    $("#treffervideo").show().trigger('play');
 }
 
-function stoptreffer(){
-    
+function playnohit(){
+    $("#keintreffervideo").show().trigger('play');
+}
+
+function playpreperation(){
+    $("#aufbauvideo").show().trigger('play');
+}
+
+function playstop(){
+    $("#stopvideo").show().trigger('play');
 }
 
 function hidevideos(){
     $("#treffervideo").hide();
     $("#keintreffervideo").hide();
+    $("#aufbauvideo").hide();
+    $("#stopvideo").hide();
 }
 
 console.log("Flunkyball-Simulator geladen");
