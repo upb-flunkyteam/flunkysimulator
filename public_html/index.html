@@ -13,15 +13,23 @@ and open the template in the editor.
         <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
     </head>
     <body>
-        <div id="mainvideobox">
-            <video id="treffervideo" src="video/treffer.mp4">
-                Getroffen!
-            </video>
-            <video id="keintreffervideo" src="video/keintreffer.mp4">
-                Nicht getroffen!
-            </video>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="btn-group-vertical">
+                    <button class="btn btn-info" id="aufbaubutton">Aufbauen</button>
+                    <button class="btn btn-info" id="wurfbutton">Werfen</button>
+                </div>
+            </div>
+            <div id="mainvideobox" class="col-md-10">
+                <video id="treffervideo" src="video/treffer3.mp4">
+                    Getroffen!
+                </video>
+                <video id="keintreffervideo" src="video/keintreffer1.mp4">
+                    Nicht getroffen!
+                </video>
+            </div>
         </div>
-        <button class="btn" id="wurfbutton">Werfen</button>
+        
         
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->

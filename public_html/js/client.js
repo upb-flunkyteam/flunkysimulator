@@ -20,8 +20,7 @@ jQuery(window).load(function () {
 
 function throwing(){
     console.log("Werfen!");
-    $("#wurfbutton").hide();
-    if(Math.random()>0.8){
+    if(Math.random()>0.5){
         playtreffer();
     }else{
         playkeintreffer();
@@ -50,10 +49,6 @@ function stoptreffer(){
 function hidevideos(){
     $("#treffervideo").hide();
     $("#keintreffervideo").hide();
-}
-
-function showbutton(){
-    $("#wurfbutton").show();
 }
 
 console.log("Flunkyball-Simulator geladen");
