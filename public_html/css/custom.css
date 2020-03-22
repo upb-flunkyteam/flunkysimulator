@@ -1,0 +1,9 @@
+/* 
+    Created on : Mar 22, 2020, 8:21:12 PM
+    Author     : jan
+*/
+fluidvideo {
+  /* override other styles to make responsive */
+  width: 100%    !important;
+  height: auto   !important;
+}
