@@ -18,6 +18,9 @@ jQuery(window).load(function () {
     $("#aufbauvideo").on('ended',function(){
         preparingend();
     });
+    $("#stopvideo").on('ended',function(){
+        hidevideos();
+    });
     hidevideos();
 });
 
@@ -45,7 +48,6 @@ function shoutstop(){
     $("#treffervideo").attr('currentTime', 0);
     hidevideos();
     playstop();
-    setTimeout(() => { hidevideos(); }, 5000);
 }
 
 function nohitend(){
