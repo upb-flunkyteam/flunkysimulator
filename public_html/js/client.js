@@ -34,7 +34,7 @@ function preparingend(){
 
 function throwing(){
     console.log("Werfen!");
-    if(Math.random()>0.5){
+    if(Math.random()<0.25){
         playhit();
         runningtime = Math.random() * 4 + 2 + 2.8;
         setTimeout(() => { shoutstop(); }, runningtime * 1000);
