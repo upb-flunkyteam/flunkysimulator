@@ -1,8 +1,19 @@
 {
     "name": "Flunkysimulator",
     "version": "1.0.0",
-    "keywords": ["util", "functional", "server", "client", "browser"],
-    "author": "jan",
+    "description": "Simulates the drinking game Flunkyball for home use",
+    "license": "GPL-3.0-or-later",
+    "repository": "https://github.com/ApolloLV/flunkysimulator",
+    "keywords": [
+        "server",
+        "client",
+        "browser",
+        "simulation"
+    ],
+    "author": "ApolloLV",
     "contributors": [],
-    "dependencies": {}
+    "dependencies": {
+        "express": "^4.17.1",
+        "path": "^0.12.7"
+    },
 }
