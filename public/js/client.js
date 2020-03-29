@@ -60,7 +60,7 @@ function playvideo(videofolder){
         default:
             return null;
     }
-    const video = videos[Math.floor(Math.random() * videos.length)];
+    const video = $(videos[Math.floor(Math.random() * videos.length)]);
     video.show().trigger('play');
     return video;
 }
