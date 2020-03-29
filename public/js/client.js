@@ -47,7 +47,7 @@ function playvideo(videofolder){
             video = $('#keintreffervideo');
             break;
         case 'stop':
-            video = $('#keintreffervideo');
+            video = $('#stopvideo');
             break;
         default:
             video = null;
