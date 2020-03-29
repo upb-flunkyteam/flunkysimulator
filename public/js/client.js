@@ -13,7 +13,7 @@ jQuery(window).load(function () {
         throwing();
     }); 
     $('.video').on('ended',function(){
-        videoend();
+        stopvideos();
     });
     $('.video').hide();
 });
@@ -34,9 +34,7 @@ function throwing(){
 
 function playvideo(videofolder){
     // Abort all previously playing videos
-    $('.video').trigger('stop');
-    $('.video').attr('currentTime', 0);
-    $('.video').hide();
+    stopvideos();
     
     switch(videofolder){
         case 'preperation':
@@ -57,4 +55,10 @@ function playvideo(videofolder){
     }
     video.show().trigger('play');
     return video;
+}
+
+function stopvideos(){
+    $('.video').trigger('stop');
+    $('.video').attr('currentTime', 0);
+    $('.video').hide();
 }
