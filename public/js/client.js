@@ -19,7 +19,7 @@ jQuery(window).load(function () {
 });
 
 function preparing(){
-    playvideo('preperation');
+    playvideo('preparation');
 }
 
 function throwing(){
@@ -37,8 +37,8 @@ function playvideo(videofolder){
     stopvideos();
     
     switch(videofolder){
-        case 'preperation':
-            video = $('.preperation.video1');
+        case 'preparation':
+            video = $('.preparation.video1');
             break;
         case 'hit':
             video = $('.hit.video1');
