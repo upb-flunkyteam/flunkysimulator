@@ -8,13 +8,14 @@ head
 .row
   .col-md-2
     .btn-group-vertical
-      button#aufbaubutton.btn.btn-info Aufbauen
+      button#aufbaubutton.btn Aufbauen
       button#wurfbutton.btn.btn-info Werfen
+    textarea.form-control(rows=15)
   #mainvideobox.col-md-10
-    video#treffervideo.fluidvideo(src='video/hit/treffer3.webm') Getroffen!
-    video#keintreffervideo.fluidvideo(src='video/nohit/keintreffer1.webm') Nicht getroffen!
-    video#aufbauvideo.fluidvideo(src='video/preperation/aufstellen.webm') Wird aufgebaut...
-    video#stopvideo.fluidvideo(src='video/stop/stop.webm') Stop!
+    video#treffervideo.fluidvideo.video(src='video/hit/treffer3.webm') Getroffen!
+    video#keintreffervideo.fluidvideo.video(src='video/nohit/keintreffer1.webm') Nicht getroffen!
+    video#aufbauvideo.fluidvideo.video(src='video/preperation/aufstellen.webm') Wird aufgebaut...
+    video#stopvideo.fluidvideo.video(src='video/stop/stop.webm') Stop!
 // Optional JavaScript
 script(src='js/jquery-2.2.4.js' type='text/javascript')
 script(src='js/bootstrap.min.js' type='text/javascript')

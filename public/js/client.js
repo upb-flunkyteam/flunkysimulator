@@ -6,75 +6,55 @@
 
 console.log("Starte Flunkyball-Simulator");
 jQuery(window).load(function () {
-    $("#aufbaubutton").click(function() {
+    $('#aufbaubutton').click(function() {
         preparing();
     }); 
-    $("#wurfbutton").click(function() {
+    $('#wurfbutton').click(function() {
         throwing();
     }); 
-    $("#keintreffervideo").on('ended',function(){
-        nohitend();
+    $('.video').on('ended',function(){
+        videoend();
     });
-    $("#aufbauvideo").on('ended',function(){
-        preparingend();
-    });
-    $("#stopvideo").on('ended',function(){
-        hidevideos();
-    });
-    hidevideos();
+    $('.video').hide();
 });
 
 function preparing(){
-    playpreperation();
-}
-
-function preparingend(){
-    hidevideos();
+    playvideo('preperation');
 }
 
 function throwing(){
-    console.log("Werfen!");
     if(Math.random()<0.25){
-        playhit();
-        runningtime = Math.random() * 4 + 2 + 2.8;
-        setTimeout(() => { shoutstop(); }, runningtime * 1000);
+        playvideo('hit');
+        runningtime = Math.random() * 4 + 2 + 2.5;
+        setTimeout(() => { playvideo('stop'); }, runningtime * 1000);
     }else{
-        playnohit();
+        playvideo('nohit');
     }
 };
 
-function shoutstop(){
-    $("#treffervideo").trigger('stop');
-    $("#treffervideo").attr('currentTime', 0);
-    hidevideos();
-    playstop();
+function playvideo(videofolder){
+    // Abort all previously playing videos
+    $('.video').trigger('stop');
+    $('.video').attr('currentTime', 0);
+    $('.video').hide();
+    
+    switch(videofolder){
+        case 'preperation':
+            video = $('#aufbauvideo');
+            break;
+        case 'hit':
+            video = $('#treffervideo');
+            break;
+        case 'nohit':
+            video = $('#keintreffervideo');
+            break;
+        case 'stop':
+            video = $('#keintreffervideo');
+            break;
+        default:
+            video = null;
+            break;
+    }
+    video.show().trigger('play');
+    return video;
 }
-
-function nohitend(){
-    hidevideos();
-}
-
-function playhit(){
-    $("#treffervideo").show().trigger('play');
-}
-
-function playnohit(){
-    $("#keintreffervideo").show().trigger('play');
-}
-
-function playpreperation(){
-    $("#aufbauvideo").show().trigger('play');
-}
-
-function playstop(){
-    $("#stopvideo").show().trigger('play');
-}
-
-function hidevideos(){
-    $("#treffervideo").hide();
-    $("#keintreffervideo").hide();
-    $("#aufbauvideo").hide();
-    $("#stopvideo").hide();
-}
-
-console.log("Flunkyball-Simulator geladen");
