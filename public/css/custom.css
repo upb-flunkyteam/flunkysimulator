@@ -7,3 +7,13 @@
   width: 100%    !important;
   height: auto   !important;
 }
+
+#mainvideobox {
+    padding-left: 0px;
+    padding-right: 0px;
+
+}
+
+.box {
+    padding: 10px;
+}

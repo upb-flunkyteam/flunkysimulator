@@ -1,22 +1,35 @@
 doctype html
 head
-  title Flunkyballsimulator
-  meta(charset='UTF-8')
-  link(href='css/bootstrap-theme.css' rel='stylesheet' type='text/css')
-  link(href='css/bootstrap.css' rel='stylesheet' type='text/css')
-  link(href='css/custom.css' rel='stylesheet' type='text/css')
-.row
-  .col-md-2
-    .btn-group-vertical
-      button#aufbaubutton.btn Aufbauen
-      button#wurfbutton.btn.btn-info Werfen
-    h2 Notizen
-    textarea.form-control(rows=15)
-  #mainvideobox.col-md-10
-    video#treffervideo.fluidvideo.video(src='video/hit/treffer3.webm') Getroffen!
-    video#keintreffervideo.fluidvideo.video(src='video/nohit/keintreffer1.webm') Nicht getroffen!
-    video#aufbauvideo.fluidvideo.video(src='video/preperation/aufstellen.webm') Wird aufgebaut...
-    video#stopvideo.fluidvideo.video(src='video/stop/stop.webm') Stop!
+    title Flunkyballsimulator
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    link(href='css/bootstrap-theme.css' rel='stylesheet' type='text/css')
+    link(href='css/bootstrap.css' rel='stylesheet' type='text/css')
+    link(href='css/custom.css' rel='stylesheet' type='text/css')
+.container-fluid
+    .row
+        .col-md-2
+            .box
+                h2 Aktionen
+                .btn-group-vertical
+                    button#aufbaubutton.btn.btn-info Aufbauen
+                    button#wurfbutton.btn.btn-info Werfen
+                h2 Notizen
+                textarea.form-control(rows=15)
+        #mainvideobox.col-md-7
+            video#treffervideo.fluidvideo.video(src='video/hit/treffer3.webm') Getroffen!
+            video#keintreffervideo.fluidvideo.video(src='video/nohit/keintreffer1.webm') Nicht getroffen!
+            video#aufbauvideo.fluidvideo.video(src='video/preperation/aufstellen.webm') Wird aufgebaut...
+            video#stopvideo.fluidvideo.video(src='video/stop/stop.webm') Stop!
+        .col-md-3
+            .box
+                h2 Chat
+                form.box
+                    .form-group
+                        label(for="username") Benutzername
+                        input#username.form-control(type="text" placeholder="Jesus")
+                    button.btn.btn-default(type="submit") Benutzernamen ändern
+                textarea.form-control(rows=15)
 // Optional JavaScript
 script(src='js/jquery-2.2.4.js' type='text/javascript')
 script(src='js/bootstrap.min.js' type='text/javascript')
