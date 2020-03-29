@@ -58,7 +58,7 @@ function playvideo(videofolder){
 }
 
 function stopvideos(){
-    $('.video').trigger('stop');
+    $('.video').trigger('pause');
     $('.video').attr('currentTime', 0);
     $('.video').hide();
 }
