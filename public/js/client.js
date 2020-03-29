@@ -28,7 +28,12 @@ function throwing(){
         runningtime = Math.random() * 4 + 2 + 2.5;
         setTimeout(() => { playvideo('stop'); }, runningtime * 1000);
     }else{
-        playvideo('nohit');
+        if(Math.random()<0.15){
+            playvideo('close');
+        }else{
+            playvideo('nohit');
+        }
+        
     }
 };
 
@@ -38,21 +43,24 @@ function playvideo(videofolder){
     
     switch(videofolder){
         case 'preparation':
-            video = $('.preparation.video1');
+            videos = $('.preparation');
             break;
         case 'hit':
-            video = $('.hit.video1');
+            videos = $('.hit');
             break;
         case 'nohit':
-            video = $('.nohit.video1');
+            videos = $('.nohit');
+            break;
+        case 'close':
+            videos = $('.close');
             break;
         case 'stop':
-            video = $('.stop.video1');
+            videos = $('.stop');
             break;
         default:
-            video = null;
-            break;
+            return null;
     }
+    const video = videos[Math.floor(Math.random() * videos.length)];
     video.show().trigger('play');
     return video;
 }
