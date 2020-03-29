@@ -38,16 +38,16 @@ function playvideo(videofolder){
     
     switch(videofolder){
         case 'preperation':
-            video = $('#aufbauvideo');
+            video = $('.preperation.video1');
             break;
         case 'hit':
-            video = $('#treffervideo');
+            video = $('.hit.video1');
             break;
         case 'nohit':
-            video = $('#keintreffervideo');
+            video = $('.nohit.video1');
             break;
         case 'stop':
-            video = $('#stopvideo');
+            video = $('.stop.video1');
             break;
         default:
             video = null;

@@ -17,18 +17,18 @@ head
                 h2 Notizen
                 textarea.form-control(rows=15)
         #mainvideobox.col-md-7
-            video#treffervideo.fluidvideo.video(src='video/hit/treffer3.webm') Getroffen!
-            video#keintreffervideo.fluidvideo.video(src='video/nohit/keintreffer1.webm') Nicht getroffen!
-            video#aufbauvideo.fluidvideo.video(src='video/preperation/aufstellen.webm') Wird aufgebaut...
-            video#stopvideo.fluidvideo.video(src='video/stop/stop.webm') Stop!
+            video.hit.video1.fluidvideo.video(src='video/hit/treffer3.webm') Getroffen!
+            video.nohit.video1.fluidvideo.video(src='video/nohit/keintreffer1.webm') Nicht getroffen!
+            video.prepration.video1.fluidvideo.video(src='video/preperation/aufstellen.webm') Wird aufgebaut...
+            video.stop.video1.fluidvideo.video(src='video/stop/stop.webm') Stop!
         .col-md-3
             .box
                 h2 Chat
-                form.box
+                .box
                     .form-group
                         label(for="username") Benutzername
                         input#username.form-control(type="text" placeholder="Jesus")
-                    button.btn.btn-default(type="submit") Benutzernamen ändern
+                    button.btn.btn-default Benutzernamen ändern
                 textarea.form-control(rows=15)
 // Optional JavaScript
 script(src='js/jquery-2.2.4.js' type='text/javascript')
