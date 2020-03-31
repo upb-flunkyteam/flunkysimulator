@@ -141,9 +141,11 @@ function playvideo(videofolder) {
 }
 
 function stopvideos() {
-    $('.video').trigger('pause');
-    $('.video').attr('currentTime', 0);
-    $('.video').hide();
+    $('.video').each(function(key, value){
+        value.pause();
+        value.currentTime = 0;
+        $(value).hide();
+    });
 }
 
 function updateActionButtonDisplay() {
