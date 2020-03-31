@@ -11,29 +11,38 @@ head
         .col-md-2
             .box
                 h2 Aktionen
-                .btn-group-vertical
-                    button#aufbaubutton.btn.btn-info Aufbauen
-                    button#wurfbutton.btn.btn-info Werfen
+                .box
+                    button#preparebutton.btn.btn-default Aufbauen
+                .box
+                    .btn-group-vertical
+                        button#softthrowbutton.btn.btn-default Vorsichtig werfen
+                        button#mediumthrowbutton.btn.btn-default Werfen
+                        button#hardthrowbutton.btn.btn-default Kräftig werfen
                 h2 Notizen
                 textarea.form-control(rows=15)
-        #mainvideobox.col-md-7
-            video.hit.video1.fluidvideo.video(src='video/hit/jonas1.webm') Getroffen!
-            video.hit.video2.fluidvideo.video(src='video/hit/stefan1.webm') Getroffen!
-            video.hit.video3.fluidvideo.video(src='video/hit/elisa1.webm') Getroffen!
-            video.hit.video4.fluidvideo.video(src='video/hit/jonas2.webm') Getroffen!
-            video.nohit.video1.fluidvideo.video(src='video/nohit/jonas1.webm') Nicht getroffen!
-            video.nohit.video2.fluidvideo.video(src='video/nohit/stefan1.webm') Nicht getroffen!
-            video.nohit.video3.fluidvideo.video(src='video/nohit/stefan2.webm') Nicht getroffen!
-            video.nohit.video4.fluidvideo.video(src='video/nohit/elisa1.webm') Nicht getroffen!
-            video.nohit.video5.fluidvideo.video(src='video/nohit/elisa2.webm') Nicht getroffen!
-            video.nohit.video6.fluidvideo.video(src='video/nohit/elisa3.webm') Nicht getroffen!
-            video.nohit.video7.fluidvideo.video(src='video/nohit/elisa4.webm') Nicht getroffen!
-            video.closenohit.video1.fluidvideo.video(src='video/closenohit/elisa1.webm') Nicht getroffen!
-            video.preparation.video1.fluidvideo.video(src='video/preparation/jonas1.webm') Wird aufgebaut...
-            video.stop.video1.fluidvideo.video(src='video/stop/jan1.webm') Stop!
+        .col-md-7
+            .box
+                .btn-group.btn-group-lg.btn-group-centered(role='group')
+                    button#teamadisplay.btn Mannschaft Oben
+                    button#teambdisplay.btn Mannschaft Unten
+            #mainvideobox
+                    video.hit.video1.fluidvideo.video(src='video/hit/jonas1.webm') Getroffen!
+                    video.hit.video2.fluidvideo.video(src='video/hit/stefan1.webm') Getroffen!
+                    video.hit.video3.fluidvideo.video(src='video/hit/elisa1.webm') Getroffen!
+                    video.hit.video4.fluidvideo.video(src='video/hit/jonas2.webm') Getroffen!
+                    video.nohit.video1.fluidvideo.video(src='video/nohit/jonas1.webm') Nicht getroffen!
+                    video.nohit.video2.fluidvideo.video(src='video/nohit/stefan1.webm') Nicht getroffen!
+                    video.nohit.video3.fluidvideo.video(src='video/nohit/stefan2.webm') Nicht getroffen!
+                    video.nohit.video4.fluidvideo.video(src='video/nohit/elisa1.webm') Nicht getroffen!
+                    video.nohit.video5.fluidvideo.video(src='video/nohit/elisa2.webm') Nicht getroffen!
+                    video.nohit.video6.fluidvideo.video(src='video/nohit/elisa3.webm') Nicht getroffen!
+                    video.nohit.video7.fluidvideo.video(src='video/nohit/elisa4.webm') Nicht getroffen!
+                    video.closenohit.video1.fluidvideo.video(src='video/closenohit/elisa1.webm') Nicht getroffen!
+                    video.preparation.video1.fluidvideo.video(src='video/preparation/jonas1.webm') Wird aufgebaut...
+                    video.stop.video1.fluidvideo.video(src='video/stop/jan1.webm') Stop!
         .col-md-3
             .box
-                h2 Chat
+                h2 Chat (deaktiviert)
                 .box
                     .form-group
                         label(for="username") Benutzername

@@ -6,42 +6,115 @@
 
 console.log("Starte Flunkyball-Simulator");
 jQuery(window).load(function () {
-    $('#aufbaubutton').click(function() {
-        preparing();
-    }); 
-    $('#wurfbutton').click(function() {
-        throwing();
-    }); 
-    $('.video').on('ended',function(){
+    $('#preparebutton').click(function () {
+        if (actionButtonsEnabled) {
+            preparing();
+        }
+    });
+    $('#softthrowbutton').click(function () {
+        if (actionButtonsEnabled) {
+            throwing('soft');
+        }
+    });
+    $('#mediumthrowbutton').click(function () {
+        if (actionButtonsEnabled) {
+            throwing('medium');
+        }
+    });
+    $('#hardthrowbutton').click(function () {
+        if (actionButtonsEnabled) {
+            throwing('hard');
+        }
+    });
+    $('#teamadisplay, #teambdisplay').click(function () {
+        if (actionButtonsEnabled) {
+            switchTeams();
+        }
+    });
+    $('.video').on('ended', function () {
         stopvideos();
     });
     $('.video').hide();
+    updateTeamDisplay();
+    updateActionButtonDisplay();
 });
 
-function preparing(){
-    playvideo('preparation');
+var currentTeamA = true;
+var actionButtonsEnabled = true;
+const throwingtime = 2.5;
+const closenohitprobability = 0.15;
+
+function startAction() {
+    actionButtonsEnabled = false;
+    updateActionButtonDisplay();
 }
 
-function throwing(){
-    if(Math.random()<0.25){
-        playvideo('hit');
-        runningtime = Math.random() * 4 + 2 + 2.5;
-        setTimeout(() => { playvideo('stop'); }, runningtime * 1000);
-    }else{
-        if(Math.random()<0.15){
-            playvideo('close');
-        }else{
-            playvideo('nohit');
-        }
-        
-    }
-};
+function endAction() {
+    actionButtonsEnabled = true;
+    updateActionButtonDisplay();
+}
 
-function playvideo(videofolder){
+function preparing() {
+    startAction();
+    video = playvideo('preparation');
+    setTimeout(() => {
+        endAction();
+    }, video[0].duration * 1000);
+}
+
+function throwing(hardness) {
+    startAction();
+    switch (hardness) {
+        case 'soft':
+            probability = 0.333;
+            minimumDrinkingTime = 3;
+            maximumDrinkingTime = 3;
+            break;
+        case 'medium':
+            probability = 0.25;
+            minimumDrinkingTime = 3;
+            maximumDrinkingTime = 5;
+            break;
+        case 'hard':
+            probability = 0.15;
+            minimumDrinkingTime = 5;
+            maximumDrinkingTime = 8.333;
+            break;
+    }
+    if (Math.random() < probability) {
+        playvideo('hit');
+        runningtime = throwingtime + minimumDrinkingTime + 
+                Math.random() * (maximumDrinkingTime - minimumDrinkingTime);
+        setTimeout(() => {
+            video = playvideo('stop');
+            setTimeout(() => {
+                endAction();
+                switchTeams();
+            }, video[0].duration * 1000);
+        }, runningtime * 1000);
+    } else {
+        if (Math.random() < closenohitprobability) {
+            video = playvideo('closenohit');
+        } else {
+            video = playvideo('nohit');
+        }
+        setTimeout(() => {
+            endAction();
+            switchTeams();
+        }, video[0].duration * 1000);
+    }
+}
+
+function switchTeams() {
+    currentTeamA = !currentTeamA;
+    updateTeamDisplay();
+}
+
+function playvideo(videofolder) {
     // Abort all previously playing videos
     stopvideos();
-    
-    switch(videofolder){
+
+    switch (videofolder) {
         case 'preparation':
             videos = $('.preparation');
             break;
@@ -51,8 +124,8 @@ function playvideo(videofolder){
         case 'nohit':
             videos = $('.nohit');
             break;
-        case 'close':
-            videos = $('.close');
+        case 'closenohit':
+            videos = $('.closenohit');
             break;
         case 'stop':
             videos = $('.stop');
@@ -65,8 +138,25 @@ function playvideo(videofolder){
     return video;
 }
 
-function stopvideos(){
+function stopvideos() {
     $('.video').trigger('pause');
     $('.video').attr('currentTime', 0);
     $('.video').hide();
+}
+
+function updateActionButtonDisplay() {
+    actionButtons = $('#mediumthrowbutton, #preparebutton, #softthrowbutton, #hardthrowbutton');
+    actionButtons.prop('disabled', !actionButtonsEnabled);
+}
+
+function updateTeamDisplay() {
+    if (currentTeamA) {
+        activeteam = $('#teamadisplay');
+        inactiveteam = $('#teambdisplay');
+    } else {
+        activeteam = $('#teambdisplay');
+        inactiveteam = $('#teamadisplay');
+    }
+    activeteam.addClass('btn-info').removeClass('btn-default').prop('disabled', true);
+    inactiveteam.removeClass('btn-info').addClass('btn-default').prop('disabled', false);
 }
