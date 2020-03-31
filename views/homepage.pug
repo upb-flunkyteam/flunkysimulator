@@ -10,16 +10,20 @@ head
     .row
         .col-md-2
             .box
-                h2 Aktionen
-                .box
-                    button#preparebutton.btn.btn-default Aufbauen
-                .box
-                    .btn-group-vertical
-                        button#softthrowbutton.btn.btn-default Vorsichtig werfen
-                        button#mediumthrowbutton.btn.btn-default Werfen
-                        button#hardthrowbutton.btn.btn-default Kräftig werfen
-                h2 Notizen
-                textarea.form-control(rows=15)
+                .row
+                    .col-md-12
+                        h2 Aktionen
+                        .box
+                            button#preparebutton.btn.btn-default Aufbauen
+                        .box
+                            .btn-group-vertical
+                                button#softthrowbutton.btn.btn-default Vorsichtig werfen
+                                button#mediumthrowbutton.btn.btn-default Werfen
+                                button#hardthrowbutton.btn.btn-default Kräftig werfen
+                .row
+                    .col-md-12.hidden-xs
+                        h2 Notizen
+                        textarea.form-control(rows=15)
         .col-md-7
             .box
                 .btn-group.btn-group-lg.btn-group-centered(role='group')
@@ -40,7 +44,7 @@ head
                     video.closenohit.video1.fluidvideo.video(src='video/closenohit/elisa1.webm') Nicht getroffen!
                     video.preparation.video1.fluidvideo.video(src='video/preparation/jonas1.webm') Wird aufgebaut...
                     video.stop.video1.fluidvideo.video(src='video/stop/jan1.webm') Stop!
-        .col-md-3
+        .col-md-3.hidden-xs
             .box
                 h2 Chat (deaktiviert)
                 .box
