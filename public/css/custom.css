@@ -2,10 +2,15 @@
     Created on : Mar 22, 2020, 8:21:12 PM
     Author     : jan
 */
-.fluidvideo {
+.video {
   /* override other styles to make responsive */
   width: 100%    !important;
   height: auto   !important;
+}
+.flippedvideo {
+    transform: rotateY(180deg);
+    -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+    -moz-transform:rotateY(180deg); /* Firefox */
 }
 
 #mainvideobox {

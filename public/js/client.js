@@ -43,6 +43,7 @@ var currentTeamA = true;
 var actionButtonsEnabled = true;
 const throwingtime = 2.5;
 const closenohitprobability = 0.15;
+const videoloadtime = 300; 
 
 function startAction() {
     actionButtonsEnabled = false;
@@ -59,7 +60,8 @@ function preparing() {
     video = playvideo('preparation');
     setTimeout(() => {
         endAction();
-    }, video[0].duration * 1000);
+        switchTeams();
+    }, video[0].duration * 1000 + videoloadtime);
 }
 
 function throwing(hardness) {
@@ -83,14 +85,14 @@ function throwing(hardness) {
     }
     if (Math.random() < probability) {
         playvideo('hit');
-        runningtime = throwingtime + minimumDrinkingTime + 
+        runningtime = throwingtime + minimumDrinkingTime +
                 Math.random() * (maximumDrinkingTime - minimumDrinkingTime);
         setTimeout(() => {
             video = playvideo('stop');
             setTimeout(() => {
                 endAction();
                 switchTeams();
-            }, video[0].duration * 1000);
+            }, video[0].duration * 1000 + videoloadtime);
         }, runningtime * 1000);
     } else {
         if (Math.random() < closenohitprobability) {
@@ -101,7 +103,7 @@ function throwing(hardness) {
         setTimeout(() => {
             endAction();
             switchTeams();
-        }, video[0].duration * 1000);
+        }, video[0].duration * 1000 + videoloadtime);
     }
 }
 
@@ -159,4 +161,9 @@ function updateTeamDisplay() {
     }
     activeteam.addClass('btn-info').removeClass('btn-default').prop('disabled', true);
     inactiveteam.removeClass('btn-info').addClass('btn-default').prop('disabled', false);
+    if (currentTeamA) {
+        $('.video').addClass('flippedvideo');
+    }else{
+        $('.video').removeClass('flippedvideo');
+    }
 }
