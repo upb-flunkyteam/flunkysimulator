@@ -68,17 +68,17 @@ function throwing(hardness) {
     startAction();
     switch (hardness) {
         case 'soft':
-            probability = 0.333;
+            probability = 0.666;
             minimumDrinkingTime = 3;
             maximumDrinkingTime = 3;
             break;
         case 'medium':
-            probability = 0.25;
+            probability = 0.5;
             minimumDrinkingTime = 3;
             maximumDrinkingTime = 5;
             break;
         case 'hard':
-            probability = 0.15;
+            probability = 0.3;
             minimumDrinkingTime = 5;
             maximumDrinkingTime = 8.333;
             break;
