@@ -126,4 +126,4 @@ temp/
 # End of https://www.gitignore.io/api/node
 
 
-public/video
+client/public/video
