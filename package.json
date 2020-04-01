@@ -27,6 +27,6 @@
     },
     "scripts": {
         "start": "node client/webserver.js",
-        "build": "webpack --config client/webpack.config.js"
+        "build": "webpack --config client/webpack.config.js --mode=development"
     }
 }

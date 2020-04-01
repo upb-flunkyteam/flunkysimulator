@@ -5,10 +5,9 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {ThrowReq, ThrowResp} = require('./flunkyprotocol_pb');
+const {ThrowReq, ThrowResp, EnumThrowStrength} = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
-
-var simulatorClient = new SimulatorClient('http://localhost:4242');
+var server = null;
 
 jQuery(window).load(function () {
     $('#preparebutton').click(function () {
@@ -18,17 +17,17 @@ jQuery(window).load(function () {
     });
     $('#softthrowbutton').click(function () {
         if (actionButtonsEnabled) {
-            throwing('soft');
+            throwing(EnumThrowStrength.SOFT);
         }
     });
     $('#mediumthrowbutton').click(function () {
         if (actionButtonsEnabled) {
-            throwing('medium');
+            throwing(EnumThrowStrength.MEDIUM);
         }
     });
     $('#hardthrowbutton').click(function () {
         if (actionButtonsEnabled) {
-            throwing('hard');
+            throwing(EnumThrowStrength.HARD);
         }
     });
     $('#teamadisplay, #teambdisplay').click(function () {
@@ -42,6 +41,7 @@ jQuery(window).load(function () {
     $('.video').hide();
     updateTeamDisplay();
     updateActionButtonDisplay();
+    server = new SimulatorClient('http://localhost:4242');
 });
 
 var currentTeamA = true;
@@ -69,47 +69,18 @@ function preparing() {
     }, video[0].duration * 1000 + videoloadtime);
 }
 
-function throwing(hardness) {
-    startAction();
-    switch (hardness) {
-        case 'soft':
-            probability = 0.666;
-            minimumDrinkingTime = 3;
-            maximumDrinkingTime = 3;
-            break;
-        case 'medium':
-            probability = 0.5;
-            minimumDrinkingTime = 3;
-            maximumDrinkingTime = 5;
-            break;
-        case 'hard':
-            probability = 0.3;
-            minimumDrinkingTime = 5;
-            maximumDrinkingTime = 8.333;
-            break;
-    }
-    if (Math.random() < probability) {
-        playvideo('hit');
-        runningtime = throwingtime + minimumDrinkingTime +
-                Math.random() * (maximumDrinkingTime - minimumDrinkingTime);
-        setTimeout(() => {
-            video = playvideo('stop');
-            setTimeout(() => {
-                endAction();
-                switchTeams();
-            }, video[0].duration * 1000 + videoloadtime);
-        }, runningtime * 1000);
-    } else {
-        if (Math.random() < closenohitprobability) {
-            video = playvideo('closenohit');
+function throwing(strength) {
+    var throwRequest = new ThrowReq();
+    throwRequest.setPlayername($('#username').text());
+    throwRequest.setStrength(strength);
+    server.throw(throwRequest, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
         } else {
-            video = playvideo('nohit');
+            console.log(response.getMessage());
         }
-        setTimeout(() => {
-            endAction();
-            switchTeams();
-        }, video[0].duration * 1000 + videoloadtime);
-    }
+    });
 }
 
 function switchTeams() {
