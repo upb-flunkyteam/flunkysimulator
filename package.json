@@ -17,7 +17,16 @@
         "path": "^0.12.7",
         "pug": "^2.0.4"
     },
+    "devDependencies": {
+        "@grpc/proto-loader": "^0.3.0",
+        "google-protobuf": "^3.6.1",
+        "grpc": "^1.15.0",
+        "grpc-web": "^1.0.0",
+        "webpack": "^4.16.5",
+        "webpack-cli": "^3.1.0"
+    },
     "scripts": {
-        "start": "node index.js"
+        "start": "node client/webserver.js",
+        "build": "webpack --config client/webpack.config.js"
     }
 }

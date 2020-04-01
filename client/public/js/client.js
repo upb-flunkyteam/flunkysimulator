@@ -5,6 +5,11 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
+const {ThrowReq, ThrowResp} = require('./flunkyprotocol_pb');
+const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
+
+var simulatorClient = new SimulatorClient('http://localhost:4242');
+
 jQuery(window).load(function () {
     $('#preparebutton').click(function () {
         if (actionButtonsEnabled) {
