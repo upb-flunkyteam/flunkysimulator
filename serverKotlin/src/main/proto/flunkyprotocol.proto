@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package endpoints.flunky.simulator;
+
+option java_multiple_files = true;
+option java_outer_classname = "SimulatorProto";
+option java_package = "de.flunkyteam.endpoints.projects.simulator";
+
+
+// A simple Flunkyball API.
+//
+// The API manages throws and teams. Teams contain players.
+service Simulator {
+
+	rpc Throw(ThrowReq) returns (ThrowResp);
+	
+	rpc RegisterPlayer(RegisterPlayerReq) returns (RegisterPlayerResp);
+	
+	rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
+	
+	// resets Strafbier counter, Abgaben, shuffles teams 
+	// and plays prepare game clip afterwards
+	rpc ResetGame(ResetGameReq) returns (ResetGameResp);
+	
+	rpc SelectThrowingPlayer(SelectThrowingPlayerReq) returns (SelectThrowingPlayerResp);
+
+	rpc SendMessage(SendMessageReq) returns (SendMessageResp);
+
+	rpc StreamState(StreamStateReq) returns (stream StreamStateResp);
+	
+	rpc StreamEvents(StreamEventsReq) returns (stream StreamEventsResp);
+	
+	rpc StreamLog(LogReq) returns (stream LogResp);
+
+}
+
+message LogResp{
+	string content = 1;
+}
+
+message LogReq{}
+
+message StreamEventsResp{
+	Event event = 1;
+}
+
+message StreamEventsReq{}
+
+message StreamStateResp{
+	GameState state = 1;
+}
+
+message StreamStateReq {}
+
+message SelectThrowingPlayerResp {}
+
+message SelectThrowingPlayerReq{
+	string playerName = 1;
+	string targeName = 2;
+}
+
+message SendMessageResp{}
+
+message SendMessageReq{
+	string playerName = 1;
+	string content = 2;
+}
+
+message ResetGameResp {}
+
+message ResetGameReq{
+	string playerName = 1;
+}
+
+
+message KickPlayerResp{};
+
+message KickPlayerReq{
+	string playerName = 1;
+	string targeName = 2;
+}
+
+
+message RegisterPlayerResp{}
+
+message RegisterPlayerReq{
+	string playerName = 1;
+}
+
+message ThrowReq{
+	string playerName = 1;
+	EnumThrowStrength strength = 2;
+}
+
+message ThrowResp{
+	bool success = 1;
+}
+
+
+message Event{
+	oneof event_oneof {
+		PrepareVideoEvent prepareVideo = 1;
+		PlayVideosEvent playVideos = 2;
+  }
+}
+
+message PrepareVideoEvent{
+	repeated string url = 1;
+}
+
+message PlayVideosEvent{
+	repeated TimedVideo videos = 1;
+}
+
+message TimedVideo{
+	int64 delay =1;
+	string url = 2;
+	bool mirrored = 3;
+}
+
+message GameState{
+	repeated Player playerTeamA = 1;
+	repeated Player playerTeamB = 2;
+	string throwingPlayer = 3;
+	int64 strafbierTeamA = 4;
+	int64 strafbierTeamB = 5;
+}
+
+message Player{
+	string name = 1;
+	bool abgegeben = 2;
+	bool spectator = 3;
+}
+
+
+enum EnumThrowStrength {
+  UNKNOWN = 0;
+  SOFT = 1;
+  MEDIUM = 2;
+  HARD = 3;
+}
