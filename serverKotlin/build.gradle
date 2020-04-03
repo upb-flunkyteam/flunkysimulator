@@ -50,9 +50,9 @@ protobuf {
     }
 }
 
-startScripts.enabled = false
+startScripts.enabled = true
 application {
-    mainClassName = 'simulator.MainKt'
+    mainClassName = 'simulator.ServerStarter'
 }
 
 /*

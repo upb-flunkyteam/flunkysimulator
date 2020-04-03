@@ -1,11 +1,7 @@
-
-
 package simulator
 
 import de.flunkyteam.endpoints.projects.simulator.*
-import io.grpc.ServerBuilder
 import io.grpc.stub.StreamObserver
-
 
 class FlunkyServer(): SimulatorGrpc.SimulatorImplBase() {
 
@@ -48,17 +44,3 @@ class FlunkyServer(): SimulatorGrpc.SimulatorImplBase() {
         super.streamLog(request, responseObserver)
     }
 }
-
-
-fun main(args: Array<String>) {
-    var server = ServerBuilder.forPort(80).addService(FlunkyServer()).build();
-
-    server.start()
-
-    println("Starting Server")
-
-    println("Press any key to cancel")
-    readLine()
-
-}
-
