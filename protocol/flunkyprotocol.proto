@@ -121,15 +121,15 @@ message TimedVideo{
 message GameState{
 	repeated Player playerTeamA = 1;
 	repeated Player playerTeamB = 2;
-	string throwingPlayer = 3;
-	int64 strafbierTeamA = 4;
-	int64 strafbierTeamB = 5;
+	repeated Player spectators = 3;
+	string throwingPlayer = 10;
+	int64 strafbierTeamA = 11;
+	int64 strafbierTeamB = 12;
 }
 
 message Player{
 	string name = 1;
 	bool abgegeben = 2;
-	bool spectator = 3;
 }
 
 
