@@ -5,16 +5,11 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {ThrowReq, ThrowResp, EnumThrowStrength} = require('./flunkyprotocol_pb');
+const {ThrowReq, ThrowResp, EnumThrowStrength, GameState} = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
-var server = null;
+var simulatorClient = null;
 
 jQuery(window).load(function () {
-    $('#preparebutton').click(function () {
-        if (actionButtonsEnabled) {
-            preparing();
-        }
-    });
     $('#softthrowbutton').click(function () {
         if (actionButtonsEnabled) {
             throwing(EnumThrowStrength.SOFT);
@@ -41,14 +36,11 @@ jQuery(window).load(function () {
     $('.video').hide();
     updateTeamDisplay();
     updateActionButtonDisplay();
-    server = new SimulatorClient('http://localhost:4242');
+    simulatorClient = new SimulatorClient('http://viings.de:8080');
 });
 
 var currentTeamA = true;
 var actionButtonsEnabled = true;
-const throwingtime = 2.5;
-const closenohitprobability = 0.15;
-const videoloadtime = 300; 
 
 function startAction() {
     actionButtonsEnabled = false;
@@ -60,20 +52,11 @@ function endAction() {
     updateActionButtonDisplay();
 }
 
-function preparing() {
-    startAction();
-    video = playvideo('preparation');
-    setTimeout(() => {
-        endAction();
-        switchTeams();
-    }, video[0].duration * 1000 + videoloadtime);
-}
-
 function throwing(strength) {
     var throwRequest = new ThrowReq();
     throwRequest.setPlayername($('#username').text());
     throwRequest.setStrength(strength);
-    server.throw(throwRequest, {}, function(err, response) {
+    simulatorClient.throw(throwRequest, {}, function(err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -81,6 +64,10 @@ function throwing(strength) {
             console.log(response.getMessage());
         }
     });
+}
+
+function processNewState(state){
+    console.log(state.getThrowingPlayer());
 }
 
 function switchTeams() {
