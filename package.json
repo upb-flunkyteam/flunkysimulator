@@ -22,8 +22,8 @@
         "google-protobuf": "^3.6.1",
         "grpc": "^1.15.0",
         "grpc-web": "^1.0.0",
-        "webpack": "^4.16.5",
-        "webpack-cli": "^3.1.0"
+        "webpack": "^4.42.1",
+        "webpack-cli": "^3.3.11"
     },
     "scripts": {
         "start": "node client/webserver.js",
