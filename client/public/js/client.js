@@ -5,7 +5,7 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {ThrowReq, ThrowResp, EnumThrowStrength} = require('./flunkyprotocol_pb');
+const {ThrowReq, ThrowResp, EnumThrowStrength, GameState} = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
 
@@ -64,6 +64,10 @@ function throwing(strength) {
             console.log(response.getMessage());
         }
     });
+}
+
+function processNewState(state){
+    console.log(state.getThrowingPlayer());
 }
 
 function switchTeams() {
