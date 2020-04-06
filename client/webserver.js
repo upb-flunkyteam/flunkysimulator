@@ -19,7 +19,7 @@ async function getFiles(dir, printdir) {
   const files = await Promise.all(dirents.map((dirent) => {
     const res = join(dir, dirent.name);
     const printres = join(printdir, dirent.name);
-    return dirent.isDirectory() ? getFiles(res, printres) : dirent.name.split('.').pop() === 'mp4' ? printres : null;
+    return dirent.isDirectory() ? getFiles(res, printres) : dirent.name.split('.').pop() === 'webm' ? printres : null;
   }));
   return Array.prototype.concat(...files).filter(n => n);
 }
