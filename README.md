@@ -24,3 +24,15 @@ Die javascript-resourcen aus commonJS zusammenbauen
 Aus protobuffer-Definitionen die commonJS-Bindings generieren
 
 `protoc -I=./protocol flunkyprotocol.proto --js_out=import_style=commonjs:./client/public/js/ --grpc-web_out=mode=grpcwebtext:./client/public/js/`
+
+### Server
+
+Server bauen und starten im *./kotlinServer* Verzeichnis
+
+`./gradlew run`
+
+Befehlt um den [Go-Proxy](https://github.com/improbable-eng/grpc-web/tree/master/go/grpcwebproxy) zu starten
+
+`./grpcwebproxy-v0.12.0-linux-x86_64 --backend_addr=localhost:11049 --allow_all_origins --run_tls_server=false`
+
+[tmux cheat sheet](https://tmuxcheatsheet.com)
