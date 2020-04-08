@@ -9,4 +9,5 @@ data class Team(val players: List<Player> = emptyList(),
     fun removePlayer(name: String) = this.copy(players = players.filter { player -> player.name != name})
 
     fun addPlayer(player: Player) = this.copy(players = players + player)
+
 }

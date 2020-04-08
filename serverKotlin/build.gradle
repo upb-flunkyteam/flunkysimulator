@@ -18,6 +18,7 @@ repositories {
     jcenter()
     mavenCentral()
     mavenLocal()
+    maven { url 'https://jitpack.io' }
 }
 
 // IMPORTANT: You probably want the non-SNAPSHOT version of gRPC. Make sure you
@@ -38,6 +39,8 @@ dependencies {
     testImplementation "io.grpc:grpc-testing:${grpcVersion}" // gRCP testing utilities
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.28.2"
+
+    implementation 'com.github.stuhlmeier:kotlin-events:v2.0'
 }
 
 protobuf {

@@ -2,6 +2,8 @@ package simulator
 
 import io.grpc.Server
 import io.grpc.ServerBuilder
+import simulator.control.GameController
+import simulator.view.FlunkyServer
 import java.io.IOException
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -20,7 +22,7 @@ class ServerStarter {
         /* The port on which the server should run */
         val port = 11049
         server = ServerBuilder.forPort(port)
-            .addService(FlunkyServer())
+            .addService(FlunkyServer(GameController()))
             .build()
             .start()
         logger.log(Level.INFO, "Server started, listening on {0}", port)

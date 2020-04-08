@@ -1,9 +1,8 @@
-package simulator
+package simulator.view
 
 import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.stub.StreamObserver
 import simulator.control.GameController
-import simulator.control.registerPlayer
 
 class FlunkyServer(private val gameController: GameController): SimulatorGrpc.SimulatorImplBase() {
 
@@ -47,7 +46,22 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
     }
 
     override fun streamState(request: StreamStateReq?, responseObserver: StreamObserver<StreamStateResp>?) {
-        super.streamState(request, responseObserver)
+        responseObserver?.onNext(
+            StreamStateResp.newBuilder()
+            .setState(gameController.state.toGRPC())
+            .build())
+
+        gameController.newGameStateEvent += { (gameState) ->
+            try {
+                responseObserver?.onNext(
+                    StreamStateResp.newBuilder()
+                        .setState(gameState.toGRPC())
+                        .build()
+                )
+            }finally {
+
+            }
+        }
     }
 
     override fun streamEvents(request: StreamEventsReq?, responseObserver: StreamObserver<StreamEventsResp>?) {
