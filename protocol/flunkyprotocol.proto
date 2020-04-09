@@ -14,6 +14,8 @@ service Simulator {
 
 	rpc Throw(ThrowReq) returns (ThrowResp);
 	
+	rpc Abgegeben(AbgegebenReq) returns (AbgegebenResp);
+	
 	rpc RegisterPlayer(RegisterPlayerReq) returns (RegisterPlayerResp);
 	
 	rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
@@ -23,6 +25,8 @@ service Simulator {
 	rpc ResetGame(ResetGameReq) returns (ResetGameResp);
 	
 	rpc SelectThrowingPlayer(SelectThrowingPlayerReq) returns (SelectThrowingPlayerResp);
+	
+	rpc ModifyStrafbierCount(ModifyStrafbierCountReq) return (ModifyStrafbierCountResp);
 
 	rpc SendMessage(SendMessageReq) returns (SendMessageResp);
 
@@ -59,6 +63,13 @@ message SelectThrowingPlayerReq{
 	string targeName = 2;
 }
 
+message ModifyStrafbierCountResp{}
+
+message ModifyStrafbierCountReq{
+	string playerName = 1;
+	EnumTeams targetTeam = 2;
+	bool increment = 3;
+
 message SendMessageResp{}
 
 message SendMessageReq{
@@ -85,6 +96,14 @@ message RegisterPlayerResp{}
 
 message RegisterPlayerReq{
 	string playerName = 1;
+}
+
+message AbgegebenResp{};
+
+message AbgegebenReq{
+	string playerName = 1;
+	string targeName = 2;
+	bool setTo = 3;
 }
 
 message ThrowReq{
@@ -138,4 +157,11 @@ enum EnumThrowStrength {
   SOFT = 1;
   MEDIUM = 2;
   HARD = 3;
+}
+
+enum EnumTeams{
+  UNKNOWN = 0;
+  SPECTATOR = 1;
+  TEAM_A = 2;
+  TEAM_B =3;
 }
