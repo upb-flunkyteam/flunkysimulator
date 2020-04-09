@@ -1,13 +1,31 @@
 package simulator.model
 
 data class Team(val players: List<Player> = emptyList(),
-                val nextThrowingPlayer: Player? = null,
-                val strafbiere: Int = 0) {
+                val strafbiere: Int = 0) : List<Player> by players {
 
-     fun playerCount(): Int = players.size
+    fun playerCount(): Int = players.count()
 
     fun removePlayer(name: String) = this.copy(players = players.filter { player -> player.name != name})
 
     fun addPlayer(player: Player) = this.copy(players = players + player)
+
+    fun getNextThrowingPlayer(previousThrower: Player?): Player? {
+        val inGamePlayersWithIndex = players
+            .mapIndexed { index, player -> player to index }
+            .filter { p -> !p.first.abgegeben }
+
+        if (!players.contains(previousThrower)){
+            return inGamePlayersWithIndex.firstOrNull()?.first
+        }
+
+        val indexOfLast = players.indexOf(previousThrower)
+
+        if (inGamePlayersWithIndex.isEmpty())
+            return null
+
+        return (inGamePlayersWithIndex.firstOrNull { (_,i) -> i > indexOfLast }
+            ?: inGamePlayersWithIndex.first())
+            .first
+    }
 
 }

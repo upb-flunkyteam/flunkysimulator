@@ -9,7 +9,10 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
     //todo register listner
 
     override fun throw_(request: ThrowReq?, responseObserver: StreamObserver<ThrowResp>?) {
-        super.throw_(request, responseObserver)
+        gameController.throwBall(request!!.playerName,request.strength)
+
+        responseObserver?.onNext(ThrowResp.getDefaultInstance())
+        responseObserver?.onCompleted()
     }
 
     override fun registerPlayer(request: RegisterPlayerReq?, responseObserver: StreamObserver<RegisterPlayerResp>?) {
@@ -42,7 +45,10 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
         request: SelectThrowingPlayerReq?,
         responseObserver: StreamObserver<SelectThrowingPlayerResp>?
     ) {
-        super.selectThrowingPlayer(request, responseObserver)
+        gameController.forceThrowingPlayer(request!!.targeName)
+
+        responseObserver?.onNext(SelectThrowingPlayerResp.getDefaultInstance())
+        responseObserver?.onCompleted()
     }
 
     override fun sendMessage(request: SendMessageReq?, responseObserver: StreamObserver<SendMessageResp>?) {
@@ -52,7 +58,7 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
     override fun streamState(request: StreamStateReq?, responseObserver: StreamObserver<StreamStateResp>?) {
         responseObserver?.onNext(
             StreamStateResp.newBuilder()
-            .setState(gameController.state.toGRPC())
+            .setState(gameController.gameState.toGRPC())
             .build())
 
         gameController.newGameStateEvent += { (gameState) ->

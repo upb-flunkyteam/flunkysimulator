@@ -1,4 +1,4 @@
 package simulator.model
 
-data class RoundState(val throwingTeam: Team? = null) {
+data class RoundState(val throwingPlayer: Player? = null) {
 }

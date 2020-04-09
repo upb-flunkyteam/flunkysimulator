@@ -5,8 +5,7 @@ data class GameState(
     val TeamA: Team = Team(),
     val TeamB: Team = Team(),
     val Spectators: List<Player> = emptyList(),
-    val roundState: RoundState = RoundState(),
-    val throwingPlayer: Player? = null
+    val roundState: RoundState = RoundState()
 ) {
     val players: Sequence<Player>
         get() = Spectators.asSequence() + TeamA.players.asSequence() + TeamB.players.asSequence()
@@ -39,8 +38,16 @@ data class GameState(
 
     fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name}
 
+    fun getTeamOfPlayer(player: Player) = when {
+        TeamA.contains(player) -> TeamA
+        TeamB.contains(player) -> TeamB
+        else -> null
+    }
+
+    fun getOtherTeam(team: Team) = if (team == TeamA) TeamB else TeamA
+
     fun toGRPC() = de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
-        .setThrowingPlayer(throwingPlayer?.name?:"")
+        .setThrowingPlayer(roundState.throwingPlayer?.name?:"")
         .addAllPlayerTeamA(TeamA.players.toGRPC())
         .setStrafbierTeamA(TeamA.strafbiere.toLong())
         .addAllPlayerTeamB(TeamB.players.toGRPC())
