@@ -13,7 +13,7 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
     }
 
     override fun registerPlayer(request: RegisterPlayerReq?, responseObserver: StreamObserver<RegisterPlayerResp>?) {
-        val name = request!!.playerName;
+        val name = request!!.playerName
 
         gameController.registerPlayer(name)
 
@@ -26,12 +26,16 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
 
         gameController.removePlayer(name)
 
-        responseObserver!!.onNext(KickPlayerResp.getDefaultInstance())
-        responseObserver.onCompleted()
+        responseObserver?.onNext(KickPlayerResp.getDefaultInstance())
+        responseObserver?.onCompleted()
     }
 
     override fun resetGame(request: ResetGameReq?, responseObserver: StreamObserver<ResetGameResp>?) {
-        super.resetGame(request, responseObserver)
+
+        gameController.resetGameAndShuffleTeams()
+
+        responseObserver?.onNext(ResetGameResp.getDefaultInstance())
+        responseObserver?.onCompleted()
     }
 
     override fun selectThrowingPlayer(
