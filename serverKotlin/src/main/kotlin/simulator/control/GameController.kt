@@ -1,5 +1,6 @@
 package simulator.control
 
+import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
 import kotlinx.event.event
 import simulator.model.GameState
@@ -106,9 +107,30 @@ class GameController {
     }
 
     fun removePlayer(target: String): Boolean {
-        gameState.getPlayer(target)?.let { player -> gameState = gameState.removePlayer(player) }
+        return gameState.getPlayer(target)?.let { player -> gameState = gameState.removePlayer(player)
+            return true}?: false
 
-        return true
+    }
+
+    fun switchTeam(name: String, team: EnumTeams): Boolean {
+        val player = gameState.getPlayer(name) ?: return false
+
+        return when(team){
+            EnumTeams.SPECTATOR_TEAMS -> {
+                gameState = gameState.addOrMoveToSpectator(player)
+                true
+            }
+            EnumTeams.TEAM_A_TEAMS -> {
+                gameState = gameState.addOrMoveToTeamA(player)
+                true
+            }
+            EnumTeams.TEAM_B_TEAMS -> {
+                gameState = gameState.addOrMoveToTeamB(player)
+                true
+            }
+            else -> false
+        }
+
     }
 
     private fun updateThrowingPlayer(player: Player?){

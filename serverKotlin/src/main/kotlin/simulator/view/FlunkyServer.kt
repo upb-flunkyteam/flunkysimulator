@@ -46,6 +46,26 @@ class FlunkyServer(
         responseObserver?.onCompleted()
     }
 
+    override fun switchTeam(request: SwitchTeamReq?, responseObserver: StreamObserver<SwitchTeamResp>?) {
+        val name = request!!.targetName;
+        val team = request.targetTeam
+
+        if(gameController.switchTeam(name, team))
+            messageController.sendMessage(request.playerName, "hat $name nach ${team.toString()} verschoben.")
+        else
+            messageController.sendMessage(request.playerName, "konnte ${name} nicht verschieben.")
+
+        responseObserver?.onNext(SwitchTeamResp.getDefaultInstance())
+        responseObserver?.onCompleted()
+    }
+
+    override fun modifyStrafbierCount(
+        request: ModifyStrafbierCountReq?,
+        responseObserver: StreamObserver<ModifyStrafbierCountResp>?
+    ) {
+        super.modifyStrafbierCount(request, responseObserver)
+    }
+
     override fun resetGame(request: ResetGameReq?, responseObserver: StreamObserver<ResetGameResp>?) {
 
         if(gameController.resetGameAndShuffleTeams())
@@ -68,6 +88,10 @@ class FlunkyServer(
 
         responseObserver?.onNext(SelectThrowingPlayerResp.getDefaultInstance())
         responseObserver?.onCompleted()
+    }
+
+    override fun abgegeben(request: AbgegebenReq?, responseObserver: StreamObserver<AbgegebenResp>?) {
+        super.abgegeben(request, responseObserver)
     }
 
     override fun sendMessage(request: SendMessageReq?, responseObserver: StreamObserver<SendMessageResp>?) {
