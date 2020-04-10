@@ -2,56 +2,45 @@ package simulator.model
 
 
 data class GameState(
-    val TeamA: Team = Team(),
-    val TeamB: Team = Team(),
-    val Spectators: List<Player> = emptyList(),
-    val roundState: RoundState = RoundState()
+    val players: List<Player> = emptyList(),
+    val roundState: RoundState = RoundState(),
+    val strafbiereA: Int = 0,
+    val strafbiereB: Int = 0
 ) {
-    val players: Sequence<Player>
-        get() = Spectators.asSequence() + TeamA.players.asSequence() + TeamB.players.asSequence()
 
-    fun addOrMoveToSpectator(player: Player): GameState = this.copy(
-        Spectators = Spectators + player,
-        TeamA = TeamA.removePlayer(player),
-        TeamB = TeamB.removePlayer(player)
-    )
+    val activePlayers: List<Player>
+        get() = players.filter { p -> p.team == Team.A || p.team == Team.B }
+    val TeamA: List<Player>
+        get() = players.filter { p -> p.team == Team.A }
+    val TeamB: List<Player>
+        get() = players.filter { p -> p.team == Team.B }
+    val Spectators: List<Player>
+        get() = players.filter { p -> p.team == Team.Spectator }
 
-    fun addOrMoveToTeamA(player: Player): GameState = this.copy(
-        Spectators = Spectators.filter { p -> p != player},
-        TeamA = TeamA.addPlayer(player),
-        TeamB = TeamB.removePlayer(player)
-    )
+    fun getTeam(team: Team) = when (team) {
+        Team.A -> TeamA
+        Team.B -> TeamB
+        else -> Spectators
+    }
 
-    fun addOrMoveToTeamB(player: Player): GameState = this.copy(
-        Spectators = Spectators.filter { p -> p != player },
-        TeamA = TeamA.removePlayer(player),
-        TeamB = TeamB.addPlayer(player)
-    )
+    fun addPlayer(player: Player) = this.copy(players = players + player)
 
-    fun removePlayer(player: Player): GameState = this.copy(
-        Spectators = Spectators.filter { p -> p != player },
-        TeamA = TeamA.removePlayer(player),
-        TeamB = TeamB.removePlayer(player)
-    )
+    fun updatePlayer(player: Player) = this.copy(players = players.map {
+        if (it.name == player.name) player else it
+    })
+
+    fun removePlayer(player: Player): GameState = this.copy(players = players.filter { p -> p != player })
 
     fun nameTaken(name: String) = this.players.any { player -> player.name == name }
 
     fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name }
 
-    fun getTeamOfPlayer(player: Player) = when {
-        TeamA.contains(player) -> TeamA
-        TeamB.contains(player) -> TeamB
-        else -> null
-    }
-
-    fun getOtherTeam(team: Team) = if (team == TeamA) TeamB else TeamA
-
     fun toGRPC() = de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
         .setThrowingPlayer(roundState.throwingPlayer?.name ?: "")
-        .addAllPlayerTeamA(TeamA.players.toGRPC())
-        .setStrafbierTeamA(TeamA.strafbiere.toLong())
-        .addAllPlayerTeamB(TeamB.players.toGRPC())
-        .setStrafbierTeamB(TeamB.strafbiere.toLong())
+        .addAllPlayerTeamA(TeamA.toGRPC())
+        .setStrafbierTeamA(strafbiereA.toLong())
+        .addAllPlayerTeamB(TeamB.toGRPC())
+        .setStrafbierTeamB(strafbiereB.toLong())
         .addAllSpectators(Spectators.toGRPC())
         .build()
 

@@ -3,16 +3,10 @@ package simulator.control
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
 import kotlinx.event.event
-import simulator.model.GameState
-import simulator.model.Player
-import simulator.model.RoundState
-import simulator.model.Team
+import simulator.model.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.random.Random
-
-
-// todo decide: error = gamestate does not change?
 
 
 class GameController {
@@ -22,16 +16,16 @@ class GameController {
     private val handlerLock = ReentrantLock()
     private val onNewGameState = event<GameStateEvent>()
 
-    fun addEventHandler(handler: ((GameController.GameStateEvent) -> Unit)){
+    fun addEventHandler(handler: ((GameController.GameStateEvent) -> Unit)) {
         handlerLock.withLock { onNewGameState += handler }
     }
 
-    fun removeEventHandler(handler: ((GameController.GameStateEvent) -> Unit)){
+    fun removeEventHandler(handler: ((GameController.GameStateEvent) -> Unit)) {
         handlerLock.withLock { onNewGameState -= handler }
     }
 
     private val gameStateLock = ReentrantLock();
-    var  gameState = GameState()
+    var gameState = GameState()
         @Synchronized get
         @Synchronized private set(value) {
             handlerLock.withLock {
@@ -40,7 +34,7 @@ class GameController {
             field = value
         }
 
-    private val lastThrown = mutableMapOf<Team, Player>()
+    private val lastThrowingPlayer: MutableMap<Team, Player> = mutableMapOf()
 
     fun throwBall(name: String, strength: EnumThrowStrength): Boolean {
         gameStateLock.withLock {
@@ -50,15 +44,14 @@ class GameController {
 
             val player = state.roundState.throwingPlayer
 
-            val throwingTeam = state.getTeamOfPlayer(player) ?: return false
+            val throwingTeam = player.team
 
             //TODO actual throw with video, calculations and shit
 
-            lastThrown[throwingTeam] = player
+            lastThrowingPlayer[throwingTeam] = player
 
-            val otherTeam = state.getOtherTeam(throwingTeam)
-            val otherTeamPreviousThrower = if (lastThrown.containsKey(otherTeam)) lastThrown[otherTeam] else null
-            val nextThrowingPlayer = otherTeam.getNextThrowingPlayer(otherTeamPreviousThrower)
+            val otherTeam = throwingTeam.getOtherTeam()
+            val nextThrowingPlayer = gameState.getNextThrowingPlayer(otherTeam)
 
             updateThrowingPlayer(nextThrowingPlayer)
 
@@ -80,9 +73,11 @@ class GameController {
 
             return when (team) {
                 EnumTeams.TEAM_A_TEAMS -> {
-                    true //TODO
+                    gameState = gameState.copy(strafbiereA = gameState.strafbiereA + diff)
+                    true
                 }
                 EnumTeams.TEAM_B_TEAMS -> {
+                    gameState = gameState.copy(strafbiereB = gameState.strafbiereB + diff)
                     true
                 }
                 else -> false
@@ -92,32 +87,32 @@ class GameController {
 
     fun resetGameAndShuffleTeams(): Boolean {
         gameStateLock.withLock {
-            val (newPlayers1, newPlayers2) = (gameState.TeamA.players + gameState.TeamB.players)
+            val (newPlayers1, newPlayers2) = gameState.activePlayers
                 .map { p -> p.copy(abgegeben = false) }
                 .shuffleSplitList()
 
             // without this random bool one team would always be the larger one
             val randBool = Random.nextBoolean()
-            val teamA = Team(if (randBool) newPlayers1 else newPlayers2)
-            val teamB = Team(if (!randBool) newPlayers1 else newPlayers2)
+            val teamA = if (randBool) newPlayers1 else newPlayers2
+            val teamB = if (!randBool) newPlayers1 else newPlayers2
 
             //determine starting team
             val startingTeam = when {
-                teamA.playerCount() > newPlayers2.count() -> teamB
-                teamB.playerCount() < newPlayers2.count() -> teamA
+                teamA.count() > newPlayers2.count() -> teamB
+                teamB.count() < newPlayers2.count() -> teamA
                 Random.nextBoolean() -> teamA
                 else -> teamB
             }
 
-            lastThrown.clear()
+            lastThrowingPlayer.clear()
 
             gameState = GameState(
-                TeamA = teamA,
-                TeamB = teamB,
-                Spectators = gameState.Spectators,
                 roundState = RoundState(
-                    throwingPlayer = startingTeam.getNextThrowingPlayer(null)
-                )
+                    throwingPlayer = startingTeam.firstOrNull()
+                ),
+                players = gameState.Spectators
+                        + teamA.map { p -> p.copy(team = Team.A) }
+                        + teamB.map { p -> p.copy(team = Team.B) }
             )
 
             return true
@@ -127,16 +122,14 @@ class GameController {
     fun registerPlayer(name: String): Boolean {
         if (name.isEmpty())
             return false
-        // TODO return error
 
         gameStateLock.withLock {
             if (gameState.nameTaken(name))
                 return false
-            // todo error message, regular negative resp?
 
             val player = Player(name)
 
-            gameState = gameState.addOrMoveToSpectator(player)
+            gameState = gameState.addPlayer(player)
 
             return true
         }
@@ -153,24 +146,11 @@ class GameController {
     fun switchTeam(name: String, team: EnumTeams): Boolean {
         gameStateLock.withLock {
             val player = gameState.getPlayer(name) ?: return false
-
-            return when (team) {
-                EnumTeams.SPECTATOR_TEAMS -> {
-                    gameState = gameState.addOrMoveToSpectator(player)
-                    true
-                }
-                EnumTeams.TEAM_A_TEAMS -> {
-                    gameState = gameState.addOrMoveToTeamA(player)
-                    true
-                }
-                EnumTeams.TEAM_B_TEAMS -> {
-                    gameState = gameState.addOrMoveToTeamB(player)
-                    true
-                }
-                else -> false
-            }
+            gameState = gameState.updatePlayer(player.copy(team = team.toKotlin()))
+            return true
         }
     }
+
 
     private fun updateThrowingPlayer(player: Player?) {
         gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player))
@@ -181,6 +161,30 @@ class GameController {
 
         return shuffled.filterIndexed(predicate = { index, _ -> index % 2 == 1 }).toList() to
                 shuffled.filterIndexed(predicate = { index, _ -> index % 2 == 0 }).toList()
+    }
+
+    private fun GameState.getNextThrowingPlayer(team: Team): Player? {
+        val previousThrower = if (lastThrowingPlayer.containsKey(team))
+            lastThrowingPlayer[team]
+        else
+            return this.getTeam(team).firstOrNull()
+
+        val inGamePlayersWithIndex = players
+            .mapIndexed { index, player -> player to index }
+            .filter { p -> !p.first.abgegeben }
+
+        if (!players.contains(previousThrower)) {
+            return inGamePlayersWithIndex.firstOrNull()?.first
+        }
+
+        val indexOfLast = players.indexOf(previousThrower)
+
+        if (inGamePlayersWithIndex.isEmpty())
+            return null
+
+        return (inGamePlayersWithIndex.firstOrNull { (_, i) -> i > indexOfLast }
+            ?: inGamePlayersWithIndex.first())
+            .first
     }
 }
 

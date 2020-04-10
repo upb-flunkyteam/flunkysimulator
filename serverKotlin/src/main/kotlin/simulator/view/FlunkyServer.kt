@@ -38,7 +38,7 @@ class FlunkyServer(
     override fun kickPlayer(request: KickPlayerReq?, responseObserver: StreamObserver<KickPlayerResp>?) {
         val name = request!!.targeName
 
-        if(gameController.removePlayer(name))
+        if (gameController.removePlayer(name))
             messageController.sendMessage(request.playerName, "hat ${name} rausgeworfen.")
         else
             messageController.sendMessage(request.playerName, "konnte ${name} nicht rauswerfen.")
@@ -51,7 +51,7 @@ class FlunkyServer(
         val name = request!!.targetName;
         val team = request.targetTeam
 
-        if(gameController.switchTeam(name, team))
+        if (gameController.switchTeam(name, team))
             messageController.sendMessage(request.playerName, "hat $name nach ${team.toString()} verschoben.")
         else
             messageController.sendMessage(request.playerName, "konnte ${name} nicht verschieben.")
@@ -64,13 +64,25 @@ class FlunkyServer(
         request: ModifyStrafbierCountReq?,
         responseObserver: StreamObserver<ModifyStrafbierCountResp>?
     ) {
-        super.modifyStrafbierCount(request, responseObserver)
+        if (gameController.modifyStrafbierCount(request!!.targetTeam, request.increment)) {
+            val text = "hat ein Strafbier für ${request.targetTeam} " +
+                    if (request.increment)
+                        "hinzugefügt"
+                    else
+                        "entfernt"
+            messageController.sendMessage(request.playerName,text)
+        } else {
+            messageController.sendMessage(request.playerName, " hat die Strafbiere für ${request.targetTeam} nicht verändert.")
+        }
     }
 
     override fun resetGame(request: ResetGameReq?, responseObserver: StreamObserver<ResetGameResp>?) {
 
-        if(gameController.resetGameAndShuffleTeams())
-            messageController.sendMessage(request!!.playerName, "das den Ground neu ausgemessen, die Kreide nachgezeichnet, die Teams neu gemischt, die Center nachgefüllt und den Ball aufgepumt.")
+        if (gameController.resetGameAndShuffleTeams())
+            messageController.sendMessage(
+                request!!.playerName,
+                "den Ground neu ausgemessen, die Kreide nachgezeichnet, die Teams gemischt, die Center nachgefüllt und den Ball aufgepumt."
+            )
         else
             messageController.sendMessage(request!!.playerName, "konnte das Spiel nicht neustarten")
 
@@ -82,17 +94,23 @@ class FlunkyServer(
         request: SelectThrowingPlayerReq?,
         responseObserver: StreamObserver<SelectThrowingPlayerResp>?
     ) {
-        if(gameController.forceThrowingPlayer(request!!.targeName))
-            messageController.sendMessage(request.playerName, "hat ${request!!.targeName} als werfenden Spieler festgelegt.")
+        if (gameController.forceThrowingPlayer(request!!.targeName))
+            messageController.sendMessage(
+                request.playerName,
+                "hat ${request!!.targeName} als werfenden Spieler festgelegt."
+            )
         else
-            messageController.sendMessage(request.playerName, "konnte ${request!!.targeName} nicht als Werfer festlegen. Spielt nicht mit oder nicht existent?")
+            messageController.sendMessage(
+                request.playerName,
+                "konnte ${request!!.targeName} nicht als Werfer festlegen. Spielt nicht mit oder nicht existent?"
+            )
 
         responseObserver?.onNext(SelectThrowingPlayerResp.getDefaultInstance())
         responseObserver?.onCompleted()
     }
 
     override fun abgegeben(request: AbgegebenReq?, responseObserver: StreamObserver<AbgegebenResp>?) {
-        super.abgegeben(request, responseObserver)
+
     }
 
     override fun sendMessage(request: SendMessageReq?, responseObserver: StreamObserver<SendMessageResp>?) {
@@ -118,7 +136,7 @@ class FlunkyServer(
                         .setState(gameState.toGRPC())
                         .build()
                 )
-            } catch (e: io.grpc.StatusRuntimeException){
+            } catch (e: io.grpc.StatusRuntimeException) {
                 if (e.status.code == Status.Code.CANCELLED)
                     println("Another stream bites the dust.")
                 else
@@ -145,7 +163,7 @@ class FlunkyServer(
                         .setContent(event.content)
                         .build()
                 )
-            } catch (e: io.grpc.StatusRuntimeException){
+            } catch (e: io.grpc.StatusRuntimeException) {
                 if (e.status.code == Status.Code.CANCELLED)
                     println("Another one bites the dust.")
                 else
