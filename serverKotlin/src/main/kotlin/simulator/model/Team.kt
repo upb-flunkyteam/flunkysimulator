@@ -5,7 +5,7 @@ data class Team(val players: List<Player> = emptyList(),
 
     fun playerCount(): Int = players.count()
 
-    fun removePlayer(name: String) = this.copy(players = players.filter { player -> player.name != name})
+    fun removePlayer(player: Player) = this.copy(players = players.filter { p -> p != player})
 
     fun addPlayer(player: Player) = this.copy(players = players + player)
 

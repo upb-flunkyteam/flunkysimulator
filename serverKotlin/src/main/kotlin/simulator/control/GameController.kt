@@ -91,7 +91,6 @@ class GameController {
     }
 
     fun resetGameAndShuffleTeams(): Boolean {
-
         gameStateLock.withLock {
             val (newPlayers1, newPlayers2) = (gameState.TeamA.players + gameState.TeamB.players)
                 .map { p -> p.copy(abgegeben = false) }
@@ -145,10 +144,9 @@ class GameController {
 
     fun removePlayer(target: String): Boolean {
         gameStateLock.withLock {
-            return gameState.getPlayer(target)?.let { player ->
-                gameState = gameState.removePlayer(player)
-                return true
-            } ?: false
+            val player = gameState.getPlayer(target) ?: return false
+            gameState = gameState.removePlayer(player)
+            return true
         }
     }
 

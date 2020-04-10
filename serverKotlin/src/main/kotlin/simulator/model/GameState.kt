@@ -12,31 +12,31 @@ data class GameState(
 
     fun addOrMoveToSpectator(player: Player): GameState = this.copy(
         Spectators = Spectators + player,
-        TeamA = TeamA.removePlayer(player.name),
-        TeamB = TeamB.removePlayer(player.name)
+        TeamA = TeamA.removePlayer(player),
+        TeamB = TeamB.removePlayer(player)
     )
 
     fun addOrMoveToTeamA(player: Player): GameState = this.copy(
-        Spectators = Spectators.filter { p -> p.name != p.name },
+        Spectators = Spectators.filter { p -> p != player},
         TeamA = TeamA.addPlayer(player),
-        TeamB = TeamB.removePlayer(player.name)
+        TeamB = TeamB.removePlayer(player)
     )
 
     fun addOrMoveToTeamB(player: Player): GameState = this.copy(
-        Spectators = Spectators.filter { p -> p.name != p.name },
-        TeamA = TeamA.removePlayer(player.name),
+        Spectators = Spectators.filter { p -> p != player },
+        TeamA = TeamA.removePlayer(player),
         TeamB = TeamB.addPlayer(player)
     )
 
-    fun removePlayer(player: Player) = this.copy(
-        Spectators = Spectators.filter { p -> p.name != p.name },
-        TeamA = TeamA.removePlayer(player.name),
-        TeamB = TeamB.removePlayer(player.name)
+    fun removePlayer(player: Player): GameState = this.copy(
+        Spectators = Spectators.filter { p -> p != player },
+        TeamA = TeamA.removePlayer(player),
+        TeamB = TeamB.removePlayer(player)
     )
 
-    fun nameTaken(name: String) = this.players.any { player -> player.name == name}
+    fun nameTaken(name: String) = this.players.any { player -> player.name == name }
 
-    fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name}
+    fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name }
 
     fun getTeamOfPlayer(player: Player) = when {
         TeamA.contains(player) -> TeamA
@@ -47,7 +47,7 @@ data class GameState(
     fun getOtherTeam(team: Team) = if (team == TeamA) TeamB else TeamA
 
     fun toGRPC() = de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
-        .setThrowingPlayer(roundState.throwingPlayer?.name?:"")
+        .setThrowingPlayer(roundState.throwingPlayer?.name ?: "")
         .addAllPlayerTeamA(TeamA.players.toGRPC())
         .setStrafbierTeamA(TeamA.strafbiere.toLong())
         .addAllPlayerTeamB(TeamB.players.toGRPC())
@@ -57,4 +57,5 @@ data class GameState(
 
     private fun Iterable<Player>.toGRPC() = this.map { player -> player.toGRPC() }
 }
+
 
