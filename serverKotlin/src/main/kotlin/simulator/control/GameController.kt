@@ -19,13 +19,14 @@ class GameController {
 
     val onNewGameState = event<GameStateEvent>()
 
-    var gameState = GameState()
-        private set(value) {
+    var  gameState = GameState()
+        @Synchronized get
+        @Synchronized private set(value) {
             onNewGameState(GameStateEvent(value))
             field = value
         }
 
-    private val lastThrown = mutableMapOf<Team,Player>()
+    private val lastThrown = mutableMapOf<Team, Player>()
 
     fun throwBall(name: String, strength: EnumThrowStrength): Boolean {
         val state = gameState
@@ -50,11 +51,26 @@ class GameController {
     }
 
     fun forceThrowingPlayer(name: String): Boolean {
-        val player = gameState.getPlayer(name)?: return false
+        val player = gameState.getPlayer(name) ?: return false
 
         updateThrowingPlayer(player)
 
         return true
+    }
+
+    fun modifyStrafbierCount(team: EnumTeams, increment: Boolean): Boolean {
+        val diff = if (increment) 1 else -1
+
+        return when (team) {
+            EnumTeams.TEAM_A_TEAMS -> {
+                true //TODO
+            }
+            EnumTeams.TEAM_B_TEAMS -> {
+                true
+            }
+            else -> false
+        }
+
     }
 
     fun resetGameAndShuffleTeams(): Boolean {
@@ -107,15 +123,17 @@ class GameController {
     }
 
     fun removePlayer(target: String): Boolean {
-        return gameState.getPlayer(target)?.let { player -> gameState = gameState.removePlayer(player)
-            return true}?: false
+        return gameState.getPlayer(target)?.let { player ->
+            gameState = gameState.removePlayer(player)
+            return true
+        } ?: false
 
     }
 
     fun switchTeam(name: String, team: EnumTeams): Boolean {
         val player = gameState.getPlayer(name) ?: return false
 
-        return when(team){
+        return when (team) {
             EnumTeams.SPECTATOR_TEAMS -> {
                 gameState = gameState.addOrMoveToSpectator(player)
                 true
@@ -133,7 +151,7 @@ class GameController {
 
     }
 
-    private fun updateThrowingPlayer(player: Player?){
+    private fun updateThrowingPlayer(player: Player?) {
         gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player))
     }
 
