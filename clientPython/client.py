@@ -45,7 +45,7 @@ def playGame():
     req.targetTeam = 2
     print pname +"goes in a team"
     stub.SwitchTeam(req)
-  
+
 
   #start game
   req = proto.ResetGameReq()
@@ -53,11 +53,15 @@ def playGame():
   stub.ResetGame(req)
 
   state = next(stub.StreamState(proto.StreamStateReq()))
-  print state
+  print (state)
 
   #kick all
-  pnames= [p.name for p in state.state.spectators]
+  players = []
+  players += [p for p in state.state.spectators]
+  players += [p for p in state.state.playerTeamA]
+  players += [p for p in state.state.playerTeamB]
 
+  pnames= [p.name for p in players]
   for pname in pnames:
       req = proto.KickPlayerReq()
       req.targeName = pname
