@@ -16,11 +16,11 @@ class GameController {
 
     data class GameStateEvent(val state: GameState)
 
-    val newGameStateEvent = event<GameStateEvent>()
+    val onNewGameState = event<GameStateEvent>()
 
     var gameState = GameState()
         private set(value) {
-            newGameStateEvent(GameStateEvent(value))
+            onNewGameState(GameStateEvent(value))
             field = value
         }
 

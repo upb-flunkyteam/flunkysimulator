@@ -3,10 +3,9 @@ package simulator.view
 import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.stub.StreamObserver
 import simulator.control.GameController
+import simulator.model.GameState
 
 class FlunkyServer(private val gameController: GameController): SimulatorGrpc.SimulatorImplBase() {
-
-    //todo register listner
 
     override fun throw_(request: ThrowReq?, responseObserver: StreamObserver<ThrowResp>?) {
         gameController.throwBall(request!!.playerName,request.strength)
@@ -61,17 +60,21 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
             .setState(gameController.gameState.toGRPC())
             .build())
 
-        gameController.newGameStateEvent += { (gameState) ->
+        var handler: ((GameController.GameStateEvent) -> Unit)? = null
+        handler = { (gameState: GameState) ->
             try {
+                //fails if stream is closed
                 responseObserver?.onNext(
                     StreamStateResp.newBuilder()
                         .setState(gameState.toGRPC())
                         .build()
                 )
             }finally {
-
+                handler?.let { gameController.onNewGameState -= it}
             }
         }
+
+        gameController.onNewGameState += handler
     }
 
     override fun streamEvents(request: StreamEventsReq?, responseObserver: StreamObserver<StreamEventsResp>?) {
