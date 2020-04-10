@@ -18,6 +18,8 @@ service Simulator {
 	
 	rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
 	
+	rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
+	
 	// resets Strafbier counter, Abgaben, shuffles teams 
 	// and plays prepare game clip afterwards
 	rpc ResetGame(ResetGameReq) returns (ResetGameResp);
@@ -72,6 +74,13 @@ message ResetGameReq{
 	string playerName = 1;
 }
 
+message SwitchTeamResp{};
+
+message SwitchTeamReq{
+	string playerName = 1;
+	string targetName = 2;
+	EnumTeams targetTeam = 3;
+}
 
 message KickPlayerResp{};
 
@@ -138,4 +147,11 @@ enum EnumThrowStrength {
   SOFT = 1;
   MEDIUM = 2;
   HARD = 3;
+}
+
+enum EnumTeams{
+  UNKNOWN = 0;
+  SPECTATOR = 1;
+  TEAM_A = 2;
+  TEAM_B =3;
 }
