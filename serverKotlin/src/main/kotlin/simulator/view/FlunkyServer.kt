@@ -3,12 +3,16 @@ package simulator.view
 import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.stub.StreamObserver
 import simulator.control.GameController
+import simulator.control.MessageController
 import simulator.model.GameState
 
-class FlunkyServer(private val gameController: GameController): SimulatorGrpc.SimulatorImplBase() {
+class FlunkyServer(
+    private val gameController: GameController,
+    private val messageController: MessageController
+) : SimulatorGrpc.SimulatorImplBase() {
 
     override fun throw_(request: ThrowReq?, responseObserver: StreamObserver<ThrowResp>?) {
-        gameController.throwBall(request!!.playerName,request.strength)
+        gameController.throwBall(request!!.playerName, request.strength)
 
         responseObserver?.onNext(ThrowResp.getDefaultInstance())
         responseObserver?.onCompleted()
@@ -51,14 +55,18 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
     }
 
     override fun sendMessage(request: SendMessageReq?, responseObserver: StreamObserver<SendMessageResp>?) {
-        super.sendMessage(request, responseObserver)
+        messageController.sendMessage(request!!.playerName, request.content)
+
+        responseObserver?.onNext(SendMessageResp.getDefaultInstance())
+        responseObserver?.onCompleted()
     }
 
     override fun streamState(request: StreamStateReq?, responseObserver: StreamObserver<StreamStateResp>?) {
         responseObserver?.onNext(
             StreamStateResp.newBuilder()
-            .setState(gameController.gameState.toGRPC())
-            .build())
+                .setState(gameController.gameState.toGRPC())
+                .build()
+        )
 
         var handler: ((GameController.GameStateEvent) -> Unit)? = null
         handler = { (gameState: GameState) ->
@@ -69,8 +77,8 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
                         .setState(gameState.toGRPC())
                         .build()
                 )
-            }finally {
-                handler?.let { gameController.onNewGameState -= it}
+            } finally {
+                handler?.let { gameController.onNewGameState -= it }
             }
         }
 
@@ -82,6 +90,20 @@ class FlunkyServer(private val gameController: GameController): SimulatorGrpc.Si
     }
 
     override fun streamLog(request: LogReq?, responseObserver: StreamObserver<LogResp>?) {
-        super.streamLog(request, responseObserver)
+        var handler: ((MessageController.MessageEvent) -> Unit)? = null
+        handler = { event: MessageController.MessageEvent ->
+            try {
+                //fails if stream is closed
+                responseObserver?.onNext(
+                    LogResp.newBuilder()
+                        .setContent(event.content)
+                        .build()
+                )
+            } finally {
+                handler?.let { messageController.onNewMessage -= it }
+            }
+        }
+
+        messageController.onNewMessage += handler
     }
 }
