@@ -9,6 +9,8 @@ class MessageController {
     val onNewMessage = event<MessageEvent>()
 
     fun sendMessage(from: String, content: String){
-        onNewMessage(MessageEvent("$from: $content"))
+        val message = "$from: $content"
+        println(message)
+        onNewMessage(MessageEvent(message))
     }
 }
