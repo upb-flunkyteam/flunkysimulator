@@ -6,7 +6,6 @@ import io.grpc.stub.StreamObserver
 import simulator.control.GameController
 import simulator.control.MessageController
 import simulator.model.GameState
-import java.lang.Exception
 
 class FlunkyServer(
     private val gameController: GameController,
@@ -120,7 +119,7 @@ class FlunkyServer(
                         .build()
                 )
             } catch (e: io.grpc.StatusRuntimeException){
-                if (e.status == Status.CANCELLED)
+                if (e.status.code == Status.Code.CANCELLED)
                     println("Another one bites the dust.")
                 else
                     throw e
@@ -147,7 +146,7 @@ class FlunkyServer(
                         .build()
                 )
             } catch (e: io.grpc.StatusRuntimeException){
-                if (e.status == Status.CANCELLED)
+                if (e.status.code == Status.Code.CANCELLED)
                     println("Another one bites the dust.")
                 else
                     throw e
