@@ -21,6 +21,11 @@ class SimulatorStub(object):
         request_serializer=flunkyprotocol__pb2.ThrowReq.SerializeToString,
         response_deserializer=flunkyprotocol__pb2.ThrowResp.FromString,
         )
+    self.Abgegeben = channel.unary_unary(
+        '/endpoints.flunky.simulator.Simulator/Abgegeben',
+        request_serializer=flunkyprotocol__pb2.AbgegebenReq.SerializeToString,
+        response_deserializer=flunkyprotocol__pb2.AbgegebenResp.FromString,
+        )
     self.RegisterPlayer = channel.unary_unary(
         '/endpoints.flunky.simulator.Simulator/RegisterPlayer',
         request_serializer=flunkyprotocol__pb2.RegisterPlayerReq.SerializeToString,
@@ -31,6 +36,11 @@ class SimulatorStub(object):
         request_serializer=flunkyprotocol__pb2.KickPlayerReq.SerializeToString,
         response_deserializer=flunkyprotocol__pb2.KickPlayerResp.FromString,
         )
+    self.SwitchTeam = channel.unary_unary(
+        '/endpoints.flunky.simulator.Simulator/SwitchTeam',
+        request_serializer=flunkyprotocol__pb2.SwitchTeamReq.SerializeToString,
+        response_deserializer=flunkyprotocol__pb2.SwitchTeamResp.FromString,
+        )
     self.ResetGame = channel.unary_unary(
         '/endpoints.flunky.simulator.Simulator/ResetGame',
         request_serializer=flunkyprotocol__pb2.ResetGameReq.SerializeToString,
@@ -40,6 +50,11 @@ class SimulatorStub(object):
         '/endpoints.flunky.simulator.Simulator/SelectThrowingPlayer',
         request_serializer=flunkyprotocol__pb2.SelectThrowingPlayerReq.SerializeToString,
         response_deserializer=flunkyprotocol__pb2.SelectThrowingPlayerResp.FromString,
+        )
+    self.ModifyStrafbierCount = channel.unary_unary(
+        '/endpoints.flunky.simulator.Simulator/ModifyStrafbierCount',
+        request_serializer=flunkyprotocol__pb2.ModifyStrafbierCountReq.SerializeToString,
+        response_deserializer=flunkyprotocol__pb2.ModifyStrafbierCountResp.FromString,
         )
     self.SendMessage = channel.unary_unary(
         '/endpoints.flunky.simulator.Simulator/SendMessage',
@@ -76,6 +91,13 @@ class SimulatorServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def Abgegeben(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def RegisterPlayer(self, request, context):
     # missing associated documentation comment in .proto file
     pass
@@ -84,6 +106,13 @@ class SimulatorServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def KickPlayer(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def SwitchTeam(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -99,6 +128,13 @@ class SimulatorServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def SelectThrowingPlayer(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def ModifyStrafbierCount(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -141,6 +177,11 @@ def add_SimulatorServicer_to_server(servicer, server):
           request_deserializer=flunkyprotocol__pb2.ThrowReq.FromString,
           response_serializer=flunkyprotocol__pb2.ThrowResp.SerializeToString,
       ),
+      'Abgegeben': grpc.unary_unary_rpc_method_handler(
+          servicer.Abgegeben,
+          request_deserializer=flunkyprotocol__pb2.AbgegebenReq.FromString,
+          response_serializer=flunkyprotocol__pb2.AbgegebenResp.SerializeToString,
+      ),
       'RegisterPlayer': grpc.unary_unary_rpc_method_handler(
           servicer.RegisterPlayer,
           request_deserializer=flunkyprotocol__pb2.RegisterPlayerReq.FromString,
@@ -151,6 +192,11 @@ def add_SimulatorServicer_to_server(servicer, server):
           request_deserializer=flunkyprotocol__pb2.KickPlayerReq.FromString,
           response_serializer=flunkyprotocol__pb2.KickPlayerResp.SerializeToString,
       ),
+      'SwitchTeam': grpc.unary_unary_rpc_method_handler(
+          servicer.SwitchTeam,
+          request_deserializer=flunkyprotocol__pb2.SwitchTeamReq.FromString,
+          response_serializer=flunkyprotocol__pb2.SwitchTeamResp.SerializeToString,
+      ),
       'ResetGame': grpc.unary_unary_rpc_method_handler(
           servicer.ResetGame,
           request_deserializer=flunkyprotocol__pb2.ResetGameReq.FromString,
@@ -160,6 +206,11 @@ def add_SimulatorServicer_to_server(servicer, server):
           servicer.SelectThrowingPlayer,
           request_deserializer=flunkyprotocol__pb2.SelectThrowingPlayerReq.FromString,
           response_serializer=flunkyprotocol__pb2.SelectThrowingPlayerResp.SerializeToString,
+      ),
+      'ModifyStrafbierCount': grpc.unary_unary_rpc_method_handler(
+          servicer.ModifyStrafbierCount,
+          request_deserializer=flunkyprotocol__pb2.ModifyStrafbierCountReq.FromString,
+          response_serializer=flunkyprotocol__pb2.ModifyStrafbierCountResp.SerializeToString,
       ),
       'SendMessage': grpc.unary_unary_rpc_method_handler(
           servicer.SendMessage,
