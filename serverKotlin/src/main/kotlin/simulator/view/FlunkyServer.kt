@@ -1,10 +1,12 @@
 package simulator.view
 
 import de.flunkyteam.endpoints.projects.simulator.*
+import io.grpc.Status
 import io.grpc.stub.StreamObserver
 import simulator.control.GameController
 import simulator.control.MessageController
 import simulator.model.GameState
+import java.lang.Exception
 
 class FlunkyServer(
     private val gameController: GameController,
@@ -117,6 +119,11 @@ class FlunkyServer(
                         .setState(gameState.toGRPC())
                         .build()
                 )
+            } catch (e: io.grpc.StatusRuntimeException){
+                if (e.status == Status.CANCELLED)
+                    println("Another one bites the dust.")
+                else
+                    throw e
             } finally {
                 handler?.let { gameController.onNewGameState -= it }
             }
@@ -139,6 +146,11 @@ class FlunkyServer(
                         .setContent(event.content)
                         .build()
                 )
+            } catch (e: io.grpc.StatusRuntimeException){
+                if (e.status == Status.CANCELLED)
+                    println("Another one bites the dust.")
+                else
+                    throw e
             } finally {
                 handler?.let { messageController.onNewMessage -= it }
             }
