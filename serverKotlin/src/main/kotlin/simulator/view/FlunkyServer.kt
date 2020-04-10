@@ -120,7 +120,7 @@ class FlunkyServer(
                 )
             } catch (e: io.grpc.StatusRuntimeException){
                 if (e.status.code == Status.Code.CANCELLED)
-                    println("Another one bites the dust.")
+                    println("Another stream bites the dust.")
                 else
                     throw e
             } finally {
