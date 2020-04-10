@@ -28,7 +28,7 @@ service Simulator {
 	
 	rpc SelectThrowingPlayer(SelectThrowingPlayerReq) returns (SelectThrowingPlayerResp);
 	
-	rpc ModifyStrafbierCount(ModifyStrafbierCountReq) return (ModifyStrafbierCountResp);
+	rpc ModifyStrafbierCount(ModifyStrafbierCountReq) returns (ModifyStrafbierCountResp);
 
 	rpc SendMessage(SendMessageReq) returns (SendMessageResp);
 
@@ -71,6 +71,7 @@ message ModifyStrafbierCountReq{
 	string playerName = 1;
 	EnumTeams targetTeam = 2;
 	bool increment = 3;
+}
 
 message SendMessageResp{}
 
@@ -162,15 +163,15 @@ message Player{
 
 
 enum EnumThrowStrength {
-  UNKNOWN = 0;
-  SOFT = 1;
-  MEDIUM = 2;
-  HARD = 3;
+  UNKNOWN_THROW_STRENGTH = 0;
+  SOFT_THROW_STRENGTH = 1;
+  MEDIUM_THROW_STRENGTH = 2;
+  HARD_THROW_STRENGTH = 3;
 }
 
 enum EnumTeams{
-  UNKNOWN = 0;
-  SPECTATOR = 1;
-  TEAM_A = 2;
-  TEAM_B =3;
+  UNKNOWN_TEAMS= 0;
+  SPECTATOR_TEAMS = 1;
+  TEAM_A_TEAMS = 2;
+  TEAM_B_TEAMS =3;
 }
