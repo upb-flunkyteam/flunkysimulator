@@ -124,11 +124,11 @@ class FlunkyServer(
                 else
                     throw e
             } finally {
-                handler?.let { gameController.onNewGameState -= it }
+                handler?.let { gameController.removeEventHandler(it) }
             }
         }
 
-        gameController.onNewGameState += handler
+        gameController.addEventHandler { it }
     }
 
     override fun streamEvents(request: StreamEventsReq?, responseObserver: StreamObserver<StreamEventsResp>?) {
@@ -151,10 +151,10 @@ class FlunkyServer(
                 else
                     throw e
             } finally {
-                handler?.let { messageController.onNewMessage -= it }
+                handler?.let { messageController.removeEventHandler(it) }
             }
         }
 
-        messageController.onNewMessage += handler
+        messageController.addEventHandler { handler }
     }
 }

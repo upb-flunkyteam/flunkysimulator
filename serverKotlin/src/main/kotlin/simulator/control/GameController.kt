@@ -7,6 +7,8 @@ import simulator.model.GameState
 import simulator.model.Player
 import simulator.model.RoundState
 import simulator.model.Team
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.random.Random
 
 
@@ -17,12 +19,23 @@ class GameController {
 
     data class GameStateEvent(val state: GameState)
 
-    val onNewGameState = event<GameStateEvent>()
+    private val handlerLock = ReentrantLock()
+    private val onNewGameState = event<GameStateEvent>()
+
+    fun addEventHandler(handler: ((GameController.GameStateEvent) -> Unit)){
+        handlerLock.withLock { onNewGameState += handler }
+    }
+
+    fun removeEventHandler(handler: ((GameController.GameStateEvent) -> Unit)){
+        handlerLock.withLock { onNewGameState -= handler }
+    }
 
     var  gameState = GameState()
         @Synchronized get
         @Synchronized private set(value) {
-            onNewGameState(GameStateEvent(value))
+            handlerLock.withLock {
+                onNewGameState(GameStateEvent(value))
+            }
             field = value
         }
 
