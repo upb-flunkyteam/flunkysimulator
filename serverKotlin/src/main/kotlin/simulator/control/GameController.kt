@@ -26,14 +26,14 @@ class GameController {
 
     private val lastThrown = mutableMapOf<Team,Player>()
 
-    fun throwBall(name: String, strength: EnumThrowStrength) {
+    fun throwBall(name: String, strength: EnumThrowStrength): Boolean {
         val state = gameState
         if (state.roundState.throwingPlayer == null || name != state.roundState.throwingPlayer.name)
-            return
+            return false
 
         val player = state.roundState.throwingPlayer
 
-        val throwingTeam = state.getTeamOfPlayer(player) ?: return
+        val throwingTeam = state.getTeamOfPlayer(player) ?: return false
 
         //TODO actual throw with video, calculations and shit
 
@@ -45,19 +45,18 @@ class GameController {
 
         updateThrowingPlayer(nextThrowingPlayer)
 
+        return true
     }
 
-    fun forceThrowingPlayer(name: String){
-        val player = gameState.getPlayer(name)?: return
+    fun forceThrowingPlayer(name: String): Boolean {
+        val player = gameState.getPlayer(name)?: return false
 
         updateThrowingPlayer(player)
+
+        return true
     }
 
-    private fun updateThrowingPlayer(player: Player?){
-        gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player))
-    }
-
-    fun resetGameAndShuffleTeams() {
+    fun resetGameAndShuffleTeams(): Boolean {
 
         val (newPlayers1, newPlayers2) = (gameState.TeamA.players + gameState.TeamB.players)
             .map { p -> p.copy(abgegeben = false) }
@@ -86,24 +85,34 @@ class GameController {
                 throwingPlayer = startingTeam.getNextThrowingPlayer(null)
             )
         )
+
+        return true
     }
 
-    fun registerPlayer(name: String) {
+    fun registerPlayer(name: String): Boolean {
         if (name.isEmpty())
-            return
+            return false
         // TODO return error
 
         if (gameState.nameTaken(name))
-            return
+            return false
         // todo error message, regular negative resp?
 
         val player = Player(name)
 
         gameState = gameState.addOrMoveToSpectator(player)
+
+        return true
     }
 
-    fun removePlayer(target: String) {
+    fun removePlayer(target: String): Boolean {
         gameState.getPlayer(target)?.let { player -> gameState = gameState.removePlayer(player) }
+
+        return true
+    }
+
+    private fun updateThrowingPlayer(player: Player?){
+        gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player))
     }
 
     private fun <E> List<E>.shuffleSplitList(): Pair<List<E>, List<E>> {

@@ -12,7 +12,11 @@ class FlunkyServer(
 ) : SimulatorGrpc.SimulatorImplBase() {
 
     override fun throw_(request: ThrowReq?, responseObserver: StreamObserver<ThrowResp>?) {
-        gameController.throwBall(request!!.playerName, request.strength)
+
+        if (gameController.throwBall(request!!.playerName, request.strength))
+            messageController.sendMessage(request.playerName, "hat geworfen")
+        else
+            messageController.sendMessage(request.playerName, "darf nicht werfen")
 
         responseObserver?.onNext(ThrowResp.getDefaultInstance())
         responseObserver?.onCompleted()
@@ -21,7 +25,10 @@ class FlunkyServer(
     override fun registerPlayer(request: RegisterPlayerReq?, responseObserver: StreamObserver<RegisterPlayerResp>?) {
         val name = request!!.playerName
 
-        gameController.registerPlayer(name)
+        if (gameController.registerPlayer(name))
+            messageController.sendMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
+        else
+            messageController.sendMessage(request.playerName, "konnte sich nicht registrieren. Name schon vergeben?")
 
         responseObserver!!.onNext(RegisterPlayerResp.getDefaultInstance())
         responseObserver.onCompleted()
@@ -30,7 +37,10 @@ class FlunkyServer(
     override fun kickPlayer(request: KickPlayerReq?, responseObserver: StreamObserver<KickPlayerResp>?) {
         val name = request!!.targeName
 
-        gameController.removePlayer(name)
+        if(gameController.removePlayer(name))
+            messageController.sendMessage(request.playerName, "hat ${name} rausgeworfen.")
+        else
+            messageController.sendMessage(request.playerName, "konnte ${name} nicht rauswerfen.")
 
         responseObserver?.onNext(KickPlayerResp.getDefaultInstance())
         responseObserver?.onCompleted()
@@ -38,7 +48,10 @@ class FlunkyServer(
 
     override fun resetGame(request: ResetGameReq?, responseObserver: StreamObserver<ResetGameResp>?) {
 
-        gameController.resetGameAndShuffleTeams()
+        if(gameController.resetGameAndShuffleTeams())
+            messageController.sendMessage(request!!.playerName, "das den Ground neu ausgemessen, die Kreide nachgezeichnet, die Teams neu gemischt, die Center nachgefüllt und den Ball aufgepumt.")
+        else
+            messageController.sendMessage(request!!.playerName, "konnte das Spiel nicht neustarten")
 
         responseObserver?.onNext(ResetGameResp.getDefaultInstance())
         responseObserver?.onCompleted()
@@ -48,7 +61,10 @@ class FlunkyServer(
         request: SelectThrowingPlayerReq?,
         responseObserver: StreamObserver<SelectThrowingPlayerResp>?
     ) {
-        gameController.forceThrowingPlayer(request!!.targeName)
+        if(gameController.forceThrowingPlayer(request!!.targeName))
+            messageController.sendMessage(request.playerName, "hat ${request!!.targeName} als werfenden Spieler festgelegt.")
+        else
+            messageController.sendMessage(request.playerName, "konnte ${request!!.targeName} nicht als Werfer festlegen. Spielt nicht mit oder nicht existent?")
 
         responseObserver?.onNext(SelectThrowingPlayerResp.getDefaultInstance())
         responseObserver?.onCompleted()
