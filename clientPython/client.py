@@ -1,6 +1,7 @@
 import grpc
 import flunkyprotocol_pb2 as proto
 import flunkyprotocol_pb2_grpc
+import sys
 
 #channel = grpc.insecure_channel('viings.de:11049')
 channel = grpc.insecure_channel('localhost:11049')
@@ -28,6 +29,7 @@ def getState():
   req = proto.StreamStateReq()
   resp = stub.StreamState(req)
   print (next(resp))
+
 
 def playGame():
   for pname in 'hans jurgen marie lola jana'.split():
@@ -72,3 +74,10 @@ def playGame():
   #%%
   state = next(stub.StreamState(proto.StreamStateReq()))
   pnames= [p.name for p in state.state.spectators]
+
+
+if (len(sys.argv) == 2 and sys.argv[1] == "listen"):
+  sys.stdout.write('llisten to stream') ; sys.stdout.flush()
+  req = proto.StreamStateReq()
+  for x in stub.StreamState(req):
+    sys.stdout.write(str(x)) ; sys.stdout.flush()
