@@ -2,10 +2,11 @@ package simulator.view
 
 import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.Status
+import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
+import simulator.DeactiveableHandler
 import simulator.control.GameController
 import simulator.control.MessageController
-import simulator.model.GameState
 
 class FlunkyServer(
     private val gameController: GameController,
@@ -48,7 +49,7 @@ class FlunkyServer(
     }
 
     override fun switchTeam(request: SwitchTeamReq?, responseObserver: StreamObserver<SwitchTeamResp>?) {
-        val name = request!!.targetName;
+        val name = request!!.targetName
         val team = request.targetTeam
 
         if (gameController.switchTeam(name, team))
@@ -70,9 +71,12 @@ class FlunkyServer(
                         "hinzugefügt"
                     else
                         "entfernt"
-            messageController.sendMessage(request.playerName,text)
+            messageController.sendMessage(request.playerName, text)
         } else {
-            messageController.sendMessage(request.playerName, " hat die Strafbiere für ${request.targetTeam} nicht verändert.")
+            messageController.sendMessage(
+                request.playerName,
+                " hat die Strafbiere für ${request.targetTeam} nicht verändert."
+            )
         }
     }
 
@@ -97,12 +101,12 @@ class FlunkyServer(
         if (gameController.forceThrowingPlayer(request!!.targeName))
             messageController.sendMessage(
                 request.playerName,
-                "hat ${request!!.targeName} als werfenden Spieler festgelegt."
+                "hat ${request.targeName} als werfenden Spieler festgelegt."
             )
         else
             messageController.sendMessage(
                 request.playerName,
-                "konnte ${request!!.targeName} nicht als Werfer festlegen. Spielt nicht mit oder nicht existent?"
+                "konnte ${request.targeName} nicht als Werfer festlegen. Spielt nicht mit oder nicht existent?"
             )
 
         responseObserver?.onNext(SelectThrowingPlayerResp.getDefaultInstance())
@@ -121,32 +125,25 @@ class FlunkyServer(
     }
 
     override fun streamState(request: StreamStateReq?, responseObserver: StreamObserver<StreamStateResp>?) {
+        // output current state
         responseObserver?.onNext(
             StreamStateResp.newBuilder()
                 .setState(gameController.gameState.toGRPC())
                 .build()
         )
 
-        var handler: ((GameController.GameStateEvent) -> Unit)? = null
-        handler = { (gameState: GameState) ->
-            try {
+        // output future states
+        val handler =
+            registerHandler { event: GameController.GameStateEvent ->
                 //fails if stream is closed
                 responseObserver?.onNext(
                     StreamStateResp.newBuilder()
-                        .setState(gameState.toGRPC())
+                        .setState(event.state.toGRPC())
                         .build()
                 )
-            } catch (e: io.grpc.StatusRuntimeException) {
-                if (e.status.code == Status.Code.CANCELLED)
-                    println("Another stream bites the dust.")
-                else
-                    throw e
-            } finally {
-                handler?.let { gameController.removeEventHandler(it) }
             }
-        }
 
-        gameController.addEventHandler { it }
+        gameController.addEventHandler(handler::doAction)
     }
 
     override fun streamEvents(request: StreamEventsReq?, responseObserver: StreamObserver<StreamEventsResp>?) {
@@ -154,25 +151,40 @@ class FlunkyServer(
     }
 
     override fun streamLog(request: LogReq?, responseObserver: StreamObserver<LogResp>?) {
-        var handler: ((MessageController.MessageEvent) -> Unit)? = null
-        handler = { event: MessageController.MessageEvent ->
-            try {
-                //fails if stream is closed
+
+        val handler =
+            registerHandler { event: MessageController.MessageEvent ->
                 responseObserver?.onNext(
                     LogResp.newBuilder()
                         .setContent(event.content)
                         .build()
                 )
-            } catch (e: io.grpc.StatusRuntimeException) {
-                if (e.status.code == Status.Code.CANCELLED)
-                    println("Another one bites the dust.")
-                else
-                    throw e
-            } finally {
-                handler?.let { messageController.removeEventHandler(it) }
             }
-        }
 
-        messageController.addEventHandler { handler }
+        messageController.addEventHandler(handler::doAction)
     }
+
+    /***
+     * action should put something in a responseObserver
+     */
+    private fun <Event> registerHandler(action: (Event) -> Unit): DeactiveableHandler<Event> =
+        DeactiveableHandler({ event: Event,
+                              deactiveableHandler: DeactiveableHandler<Event> ->
+            try {
+                //fails if stream is closed
+                action(event)
+            } catch (e: StatusRuntimeException) {
+                if (e.status.code == Status.Code.CANCELLED) {
+                    println("Another stream bites the dust.")
+                    deactiveableHandler.enabled = false
+                    /*TODO delete handlers when connection gone but not while iterating
+                         through handlers like in this position, because this would casue
+                         concurrency modification errors because of the underlying HashSet
+                         in the Event plugin.
+                         handler?.let { gameController.removeEventHandler(it) }
+                         */
+                } else
+                    throw e
+            }
+        })
 }

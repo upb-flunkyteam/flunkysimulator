@@ -2,34 +2,21 @@ package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
-import kotlinx.event.event
 import simulator.model.*
-import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 
 
-class GameController {
+class GameController : EventController<GameController.GameStateEvent>() {
 
     data class GameStateEvent(val state: GameState)
 
-    private val handlerLock = ReentrantLock()
-    private val onNewGameState = event<GameStateEvent>()
+    private val gameStateLock = handlerLock
 
-    fun addEventHandler(handler: ((GameController.GameStateEvent) -> Unit)) {
-        handlerLock.withLock { onNewGameState += handler }
-    }
-
-    fun removeEventHandler(handler: ((GameController.GameStateEvent) -> Unit)) {
-        handlerLock.withLock { onNewGameState -= handler }
-    }
-
-    private val gameStateLock = ReentrantLock();
     var gameState = GameState()
-        @Synchronized get
-        @Synchronized private set(value) {
+        private set(value) {
             handlerLock.withLock {
-                onNewGameState(GameStateEvent(value))
+                onEvent(GameStateEvent(value))
             }
             field = value
         }

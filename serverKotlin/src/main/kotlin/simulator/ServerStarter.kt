@@ -20,10 +20,20 @@ class ServerStarter {
 
     @Throws(IOException::class)
     private fun start() {
+
+
+        val gameController = GameController()
+        val messageController = MessageController()
+        val flunkyServer = FlunkyServer(gameController, messageController)
+
+        // debug print
+        gameController.addEventHandler { println(it) }
+        messageController.addEventHandler { println(it) }
+
         /* The port on which the server should run */
         val port = 11049
         server = ServerBuilder.forPort(port)
-            .addService(FlunkyServer(GameController(), MessageController()))
+            .addService(flunkyServer)
             .build()
             .start()
         logger.log(Level.INFO, "Server started, listening on {0}", port)
