@@ -7,12 +7,6 @@ import sys
 channel = grpc.insecure_channel('localhost:11049')
 stub = flunkyprotocol_pb2_grpc.SimulatorStub(channel)
 
-def throw():
-  throwReq=proto.ThrowReq()
-  response = stub.Throw(throwReq)
-
-
-
 def registerPlayer(name):
   req = proto.RegisterPlayerReq()
   req.playerName = name
@@ -30,8 +24,7 @@ def getState():
   resp = stub.StreamState(req)
   print (next(resp))
 
-
-def playGame():
+def registerPlayersAndStartGame():
   for pname in 'hans jurgen marie lola jana'.split():
     req = proto.RegisterPlayerReq()
     req.playerName = pname
@@ -48,15 +41,37 @@ def playGame():
     print pname +"goes in a team"
     stub.SwitchTeam(req)
 
-
   #start game
   req = proto.ResetGameReq()
   req.playerName = "hans"
   stub.ResetGame(req)
+  
+def throw(name, strength = 1):
+  req = proto.ThrowReq()
+  req.playerName = name
+  req.strength = strength
+  stub.Throw(req)
 
+def throwNext( strength = 1):
+  state = next(stub.StreamState(proto.StreamStateReq()))
+  name = state.state.throwingPlayer
+  print( name + " is throwing")
+  throw(name,strength)
+
+def setAbgegeben(player, abgegeben = true):
+  req = proto.AbgegebenReq()
+  req.playerName = "jemand"
+  req.targeName = player
+  req.setTo = abgegeben
+
+def playGame():
+  registerPlayersAndStartGame()
+  
   state = next(stub.StreamState(proto.StreamStateReq()))
   print (state)
 
+  throw(state.state.throwingPlayer)
+  
   #kick all
   players = []
   players += [p for p in state.state.spectators]
