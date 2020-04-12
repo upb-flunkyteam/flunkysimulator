@@ -16,7 +16,7 @@ class FlunkyServer(
     override fun throw_(request: ThrowReq?, responseObserver: StreamObserver<ThrowResp>?) {
 
         if (gameController.throwBall(request!!.playerName, request.strength))
-            messageController.sendMessage(request.playerName, "hat geworfen")
+            messageController.sendMessage(request.playerName, "hat ${request.strength} geworfen")
         else
             messageController.sendMessage(request.playerName, "darf nicht werfen")
 
@@ -114,7 +114,7 @@ class FlunkyServer(
     }
 
     override fun abgegeben(request: AbgegebenReq?, responseObserver: StreamObserver<AbgegebenResp>?) {
-
+        //TODo
     }
 
     override fun sendMessage(request: SendMessageReq?, responseObserver: StreamObserver<SendMessageResp>?) {

@@ -10,7 +10,7 @@ class MessageController: EventController<MessageController.MessageEvent>() {
     private val onMessage = onEvent
 
     fun sendMessage(from: String, content: String){
-        val message = "$from $content"
+        val message = "$from  $content"
         handlerLock.withLock {
             onMessage(MessageEvent(message))
         }

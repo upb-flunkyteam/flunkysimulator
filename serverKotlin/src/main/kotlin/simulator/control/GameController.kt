@@ -7,7 +7,7 @@ import kotlin.concurrent.withLock
 import kotlin.random.Random
 
 
-class GameController : EventController<GameController.GameStateEvent>() {
+class GameController(private val videoController: VideoController) : EventController<GameController.GameStateEvent>() {
 
     data class GameStateEvent(val state: GameState)
 
@@ -26,14 +26,54 @@ class GameController : EventController<GameController.GameStateEvent>() {
     fun throwBall(name: String, strength: EnumThrowStrength): Boolean {
         gameStateLock.withLock {
             val state = gameState
-            if (state.roundState.throwingPlayer == null || name != state.roundState.throwingPlayer.name)
+            if (state.roundState.throwingPlayer == null || name != state.roundState.throwingPlayer)
                 return false
 
-            val player = state.roundState.throwingPlayer
+            val player = gameState.getPlayer(state.roundState.throwingPlayer) ?: return false
 
             val throwingTeam = player.team
+            val teamAThrows = throwingTeam == Team.A
 
-            //TODO actual throw with video, calculations and shit
+            val throwingTime = 2.5
+            val closeMissProbability = 0.15
+
+            val videosToPlay = mutableListOf<VideoInstructions>()
+
+            val probability: Double
+            val minimumDrinkingTime: Double
+            val maximumDrinkingTime: Double
+
+            when (strength) {
+                EnumThrowStrength.SOFT_THROW_STRENGTH -> {
+                    probability = 0.666
+                    minimumDrinkingTime = 3.0
+                    maximumDrinkingTime = 3.0
+                }
+                EnumThrowStrength.MEDIUM_THROW_STRENGTH -> {
+                    probability = 0.5
+                    minimumDrinkingTime = 3.0
+                    maximumDrinkingTime = 5.0
+                }
+                EnumThrowStrength.HARD_THROW_STRENGTH -> {
+                    probability = 0.3
+                    minimumDrinkingTime = 5.0
+                    maximumDrinkingTime = 8.333
+                }
+                else -> return false
+            }
+            if (Math.random() < probability) {
+                videosToPlay += VideoInstructions(VideoType.Hit, mirrored = teamAThrows)
+                val runningTime = throwingTime + minimumDrinkingTime +
+                        Math.random() * (maximumDrinkingTime - minimumDrinkingTime)
+                videosToPlay += VideoInstructions(VideoType.Stop, runningTime)
+            } else {
+                videosToPlay += if (Math.random() < closeMissProbability) {
+                    VideoInstructions(VideoType.CloseMiss, mirrored = teamAThrows)
+                } else {
+                    VideoInstructions(VideoType.Miss, mirrored = teamAThrows)
+                }
+            }
+            videoController.playVideos(videosToPlay)
 
             lastThrowingPlayer[throwingTeam] = player
 
@@ -95,12 +135,17 @@ class GameController : EventController<GameController.GameStateEvent>() {
 
             gameState = GameState(
                 roundState = RoundState(
-                    throwingPlayer = startingTeam.firstOrNull()
+                    throwingPlayer = startingTeam.firstOrNull()?.name
                 ),
                 players = gameState.Spectators
                         + teamA.map { p -> p.copy(team = Team.A) }
                         + teamB.map { p -> p.copy(team = Team.B) }
             )
+
+            videoController.playVideos(listOf(
+                VideoInstructions(VideoType.Setup),
+                VideoInstructions(VideoType.Setup, delay = 5.0,mirrored = true) //TODO get actual setup time
+            ))
 
             return true
         }
@@ -138,9 +183,8 @@ class GameController : EventController<GameController.GameStateEvent>() {
         }
     }
 
-
     private fun updateThrowingPlayer(player: Player?) {
-        gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player))
+        gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player?.name?: ""))
     }
 
     private fun <E> List<E>.shuffleSplitList(): Pair<List<E>, List<E>> {
@@ -158,7 +202,7 @@ class GameController : EventController<GameController.GameStateEvent>() {
 
         val inGamePlayersWithIndex = players
             .mapIndexed { index, player -> player to index }
-            .filter { p -> !p.first.abgegeben }
+            .filter { p -> p.first.team == team && !p.first.abgegeben}
 
         if (!players.contains(previousThrower)) {
             return inGamePlayersWithIndex.firstOrNull()?.first

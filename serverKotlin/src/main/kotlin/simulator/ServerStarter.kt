@@ -4,6 +4,7 @@ import io.grpc.Server
 import io.grpc.ServerBuilder
 import simulator.control.GameController
 import simulator.control.MessageController
+import simulator.control.VideoController
 import simulator.view.FlunkyServer
 import java.io.IOException
 import java.util.logging.Level
@@ -22,8 +23,9 @@ class ServerStarter {
     private fun start() {
 
 
-        val gameController = GameController()
         val messageController = MessageController()
+        val videoController = VideoController(messageController)
+        val gameController = GameController(videoController)
         val flunkyServer = FlunkyServer(gameController, messageController)
 
         // debug print

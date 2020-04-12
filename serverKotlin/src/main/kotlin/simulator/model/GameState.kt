@@ -36,7 +36,7 @@ data class GameState(
     fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name }
 
     fun toGRPC() = de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
-        .setThrowingPlayer(roundState.throwingPlayer?.name ?: "")
+        .setThrowingPlayer(roundState.throwingPlayer?: "")
         .addAllPlayerTeamA(TeamA.toGRPC())
         .setStrafbierTeamA(strafbiereA.toLong())
         .addAllPlayerTeamB(TeamB.toGRPC())
