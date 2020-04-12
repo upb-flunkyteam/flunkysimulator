@@ -183,6 +183,14 @@ class GameController(private val videoController: VideoController) : EventContro
         }
     }
 
+    fun setAbgegeben(name: String, abgegeben: Boolean): Boolean {
+        gameStateLock.withLock {
+            val player = gameState.getPlayer(name) ?: return false
+            gameState = gameState.updatePlayer(player.copy(abgegeben = abgegeben))
+            return true
+        }
+    }
+
     private fun updateThrowingPlayer(player: Player?) {
         gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player?.name?: ""))
     }

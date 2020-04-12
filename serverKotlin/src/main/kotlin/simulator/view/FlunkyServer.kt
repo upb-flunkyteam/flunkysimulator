@@ -114,7 +114,18 @@ class FlunkyServer(
     }
 
     override fun abgegeben(request: AbgegebenReq?, responseObserver: StreamObserver<AbgegebenResp>?) {
-        //TODo
+        if (gameController.setAbgegeben(request!!.targeName, request.setTo)) {
+            val text =
+                "hat ${request.targeName}" + if (request.setTo) "s abgabe abgenommen." else " ein Bier geöffnet."
+            messageController.sendMessage(request.playerName, text)
+        } else
+            messageController.sendMessage(
+                request.playerName,
+                "konnte ${request.targeName} Abgabestatus nicht ändern."
+            )
+
+        responseObserver?.onNext(AbgegebenResp.getDefaultInstance())
+        responseObserver?.onCompleted()
     }
 
     override fun sendMessage(request: SendMessageReq?, responseObserver: StreamObserver<SendMessageResp>?) {
