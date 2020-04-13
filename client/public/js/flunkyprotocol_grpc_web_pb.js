@@ -7,37 +7,14 @@
 // GENERATED CODE -- DO NOT EDIT!
 
 
-goog.provide('proto.endpoints.flunky.simulator.SimulatorClient');
-goog.provide('proto.endpoints.flunky.simulator.SimulatorPromiseClient');
 
-goog.require('grpc.web.GrpcWebClientBase');
-goog.require('grpc.web.AbstractClientBase');
-goog.require('grpc.web.ClientReadableStream');
-goog.require('grpc.web.Error');
-goog.require('grpc.web.MethodDescriptor');
-goog.require('grpc.web.MethodType');
-goog.require('proto.endpoints.flunky.simulator.KickPlayerReq');
-goog.require('proto.endpoints.flunky.simulator.KickPlayerResp');
-goog.require('proto.endpoints.flunky.simulator.LogReq');
-goog.require('proto.endpoints.flunky.simulator.LogResp');
-goog.require('proto.endpoints.flunky.simulator.RegisterPlayerReq');
-goog.require('proto.endpoints.flunky.simulator.RegisterPlayerResp');
-goog.require('proto.endpoints.flunky.simulator.ResetGameReq');
-goog.require('proto.endpoints.flunky.simulator.ResetGameResp');
-goog.require('proto.endpoints.flunky.simulator.SelectThrowingPlayerReq');
-goog.require('proto.endpoints.flunky.simulator.SelectThrowingPlayerResp');
-goog.require('proto.endpoints.flunky.simulator.SendMessageReq');
-goog.require('proto.endpoints.flunky.simulator.SendMessageResp');
-goog.require('proto.endpoints.flunky.simulator.StreamEventsReq');
-goog.require('proto.endpoints.flunky.simulator.StreamEventsResp');
-goog.require('proto.endpoints.flunky.simulator.StreamStateReq');
-goog.require('proto.endpoints.flunky.simulator.StreamStateResp');
-goog.require('proto.endpoints.flunky.simulator.ThrowReq');
-goog.require('proto.endpoints.flunky.simulator.ThrowResp');
+const grpc = {};
+grpc.web = require('grpc-web');
 
-
-
-goog.scope(function() {
+const proto = {};
+proto.endpoints = {};
+proto.endpoints.flunky = {};
+proto.endpoints.flunky.simulator = require('./flunkyprotocol_pb.js');
 
 /**
  * @param {string} hostname
@@ -168,6 +145,86 @@ proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.throw =
       request,
       metadata || {},
       methodDescriptor_Simulator_Throw);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.endpoints.flunky.simulator.AbgegebenReq,
+ *   !proto.endpoints.flunky.simulator.AbgegebenResp>}
+ */
+const methodDescriptor_Simulator_Abgegeben = new grpc.web.MethodDescriptor(
+  '/endpoints.flunky.simulator.Simulator/Abgegeben',
+  grpc.web.MethodType.UNARY,
+  proto.endpoints.flunky.simulator.AbgegebenReq,
+  proto.endpoints.flunky.simulator.AbgegebenResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.AbgegebenResp.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.endpoints.flunky.simulator.AbgegebenReq,
+ *   !proto.endpoints.flunky.simulator.AbgegebenResp>}
+ */
+const methodInfo_Simulator_Abgegeben = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.endpoints.flunky.simulator.AbgegebenResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.AbgegebenResp.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.endpoints.flunky.simulator.AbgegebenResp)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.AbgegebenResp>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.endpoints.flunky.simulator.SimulatorClient.prototype.abgegeben =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/Abgegeben',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_Abgegeben,
+      callback);
+};
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.endpoints.flunky.simulator.AbgegebenResp>}
+ *     A native promise that resolves to the response
+ */
+proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.abgegeben =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/Abgegeben',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_Abgegeben);
 };
 
 
@@ -334,6 +391,86 @@ proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.kickPlayer =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
+ *   !proto.endpoints.flunky.simulator.SwitchTeamReq,
+ *   !proto.endpoints.flunky.simulator.SwitchTeamResp>}
+ */
+const methodDescriptor_Simulator_SwitchTeam = new grpc.web.MethodDescriptor(
+  '/endpoints.flunky.simulator.Simulator/SwitchTeam',
+  grpc.web.MethodType.UNARY,
+  proto.endpoints.flunky.simulator.SwitchTeamReq,
+  proto.endpoints.flunky.simulator.SwitchTeamResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.SwitchTeamReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.SwitchTeamResp.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.endpoints.flunky.simulator.SwitchTeamReq,
+ *   !proto.endpoints.flunky.simulator.SwitchTeamResp>}
+ */
+const methodInfo_Simulator_SwitchTeam = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.endpoints.flunky.simulator.SwitchTeamResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.SwitchTeamReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.SwitchTeamResp.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.SwitchTeamReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.endpoints.flunky.simulator.SwitchTeamResp)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.SwitchTeamResp>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.endpoints.flunky.simulator.SimulatorClient.prototype.switchTeam =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/SwitchTeam',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_SwitchTeam,
+      callback);
+};
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.SwitchTeamReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.endpoints.flunky.simulator.SwitchTeamResp>}
+ *     A native promise that resolves to the response
+ */
+proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.switchTeam =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/SwitchTeam',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_SwitchTeam);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
  *   !proto.endpoints.flunky.simulator.ResetGameReq,
  *   !proto.endpoints.flunky.simulator.ResetGameResp>}
  */
@@ -488,6 +625,86 @@ proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.selectThrowing
       request,
       metadata || {},
       methodDescriptor_Simulator_SelectThrowingPlayer);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.endpoints.flunky.simulator.ModifyStrafbierCountReq,
+ *   !proto.endpoints.flunky.simulator.ModifyStrafbierCountResp>}
+ */
+const methodDescriptor_Simulator_ModifyStrafbierCount = new grpc.web.MethodDescriptor(
+  '/endpoints.flunky.simulator.Simulator/ModifyStrafbierCount',
+  grpc.web.MethodType.UNARY,
+  proto.endpoints.flunky.simulator.ModifyStrafbierCountReq,
+  proto.endpoints.flunky.simulator.ModifyStrafbierCountResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.ModifyStrafbierCountReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.ModifyStrafbierCountResp.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.endpoints.flunky.simulator.ModifyStrafbierCountReq,
+ *   !proto.endpoints.flunky.simulator.ModifyStrafbierCountResp>}
+ */
+const methodInfo_Simulator_ModifyStrafbierCount = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.endpoints.flunky.simulator.ModifyStrafbierCountResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.ModifyStrafbierCountReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.ModifyStrafbierCountResp.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.ModifyStrafbierCountReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.endpoints.flunky.simulator.ModifyStrafbierCountResp)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.ModifyStrafbierCountResp>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.endpoints.flunky.simulator.SimulatorClient.prototype.modifyStrafbierCount =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/ModifyStrafbierCount',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_ModifyStrafbierCount,
+      callback);
+};
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.ModifyStrafbierCountReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.endpoints.flunky.simulator.ModifyStrafbierCountResp>}
+ *     A native promise that resolves to the response
+ */
+proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.modifyStrafbierCount =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/ModifyStrafbierCount',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_ModifyStrafbierCount);
 };
 
 
@@ -796,5 +1013,5 @@ proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.streamLog =
 };
 
 
-}); // goog.scope
+module.exports = proto.endpoints.flunky.simulator;
 

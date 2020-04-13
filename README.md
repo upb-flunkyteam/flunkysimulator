@@ -23,7 +23,7 @@ Die javascript-resourcen aus commonJS zusammenbauen
 
 Aus protobuffer-Definitionen die commonJS-Bindings generieren
 
-`protoc -I=./protocol flunkyprotocol.proto --js_out=import_style=commonjs:./client/public/js/ --grpc-web_out=mode=grpcwebtext:./client/public/js/`
+`protoc -I=./protocol flunkyprotocol.proto --js_out=import_style=commonjs:./client/public/js/ --grpc-web_out=mode=grpcwebtext,import_style=commonjs:./client/public/js/`
 
 ### Server
 
