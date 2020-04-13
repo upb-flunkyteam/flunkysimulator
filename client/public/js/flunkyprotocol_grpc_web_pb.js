@@ -7,43 +7,14 @@
 // GENERATED CODE -- DO NOT EDIT!
 
 
-goog.provide('proto.endpoints.flunky.simulator.SimulatorClient');
-goog.provide('proto.endpoints.flunky.simulator.SimulatorPromiseClient');
 
-goog.require('grpc.web.GrpcWebClientBase');
-goog.require('grpc.web.AbstractClientBase');
-goog.require('grpc.web.ClientReadableStream');
-goog.require('grpc.web.Error');
-goog.require('grpc.web.MethodDescriptor');
-goog.require('grpc.web.MethodType');
-goog.require('proto.endpoints.flunky.simulator.AbgegebenReq');
-goog.require('proto.endpoints.flunky.simulator.AbgegebenResp');
-goog.require('proto.endpoints.flunky.simulator.KickPlayerReq');
-goog.require('proto.endpoints.flunky.simulator.KickPlayerResp');
-goog.require('proto.endpoints.flunky.simulator.LogReq');
-goog.require('proto.endpoints.flunky.simulator.LogResp');
-goog.require('proto.endpoints.flunky.simulator.ModifyStrafbierCountReq');
-goog.require('proto.endpoints.flunky.simulator.ModifyStrafbierCountResp');
-goog.require('proto.endpoints.flunky.simulator.RegisterPlayerReq');
-goog.require('proto.endpoints.flunky.simulator.RegisterPlayerResp');
-goog.require('proto.endpoints.flunky.simulator.ResetGameReq');
-goog.require('proto.endpoints.flunky.simulator.ResetGameResp');
-goog.require('proto.endpoints.flunky.simulator.SelectThrowingPlayerReq');
-goog.require('proto.endpoints.flunky.simulator.SelectThrowingPlayerResp');
-goog.require('proto.endpoints.flunky.simulator.SendMessageReq');
-goog.require('proto.endpoints.flunky.simulator.SendMessageResp');
-goog.require('proto.endpoints.flunky.simulator.StreamEventsReq');
-goog.require('proto.endpoints.flunky.simulator.StreamEventsResp');
-goog.require('proto.endpoints.flunky.simulator.StreamStateReq');
-goog.require('proto.endpoints.flunky.simulator.StreamStateResp');
-goog.require('proto.endpoints.flunky.simulator.SwitchTeamReq');
-goog.require('proto.endpoints.flunky.simulator.SwitchTeamResp');
-goog.require('proto.endpoints.flunky.simulator.ThrowReq');
-goog.require('proto.endpoints.flunky.simulator.ThrowResp');
+const grpc = {};
+grpc.web = require('grpc-web');
 
-
-
-goog.scope(function() {
+const proto = {};
+proto.endpoints = {};
+proto.endpoints.flunky = {};
+proto.endpoints.flunky.simulator = require('./flunkyprotocol_pb.js');
 
 /**
  * @param {string} hostname
@@ -1042,5 +1013,5 @@ proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.streamLog =
 };
 
 
-}); // goog.scope
+module.exports = proto.endpoints.flunky.simulator;
 
