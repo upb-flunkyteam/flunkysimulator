@@ -5,7 +5,7 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {ThrowReq, ThrowResp, EnumThrowStrength, GameState} = require('./flunkyprotocol_pb');
+const {EnumThrowStrength, GameState, ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp, StreamStateReq, StreamStateResp, LogReq, LogResp} = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
 var playerName = "";
@@ -27,7 +27,6 @@ jQuery(window).load(function () {
         }
     });
     $('#playernamebutton').click(function () {
-        console.log("Changing username");
         changePlayername();
     });
     $('#teamadisplay, #teambdisplay').click(function () {
@@ -41,11 +40,24 @@ jQuery(window).load(function () {
     $('.video').hide();
     updateTeamDisplay();
     updateActionButtonDisplay();
-    simulatorClient = new SimulatorClient('http://viings.de:8080');
+    simulatorClient = new SimulatorClient('https://viings.de:8080');
+    subscribeStreams();
 });
 
 var currentTeamA = true;
 var actionButtonsEnabled = true;
+
+function subscribeStreams(){
+    var request = new StreamStateReq();
+    simulatorClient.streamState()(request, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        } else {
+            console.log(response.getEvent());
+        }
+    });
+}
 
 function startAction() {
     actionButtonsEnabled = false;
@@ -66,7 +78,6 @@ function changePlayername(){
             console.log(err.code);
             console.log(err.message);
         } else {
-            console.log(response.getMessage());
             //TODO(jdrees): Implement resetting the playerName if request was 
             //not successful
             playerName = desiredPlayername;
@@ -82,8 +93,6 @@ function throwing(strength) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
-        } else {
-            console.log(response.getMessage());
         }
     });
 }
