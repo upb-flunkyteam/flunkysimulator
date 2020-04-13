@@ -8,36 +8,29 @@ option java_package = "de.flunkyteam.endpoints.projects.simulator";
 
 
 // A simple Flunkyball API.
-//
 // The API manages throws and teams. Teams contain players.
 service Simulator {
-
-	rpc Throw(ThrowReq) returns (ThrowResp);
-	
-	rpc Abgegeben(AbgegebenReq) returns (AbgegebenResp);
-	
+	// PLAYER MANAGEMENT
 	rpc RegisterPlayer(RegisterPlayerReq) returns (RegisterPlayerResp);
-	
 	rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
-	
 	rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
-	
+
+	// PLAYER ACTIONS
+	rpc Throw(ThrowReq) returns (ThrowResp);
+	rpc Abgegeben(AbgegebenReq) returns (AbgegebenResp);
+
+	// GAMESTATE MODIFICATIONS
 	// resets Strafbier counter, Abgaben, shuffles teams 
 	// and plays prepare game clip afterwards
 	rpc ResetGame(ResetGameReq) returns (ResetGameResp);
-	
 	rpc SelectThrowingPlayer(SelectThrowingPlayerReq) returns (SelectThrowingPlayerResp);
-	
 	rpc ModifyStrafbierCount(ModifyStrafbierCountReq) returns (ModifyStrafbierCountResp);
 
+	// UPDATE STREAMS
 	rpc SendMessage(SendMessageReq) returns (SendMessageResp);
-
 	rpc StreamState(StreamStateReq) returns (stream StreamStateResp);
-	
 	rpc StreamEvents(StreamEventsReq) returns (stream StreamEventsResp);
-	
 	rpc StreamLog(LogReq) returns (stream LogResp);
-
 }
 
 message LogResp{
@@ -62,7 +55,7 @@ message SelectThrowingPlayerResp {}
 
 message SelectThrowingPlayerReq{
 	string playerName = 1;
-	string targeName = 2;
+	string targetName = 2;
 }
 
 message ModifyStrafbierCountResp{}
@@ -98,7 +91,7 @@ message KickPlayerResp{};
 
 message KickPlayerReq{
 	string playerName = 1;
-	string targeName = 2;
+	string targetName = 2;
 }
 
 
@@ -112,7 +105,7 @@ message AbgegebenResp{};
 
 message AbgegebenReq{
 	string playerName = 1;
-	string targeName = 2;
+	string targetName = 2;
 	bool setTo = 3;
 }
 
@@ -170,7 +163,7 @@ enum EnumThrowStrength {
 }
 
 enum EnumTeams{
-  UNKNOWN_TEAMS= 0;
+  UNKNOWN_TEAMS = 0;
   SPECTATOR_TEAMS = 1;
   TEAM_A_TEAMS = 2;
   TEAM_B_TEAMS =3;

@@ -5,234 +5,424 @@ import flunkyprotocol_pb2 as flunkyprotocol__pb2
 
 
 class SimulatorStub(object):
-  """A simple Flunkyball API.
-
-  The API manages throws and teams. Teams contain players.
-  """
-
-  def __init__(self, channel):
-    """Constructor.
-
-    Args:
-      channel: A grpc.Channel.
+    """A simple Flunkyball API.
+    The API manages throws and teams. Teams contain players.
     """
-    self.Throw = channel.unary_unary(
-        '/endpoints.flunky.simulator.Simulator/Throw',
-        request_serializer=flunkyprotocol__pb2.ThrowReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.ThrowResp.FromString,
-        )
-    self.Abgegeben = channel.unary_unary(
-        '/endpoints.flunky.simulator.Simulator/Abgegeben',
-        request_serializer=flunkyprotocol__pb2.AbgegebenReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.AbgegebenResp.FromString,
-        )
-    self.RegisterPlayer = channel.unary_unary(
-        '/endpoints.flunky.simulator.Simulator/RegisterPlayer',
-        request_serializer=flunkyprotocol__pb2.RegisterPlayerReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.RegisterPlayerResp.FromString,
-        )
-    self.KickPlayer = channel.unary_unary(
-        '/endpoints.flunky.simulator.Simulator/KickPlayer',
-        request_serializer=flunkyprotocol__pb2.KickPlayerReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.KickPlayerResp.FromString,
-        )
-    self.SwitchTeam = channel.unary_unary(
-        '/endpoints.flunky.simulator.Simulator/SwitchTeam',
-        request_serializer=flunkyprotocol__pb2.SwitchTeamReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.SwitchTeamResp.FromString,
-        )
-    self.ResetGame = channel.unary_unary(
-        '/endpoints.flunky.simulator.Simulator/ResetGame',
-        request_serializer=flunkyprotocol__pb2.ResetGameReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.ResetGameResp.FromString,
-        )
-    self.SelectThrowingPlayer = channel.unary_unary(
-        '/endpoints.flunky.simulator.Simulator/SelectThrowingPlayer',
-        request_serializer=flunkyprotocol__pb2.SelectThrowingPlayerReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.SelectThrowingPlayerResp.FromString,
-        )
-    self.ModifyStrafbierCount = channel.unary_unary(
-        '/endpoints.flunky.simulator.Simulator/ModifyStrafbierCount',
-        request_serializer=flunkyprotocol__pb2.ModifyStrafbierCountReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.ModifyStrafbierCountResp.FromString,
-        )
-    self.SendMessage = channel.unary_unary(
-        '/endpoints.flunky.simulator.Simulator/SendMessage',
-        request_serializer=flunkyprotocol__pb2.SendMessageReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.SendMessageResp.FromString,
-        )
-    self.StreamState = channel.unary_stream(
-        '/endpoints.flunky.simulator.Simulator/StreamState',
-        request_serializer=flunkyprotocol__pb2.StreamStateReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.StreamStateResp.FromString,
-        )
-    self.StreamEvents = channel.unary_stream(
-        '/endpoints.flunky.simulator.Simulator/StreamEvents',
-        request_serializer=flunkyprotocol__pb2.StreamEventsReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.StreamEventsResp.FromString,
-        )
-    self.StreamLog = channel.unary_stream(
-        '/endpoints.flunky.simulator.Simulator/StreamLog',
-        request_serializer=flunkyprotocol__pb2.LogReq.SerializeToString,
-        response_deserializer=flunkyprotocol__pb2.LogResp.FromString,
-        )
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.RegisterPlayer = channel.unary_unary(
+                '/endpoints.flunky.simulator.Simulator/RegisterPlayer',
+                request_serializer=flunkyprotocol__pb2.RegisterPlayerReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.RegisterPlayerResp.FromString,
+                )
+        self.KickPlayer = channel.unary_unary(
+                '/endpoints.flunky.simulator.Simulator/KickPlayer',
+                request_serializer=flunkyprotocol__pb2.KickPlayerReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.KickPlayerResp.FromString,
+                )
+        self.SwitchTeam = channel.unary_unary(
+                '/endpoints.flunky.simulator.Simulator/SwitchTeam',
+                request_serializer=flunkyprotocol__pb2.SwitchTeamReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.SwitchTeamResp.FromString,
+                )
+        self.Throw = channel.unary_unary(
+                '/endpoints.flunky.simulator.Simulator/Throw',
+                request_serializer=flunkyprotocol__pb2.ThrowReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.ThrowResp.FromString,
+                )
+        self.Abgegeben = channel.unary_unary(
+                '/endpoints.flunky.simulator.Simulator/Abgegeben',
+                request_serializer=flunkyprotocol__pb2.AbgegebenReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.AbgegebenResp.FromString,
+                )
+        self.ResetGame = channel.unary_unary(
+                '/endpoints.flunky.simulator.Simulator/ResetGame',
+                request_serializer=flunkyprotocol__pb2.ResetGameReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.ResetGameResp.FromString,
+                )
+        self.SelectThrowingPlayer = channel.unary_unary(
+                '/endpoints.flunky.simulator.Simulator/SelectThrowingPlayer',
+                request_serializer=flunkyprotocol__pb2.SelectThrowingPlayerReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.SelectThrowingPlayerResp.FromString,
+                )
+        self.ModifyStrafbierCount = channel.unary_unary(
+                '/endpoints.flunky.simulator.Simulator/ModifyStrafbierCount',
+                request_serializer=flunkyprotocol__pb2.ModifyStrafbierCountReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.ModifyStrafbierCountResp.FromString,
+                )
+        self.SendMessage = channel.unary_unary(
+                '/endpoints.flunky.simulator.Simulator/SendMessage',
+                request_serializer=flunkyprotocol__pb2.SendMessageReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.SendMessageResp.FromString,
+                )
+        self.StreamState = channel.unary_stream(
+                '/endpoints.flunky.simulator.Simulator/StreamState',
+                request_serializer=flunkyprotocol__pb2.StreamStateReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.StreamStateResp.FromString,
+                )
+        self.StreamEvents = channel.unary_stream(
+                '/endpoints.flunky.simulator.Simulator/StreamEvents',
+                request_serializer=flunkyprotocol__pb2.StreamEventsReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.StreamEventsResp.FromString,
+                )
+        self.StreamLog = channel.unary_stream(
+                '/endpoints.flunky.simulator.Simulator/StreamLog',
+                request_serializer=flunkyprotocol__pb2.LogReq.SerializeToString,
+                response_deserializer=flunkyprotocol__pb2.LogResp.FromString,
+                )
 
 
 class SimulatorServicer(object):
-  """A simple Flunkyball API.
-
-  The API manages throws and teams. Teams contain players.
-  """
-
-  def Throw(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def Abgegeben(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def RegisterPlayer(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def KickPlayer(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def SwitchTeam(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def ResetGame(self, request, context):
-    """resets Strafbier counter, Abgaben, shuffles teams 
-    and plays prepare game clip afterwards
+    """A simple Flunkyball API.
+    The API manages throws and teams. Teams contain players.
     """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
 
-  def SelectThrowingPlayer(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def RegisterPlayer(self, request, context):
+        """PLAYER MANAGEMENT
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
-  def ModifyStrafbierCount(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def KickPlayer(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
-  def SendMessage(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def SwitchTeam(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
-  def StreamState(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def Throw(self, request, context):
+        """PLAYER ACTIONS
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
-  def StreamEvents(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def Abgegeben(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
-  def StreamLog(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def ResetGame(self, request, context):
+        """GAMESTATE MODIFICATIONS
+        resets Strafbier counter, Abgaben, shuffles teams 
+        and plays prepare game clip afterwards
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SelectThrowingPlayer(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ModifyStrafbierCount(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SendMessage(self, request, context):
+        """UPDATE STREAMS
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StreamState(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StreamEvents(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StreamLog(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
 
 def add_SimulatorServicer_to_server(servicer, server):
-  rpc_method_handlers = {
-      'Throw': grpc.unary_unary_rpc_method_handler(
-          servicer.Throw,
-          request_deserializer=flunkyprotocol__pb2.ThrowReq.FromString,
-          response_serializer=flunkyprotocol__pb2.ThrowResp.SerializeToString,
-      ),
-      'Abgegeben': grpc.unary_unary_rpc_method_handler(
-          servicer.Abgegeben,
-          request_deserializer=flunkyprotocol__pb2.AbgegebenReq.FromString,
-          response_serializer=flunkyprotocol__pb2.AbgegebenResp.SerializeToString,
-      ),
-      'RegisterPlayer': grpc.unary_unary_rpc_method_handler(
-          servicer.RegisterPlayer,
-          request_deserializer=flunkyprotocol__pb2.RegisterPlayerReq.FromString,
-          response_serializer=flunkyprotocol__pb2.RegisterPlayerResp.SerializeToString,
-      ),
-      'KickPlayer': grpc.unary_unary_rpc_method_handler(
-          servicer.KickPlayer,
-          request_deserializer=flunkyprotocol__pb2.KickPlayerReq.FromString,
-          response_serializer=flunkyprotocol__pb2.KickPlayerResp.SerializeToString,
-      ),
-      'SwitchTeam': grpc.unary_unary_rpc_method_handler(
-          servicer.SwitchTeam,
-          request_deserializer=flunkyprotocol__pb2.SwitchTeamReq.FromString,
-          response_serializer=flunkyprotocol__pb2.SwitchTeamResp.SerializeToString,
-      ),
-      'ResetGame': grpc.unary_unary_rpc_method_handler(
-          servicer.ResetGame,
-          request_deserializer=flunkyprotocol__pb2.ResetGameReq.FromString,
-          response_serializer=flunkyprotocol__pb2.ResetGameResp.SerializeToString,
-      ),
-      'SelectThrowingPlayer': grpc.unary_unary_rpc_method_handler(
-          servicer.SelectThrowingPlayer,
-          request_deserializer=flunkyprotocol__pb2.SelectThrowingPlayerReq.FromString,
-          response_serializer=flunkyprotocol__pb2.SelectThrowingPlayerResp.SerializeToString,
-      ),
-      'ModifyStrafbierCount': grpc.unary_unary_rpc_method_handler(
-          servicer.ModifyStrafbierCount,
-          request_deserializer=flunkyprotocol__pb2.ModifyStrafbierCountReq.FromString,
-          response_serializer=flunkyprotocol__pb2.ModifyStrafbierCountResp.SerializeToString,
-      ),
-      'SendMessage': grpc.unary_unary_rpc_method_handler(
-          servicer.SendMessage,
-          request_deserializer=flunkyprotocol__pb2.SendMessageReq.FromString,
-          response_serializer=flunkyprotocol__pb2.SendMessageResp.SerializeToString,
-      ),
-      'StreamState': grpc.unary_stream_rpc_method_handler(
-          servicer.StreamState,
-          request_deserializer=flunkyprotocol__pb2.StreamStateReq.FromString,
-          response_serializer=flunkyprotocol__pb2.StreamStateResp.SerializeToString,
-      ),
-      'StreamEvents': grpc.unary_stream_rpc_method_handler(
-          servicer.StreamEvents,
-          request_deserializer=flunkyprotocol__pb2.StreamEventsReq.FromString,
-          response_serializer=flunkyprotocol__pb2.StreamEventsResp.SerializeToString,
-      ),
-      'StreamLog': grpc.unary_stream_rpc_method_handler(
-          servicer.StreamLog,
-          request_deserializer=flunkyprotocol__pb2.LogReq.FromString,
-          response_serializer=flunkyprotocol__pb2.LogResp.SerializeToString,
-      ),
-  }
-  generic_handler = grpc.method_handlers_generic_handler(
-      'endpoints.flunky.simulator.Simulator', rpc_method_handlers)
-  server.add_generic_rpc_handlers((generic_handler,))
+    rpc_method_handlers = {
+            'RegisterPlayer': grpc.unary_unary_rpc_method_handler(
+                    servicer.RegisterPlayer,
+                    request_deserializer=flunkyprotocol__pb2.RegisterPlayerReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.RegisterPlayerResp.SerializeToString,
+            ),
+            'KickPlayer': grpc.unary_unary_rpc_method_handler(
+                    servicer.KickPlayer,
+                    request_deserializer=flunkyprotocol__pb2.KickPlayerReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.KickPlayerResp.SerializeToString,
+            ),
+            'SwitchTeam': grpc.unary_unary_rpc_method_handler(
+                    servicer.SwitchTeam,
+                    request_deserializer=flunkyprotocol__pb2.SwitchTeamReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.SwitchTeamResp.SerializeToString,
+            ),
+            'Throw': grpc.unary_unary_rpc_method_handler(
+                    servicer.Throw,
+                    request_deserializer=flunkyprotocol__pb2.ThrowReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.ThrowResp.SerializeToString,
+            ),
+            'Abgegeben': grpc.unary_unary_rpc_method_handler(
+                    servicer.Abgegeben,
+                    request_deserializer=flunkyprotocol__pb2.AbgegebenReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.AbgegebenResp.SerializeToString,
+            ),
+            'ResetGame': grpc.unary_unary_rpc_method_handler(
+                    servicer.ResetGame,
+                    request_deserializer=flunkyprotocol__pb2.ResetGameReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.ResetGameResp.SerializeToString,
+            ),
+            'SelectThrowingPlayer': grpc.unary_unary_rpc_method_handler(
+                    servicer.SelectThrowingPlayer,
+                    request_deserializer=flunkyprotocol__pb2.SelectThrowingPlayerReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.SelectThrowingPlayerResp.SerializeToString,
+            ),
+            'ModifyStrafbierCount': grpc.unary_unary_rpc_method_handler(
+                    servicer.ModifyStrafbierCount,
+                    request_deserializer=flunkyprotocol__pb2.ModifyStrafbierCountReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.ModifyStrafbierCountResp.SerializeToString,
+            ),
+            'SendMessage': grpc.unary_unary_rpc_method_handler(
+                    servicer.SendMessage,
+                    request_deserializer=flunkyprotocol__pb2.SendMessageReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.SendMessageResp.SerializeToString,
+            ),
+            'StreamState': grpc.unary_stream_rpc_method_handler(
+                    servicer.StreamState,
+                    request_deserializer=flunkyprotocol__pb2.StreamStateReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.StreamStateResp.SerializeToString,
+            ),
+            'StreamEvents': grpc.unary_stream_rpc_method_handler(
+                    servicer.StreamEvents,
+                    request_deserializer=flunkyprotocol__pb2.StreamEventsReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.StreamEventsResp.SerializeToString,
+            ),
+            'StreamLog': grpc.unary_stream_rpc_method_handler(
+                    servicer.StreamLog,
+                    request_deserializer=flunkyprotocol__pb2.LogReq.FromString,
+                    response_serializer=flunkyprotocol__pb2.LogResp.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'endpoints.flunky.simulator.Simulator', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+ # This class is part of an EXPERIMENTAL API.
+class Simulator(object):
+    """A simple Flunkyball API.
+    The API manages throws and teams. Teams contain players.
+    """
+
+    @staticmethod
+    def RegisterPlayer(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/endpoints.flunky.simulator.Simulator/RegisterPlayer',
+            flunkyprotocol__pb2.RegisterPlayerReq.SerializeToString,
+            flunkyprotocol__pb2.RegisterPlayerResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def KickPlayer(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/endpoints.flunky.simulator.Simulator/KickPlayer',
+            flunkyprotocol__pb2.KickPlayerReq.SerializeToString,
+            flunkyprotocol__pb2.KickPlayerResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SwitchTeam(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/endpoints.flunky.simulator.Simulator/SwitchTeam',
+            flunkyprotocol__pb2.SwitchTeamReq.SerializeToString,
+            flunkyprotocol__pb2.SwitchTeamResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Throw(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/endpoints.flunky.simulator.Simulator/Throw',
+            flunkyprotocol__pb2.ThrowReq.SerializeToString,
+            flunkyprotocol__pb2.ThrowResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Abgegeben(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/endpoints.flunky.simulator.Simulator/Abgegeben',
+            flunkyprotocol__pb2.AbgegebenReq.SerializeToString,
+            flunkyprotocol__pb2.AbgegebenResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ResetGame(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/endpoints.flunky.simulator.Simulator/ResetGame',
+            flunkyprotocol__pb2.ResetGameReq.SerializeToString,
+            flunkyprotocol__pb2.ResetGameResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SelectThrowingPlayer(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/endpoints.flunky.simulator.Simulator/SelectThrowingPlayer',
+            flunkyprotocol__pb2.SelectThrowingPlayerReq.SerializeToString,
+            flunkyprotocol__pb2.SelectThrowingPlayerResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ModifyStrafbierCount(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/endpoints.flunky.simulator.Simulator/ModifyStrafbierCount',
+            flunkyprotocol__pb2.ModifyStrafbierCountReq.SerializeToString,
+            flunkyprotocol__pb2.ModifyStrafbierCountResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SendMessage(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/endpoints.flunky.simulator.Simulator/SendMessage',
+            flunkyprotocol__pb2.SendMessageReq.SerializeToString,
+            flunkyprotocol__pb2.SendMessageResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def StreamState(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/endpoints.flunky.simulator.Simulator/StreamState',
+            flunkyprotocol__pb2.StreamStateReq.SerializeToString,
+            flunkyprotocol__pb2.StreamStateResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def StreamEvents(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/endpoints.flunky.simulator.Simulator/StreamEvents',
+            flunkyprotocol__pb2.StreamEventsReq.SerializeToString,
+            flunkyprotocol__pb2.StreamEventsResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def StreamLog(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/endpoints.flunky.simulator.Simulator/StreamLog',
+            flunkyprotocol__pb2.LogReq.SerializeToString,
+            flunkyprotocol__pb2.LogResp.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
