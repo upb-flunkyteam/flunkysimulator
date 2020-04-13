@@ -8,6 +8,7 @@ console.log("Starte Flunkyball-Simulator");
 const {ThrowReq, ThrowResp, EnumThrowStrength, GameState} = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
+var playerName = "";
 
 jQuery(window).load(function () {
     $('#softthrowbutton').click(function () {
@@ -24,6 +25,10 @@ jQuery(window).load(function () {
         if (actionButtonsEnabled) {
             throwing(EnumThrowStrength.HARD);
         }
+    });
+    $('#playernamebutton').click(function () {
+        console.log("Changing username");
+        changePlayername();
     });
     $('#teamadisplay, #teambdisplay').click(function () {
         if (actionButtonsEnabled) {
@@ -52,11 +57,28 @@ function endAction() {
     updateActionButtonDisplay();
 }
 
+function changePlayername(){
+    var request = new RegisterPlayerReq();
+    var desiredPlayername = $('#username').text();
+    request.setPlayername(desiredPlayername);
+    simulatorClient.registerPlayer(request, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        } else {
+            console.log(response.getMessage());
+            //TODO(jdrees): Implement resetting the playerName if request was 
+            //not successful
+            playerName = desiredPlayername;
+        }
+    });
+}
+
 function throwing(strength) {
-    var throwRequest = new ThrowReq();
-    throwRequest.setPlayername($('#username').text());
-    throwRequest.setStrength(strength);
-    simulatorClient.throw(throwRequest, {}, function(err, response) {
+    var request = new ThrowReq();
+    request.setPlayername($('#username').text());
+    request.setStrength(strength);
+    simulatorClient.throw(request, {}, function(err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
