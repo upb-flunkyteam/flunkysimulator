@@ -2,10 +2,13 @@ import grpc
 import flunkyprotocol_pb2 as proto
 import flunkyprotocol_pb2_grpc
 import sys
+import random
 
-#channel = grpc.insecure_channel('viings.de:11049')
-channel = grpc.insecure_channel('localhost:11049')
+channel = grpc.insecure_channel('viings.de:11049')
+#channel = grpc.insecure_channel('localhost:11049')
 stub = flunkyprotocol_pb2_grpc.SimulatorStub(channel)
+
+players = 'hans jurgen marie lola jana'.split()
 
 def registerPlayer(name):
   req = proto.RegisterPlayerReq()
@@ -33,7 +36,7 @@ def registerPlayersAndStartGame():
 
   # go into teams
 
-  for pname in 'hans jurgen marie lola jana'.split():
+  for pname in players:
     req = proto.SwitchTeamReq()
     req.playerName = pname
     req.targetName = pname
@@ -58,11 +61,19 @@ def throwNext( strength = 1):
   print( name + " is throwing")
   throw(name,strength)
 
-def setAbgegeben(player, abgegeben = true):
+def setAbgegeben(player, abgegeben = True):
   req = proto.AbgegebenReq()
   req.playerName = "jemand"
   req.targeName = player
   req.setTo = abgegeben
+  stub.Abgegeben(req)
+
+def modifyStrafbier(increment = True,team = 2):
+  req = proto.ModifyStrafbierCountReq()
+  req.playerName = "Strafbierboy"
+  req.targetTeam = team
+  req.increment = increment
+  stub.ModifyStrafbierCount(req)
 
 def playGame():
   registerPlayersAndStartGame()
@@ -71,14 +82,30 @@ def playGame():
   print (state)
 
   throw(state.state.throwingPlayer)
+
+  rnd = random.Random()
+  for x in range (2):
+    throwNext(rnd.randint(1,3))
+
+  p1 = players[rnd.randint(0,len(players)-1)]
+  setAbgegeben(p1)
+  setAbgegeben(players[rnd.randint(0,len(players)-1)])
+
+  throwNext(rnd.randint(1,3))
+  modifyStrafbier()
+
+  modifyStrafbier(False)
+  setAbgegeben(p1,False)
+  
+  throwNext(rnd.randint(1,3))
   
   #kick all
-  players = []
-  players += [p for p in state.state.spectators]
-  players += [p for p in state.state.playerTeamA]
-  players += [p for p in state.state.playerTeamB]
+  playersA = []
+  playersA += [p for p in state.state.spectators]
+  playersA += [p for p in state.state.playerTeamA]
+  playersA += [p for p in state.state.playerTeamB]
 
-  pnames= [p.name for p in players]
+  pnames= [p.name for p in playersA]
   for pname in pnames:
       req = proto.KickPlayerReq()
       req.targeName = pname
