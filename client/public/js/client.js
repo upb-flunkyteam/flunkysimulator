@@ -49,13 +49,9 @@ var actionButtonsEnabled = true;
 
 function subscribeStreams(){
     var request = new StreamStateReq();
-    simulatorClient.streamState()(request, {}, function(err, response) {
-        if (err) {
-            console.log(err.code);
-            console.log(err.message);
-        } else {
-            console.log(response.getEvent());
-        }
+    var stateStream = simulatorClient.streamState(request, {});
+    stateStream.on('data', function (response) {
+        console.log("New Game State: ", response.getGameState());
     });
 }
 
