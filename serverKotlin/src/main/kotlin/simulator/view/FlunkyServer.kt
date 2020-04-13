@@ -78,6 +78,9 @@ class FlunkyServer(
                 " hat die Strafbiere für ${request.targetTeam} nicht verändert."
             )
         }
+
+        responseObserver?.onNext(ModifyStrafbierCountResp.getDefaultInstance())
+        responseObserver?.onCompleted()
     }
 
     override fun resetGame(request: ResetGameReq?, responseObserver: StreamObserver<ResetGameResp>?) {
@@ -161,6 +164,7 @@ class FlunkyServer(
         super.streamEvents(request, responseObserver)
     }
 
+    
     override fun streamLog(request: LogReq?, responseObserver: StreamObserver<LogResp>?) {
 
         val handler =
