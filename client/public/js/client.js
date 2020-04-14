@@ -5,32 +5,38 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {EnumThrowStrength, GameState, ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp, StreamStateReq, StreamStateResp, LogReq, LogResp} = require('./flunkyprotocol_pb');
+const {EnumThrowStrength, GameState, ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp, StreamStateReq, StreamStateResp, LogReq, LogResp, SendMessageReq, SendMessageResp, ResetGameReq, ResetGameResp} = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
 var playerName = "";
 var currentTeamA = true;
-var actionButtonsEnabled = false;
+var actionButtonsEnabled = true;
 var currentGameState = null;
 
 jQuery(window).load(function () {
     $('#softthrowbutton').click(function () {
         if (actionButtonsEnabled) {
-            throwing(EnumThrowStrength.SOFT);
+            throwing(EnumThrowStrength.SOFT_THROW_STRENGTH);
         }
     });
     $('#mediumthrowbutton').click(function () {
         if (actionButtonsEnabled) {
-            throwing(EnumThrowStrength.MEDIUM);
+            throwing(EnumThrowStrength.MEDIUM_THROW_STRENGTH);
         }
     });
     $('#hardthrowbutton').click(function () {
         if (actionButtonsEnabled) {
-            throwing(EnumThrowStrength.HARD);
+            throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
         }
     });
     $('#playernamebutton').click(function () {
         changePlayername();
+    });
+    $('#chatbutton').click(function () {
+        sendMessage();
+    });
+    $('#resetbutton').click(function () {
+        resetGame();
     });
     $('#teamadisplay, #teambdisplay').click(function () {
         if (actionButtonsEnabled) {
@@ -41,10 +47,12 @@ jQuery(window).load(function () {
         stopvideos();
     });
     $('.video').hide();
+    $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     updateTeamDisplay();
     updateActionButtonDisplay();
     simulatorClient = new SimulatorClient('http://viings.de:8080');
     subscribeStreams();
+    changePlayername();
 });
 
 function subscribeStreams(){
@@ -72,8 +80,12 @@ function endAction() {
 
 function changePlayername(){
     var request = new RegisterPlayerReq();
-    var desiredPlayername = $('#username').text();
+    var desiredPlayername = $('#playername').val();
+    if(desiredPlayername === ''){
+        return;
+    }
     request.setPlayername(desiredPlayername);
+    console.log(request.toObject());
     simulatorClient.registerPlayer(request, {}, function(err, response) {
         if (err) {
             console.log(err.code);
@@ -90,7 +102,34 @@ function throwing(strength) {
     var request = new ThrowReq();
     request.setPlayername(playerName);
     request.setStrength(strength);
+    console.log(request.toObject());
     simulatorClient.throw(request, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        }
+    });
+}
+
+function sendMessage(){
+    var request = new SendMessageReq();
+    request.setPlayername(playerName);
+    request.setContent($('#chatinput').val());
+    console.log(request.toObject());
+    simulatorClient.sendMessage(request, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        }
+    });
+    $('#chatinput').val('');
+}
+
+function resetGame(){
+    var request = new ResetGameReq();
+    request.setPlayername(playerName);
+    console.log(request.toObject());
+    simulatorClient.resetGame(request, {}, function(err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -100,14 +139,27 @@ function throwing(strength) {
 
 function processNewState(state){
     currentGameState = state.toObject();
+    if(currentGameState.throwingplayer === playerName){
+        actionButtonsEnabled = true;
+    }else{
+        actionButtonsEnabled = false;
+    }
+    currentTeamA = true;
+    currentGameState.playerteambList.forEach(function(player, index) {
+        if(player.name === currentGameState.throwingplayer){
+            currentTeamA = false;
+        }
+    });
     console.log(currentGameState);
     updateActionButtonDisplay();
+    updateTeamDisplay();
 }
 
 function processNewLog(content){
     $('#logbox').val(function(i, text) {
         return text + '\n' + content;
     });
+    $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
 }
 
 function switchTeams() {
