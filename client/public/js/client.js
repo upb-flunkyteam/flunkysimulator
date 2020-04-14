@@ -9,6 +9,9 @@ const {EnumThrowStrength, GameState, ThrowReq, ThrowResp, RegisterPlayerReq, Reg
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
 var playerName = "";
+var currentTeamA = true;
+var actionButtonsEnabled = false;
+var currentGameState = null;
 
 jQuery(window).load(function () {
     $('#softthrowbutton').click(function () {
@@ -40,18 +43,20 @@ jQuery(window).load(function () {
     $('.video').hide();
     updateTeamDisplay();
     updateActionButtonDisplay();
-    simulatorClient = new SimulatorClient('https://viings.de:8080');
+    simulatorClient = new SimulatorClient('http://viings.de:8080');
     subscribeStreams();
 });
 
-var currentTeamA = true;
-var actionButtonsEnabled = true;
-
 function subscribeStreams(){
-    var request = new StreamStateReq();
-    var stateStream = simulatorClient.streamState(request, {});
-    stateStream.on('data', function (response) {
-        console.log("New Game State: ", response.getGameState());
+    var stateRequest = new StreamStateReq();
+    var stateStream = simulatorClient.streamState(stateRequest, {});
+    stateStream.on('data', (response) => {
+        processNewState(response.getState());
+    });
+    var logRequest = new LogReq();
+    var logStream = simulatorClient.streamLog(logRequest, {});
+    logStream.on('data', (response) => {
+        processNewLog(response.getContent());
     });
 }
 
@@ -83,7 +88,7 @@ function changePlayername(){
 
 function throwing(strength) {
     var request = new ThrowReq();
-    request.setPlayername($('#username').text());
+    request.setPlayername(playerName);
     request.setStrength(strength);
     simulatorClient.throw(request, {}, function(err, response) {
         if (err) {
@@ -94,7 +99,15 @@ function throwing(strength) {
 }
 
 function processNewState(state){
-    console.log(state.getThrowingPlayer());
+    currentGameState = state.toObject();
+    console.log(currentGameState);
+    updateActionButtonDisplay();
+}
+
+function processNewLog(content){
+    $('#logbox').val(function(i, text) {
+        return text + '\n' + content;
+    });
 }
 
 function switchTeams() {
