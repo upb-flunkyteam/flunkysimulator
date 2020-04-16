@@ -176,6 +176,7 @@ function processNewState(state){
 }
 
 function processNewLog(content){
+    console.log("New log message: " + content);
     $('#logbox').val(function(i, text) {
         return text + '\n' + content;
     });
