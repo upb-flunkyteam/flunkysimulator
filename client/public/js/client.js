@@ -58,7 +58,7 @@ jQuery(window).load(function () {
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     updateTeamDisplay();
     updateActionButtonDisplay();
-    simulatorClient = new SimulatorClient('http://viings.de:8080');
+    simulatorClient = new SimulatorClient('https://viings.de:8443');
     subscribeStreams();
     changePlayername();
 });
