@@ -269,3 +269,12 @@ function generatePlayerHTML(player, throwingPlayer) {
         </div>';
     return html;
 }
+
+function generateStrafbierHTML(number){
+    html = '<div class="btn-group btn-group-justified vspace" role="group">';
+    for(var i=0; i < number; i++){
+        html += '<div class="btn btn-default"><span class="glyphicon glyphicon-glass"></span></div>';
+    }
+    html += '</div>';
+    return html;
+}
