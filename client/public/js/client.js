@@ -169,6 +169,8 @@ function processNewState(state){
     currentGameState.spectatorsList.forEach(function(player, index) {    
         $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
     });
+    $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama));
+    $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb));
     updateActionButtonDisplay();
     updateTeamDisplay();
 }
@@ -271,10 +273,11 @@ function generatePlayerHTML(player, throwingPlayer) {
 }
 
 function generateStrafbierHTML(number){
-    html = '<div class="btn-group btn-group-justified vspace" role="group">';
+    html = '<div class="btn-group vspace" role="group">';
     for(var i=0; i < number; i++){
         html += '<div class="btn btn-default"><span class="glyphicon glyphicon-glass"></span></div>';
     }
+    html += '<div class="btn btn-default"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-glass"></span></div>';
     html += '</div>';
     return html;
 }
