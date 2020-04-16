@@ -33,7 +33,15 @@ jQuery(window).load(function () {
         changePlayername();
     });
     $('#chatbutton').click(function () {
+        
+    });
+    $('#chatinput').bind("enterKey",function(e){
         sendMessage();
+    });
+    $('#chatinput').keyup(function(e){
+        if(e.keyCode === 13){
+            $(this).trigger("enterKey");
+        }
     });
     $('#resetbutton').click(function () {
         resetGame();
@@ -151,6 +159,16 @@ function processNewState(state){
         }
     });
     console.log(currentGameState);
+    $('#teamaarea, #teambarea, #spectatorarea').empty();
+    currentGameState.playerteamaList.forEach(function(player, index) {    
+        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+    });
+    currentGameState.playerteambList.forEach(function(player, index) {    
+        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+    });
+    currentGameState.spectatorsList.forEach(function(player, index) {    
+        $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+    });
     updateActionButtonDisplay();
     updateTeamDisplay();
 }
@@ -223,4 +241,31 @@ function updateTeamDisplay() {
     }else{
         $('.video').removeClass('flippedvideo');
     }
+}
+
+function generatePlayerHTML(player, throwingPlayer) {
+    disabled = '';
+    if(player.abgegeben){
+        disabled = ' disabled="disabled"';
+    }
+    classes = ' btn-default';
+    if(player.name === throwingPlayer){
+        classes = ' btn-primary';
+    }
+    html = 
+        '<div class="btn-group btn-group-justified vspace" role="group">\n\
+            <div class="btn' + classes + '"' + disabled + '>'+player.name+'</div>\n\
+            <div class="btn-group" role="group">\n\
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n\
+                    <span class="glyphicon glyphicon-transfer"></span>\n\
+                </button>\n\
+                <ul class="dropdown-menu">\n\
+                    <li><a href="">Linkes Team</a></li>\n\
+                    <li><a href="">Rechtes Team</a></li>\n\
+                    <li><a href="">Zuschauer</a></li>\n\
+                </ul>\n\
+            </div>\n\
+            <div class="btn btn-danger"><span class="glyphicon glyphicon-ban-circle"></span></div>\n\
+        </div>';
+    return html;
 }

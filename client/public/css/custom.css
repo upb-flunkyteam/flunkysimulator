@@ -22,3 +22,8 @@
 .box {
     padding: 10px;
 }
+
+.vspace {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
