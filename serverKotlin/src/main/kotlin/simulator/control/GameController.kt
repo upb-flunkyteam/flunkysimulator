@@ -114,7 +114,7 @@ class GameController(private val videoController: VideoController) : EventContro
 
     fun resetGameAndShuffleTeams(): Boolean {
         gameStateLock.withLock {
-            val (newPlayers1, newPlayers2) = gameState.activePlayers
+            val (newPlayers1, newPlayers2) = gameState.players
                 .map { p -> p.copy(abgegeben = false) }
                 .shuffleSplitList()
 

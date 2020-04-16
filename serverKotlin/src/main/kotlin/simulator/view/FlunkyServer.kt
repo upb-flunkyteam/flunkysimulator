@@ -29,8 +29,8 @@ class FlunkyServer(
 
         if (gameController.registerPlayer(name))
             messageController.sendMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
-        else
-            messageController.sendMessage(request.playerName, "konnte sich nicht registrieren. Name schon vergeben?")
+        //else
+            //messageController.sendMessage(request.playerName, "konnte sich nicht registrieren. Name schon vergeben?")
 
         responseObserver!!.onNext(RegisterPlayerResp.getDefaultInstance())
         responseObserver.onCompleted()
@@ -160,11 +160,13 @@ class FlunkyServer(
         gameController.addEventHandler(handler::doAction)
     }
 
-    override fun streamEvents(request: StreamEventsReq?, responseObserver: StreamObserver<StreamEventsResp>?) {
-        super.streamEvents(request, responseObserver)
+    override fun streamVideoEvents(
+        request: StreamVideoEventsReq?,
+        responseObserver: StreamObserver<StreamVideoEventsResp>?
+    ) {
+        super.streamVideoEvents(request, responseObserver)
     }
 
-    
     override fun streamLog(request: LogReq?, responseObserver: StreamObserver<LogResp>?) {
 
         val handler =

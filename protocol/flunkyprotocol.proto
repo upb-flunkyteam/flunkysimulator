@@ -8,29 +8,36 @@ option java_package = "de.flunkyteam.endpoints.projects.simulator";
 
 
 // A simple Flunkyball API.
+//
 // The API manages throws and teams. Teams contain players.
 service Simulator {
-	// PLAYER MANAGEMENT
-	rpc RegisterPlayer(RegisterPlayerReq) returns (RegisterPlayerResp);
-	rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
-	rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
 
-	// PLAYER ACTIONS
 	rpc Throw(ThrowReq) returns (ThrowResp);
+	
 	rpc Abgegeben(AbgegebenReq) returns (AbgegebenResp);
-
-	// GAMESTATE MODIFICATIONS
+	
+	rpc RegisterPlayer(RegisterPlayerReq) returns (RegisterPlayerResp);
+	
+	rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
+	
+	rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
+	
 	// resets Strafbier counter, Abgaben, shuffles teams 
 	// and plays prepare game clip afterwards
 	rpc ResetGame(ResetGameReq) returns (ResetGameResp);
+	
 	rpc SelectThrowingPlayer(SelectThrowingPlayerReq) returns (SelectThrowingPlayerResp);
+	
 	rpc ModifyStrafbierCount(ModifyStrafbierCountReq) returns (ModifyStrafbierCountResp);
 
-	// UPDATE STREAMS
 	rpc SendMessage(SendMessageReq) returns (SendMessageResp);
+
 	rpc StreamState(StreamStateReq) returns (stream StreamStateResp);
-	rpc StreamEvents(StreamEventsReq) returns (stream StreamEventsResp);
+	
+	rpc StreamVideoEvents(StreamVideoEventsReq) returns (stream StreamVideoEventsResp);
+	
 	rpc StreamLog(LogReq) returns (stream LogResp);
+
 }
 
 message LogResp{
@@ -39,11 +46,11 @@ message LogResp{
 
 message LogReq{}
 
-message StreamEventsResp{
-	Event event = 1;
+message StreamVideoEventsResp{
+	VideoEvent event = 1;
 }
 
-message StreamEventsReq{}
+message StreamVideoEventsReq{}
 
 message StreamStateResp{
 	GameState state = 1;
@@ -55,7 +62,7 @@ message SelectThrowingPlayerResp {}
 
 message SelectThrowingPlayerReq{
 	string playerName = 1;
-	string targetName = 2;
+	string targeName = 2;
 }
 
 message ModifyStrafbierCountResp{}
@@ -91,7 +98,7 @@ message KickPlayerResp{};
 
 message KickPlayerReq{
 	string playerName = 1;
-	string targetName = 2;
+	string targeName = 2;
 }
 
 
@@ -105,7 +112,7 @@ message AbgegebenResp{};
 
 message AbgegebenReq{
 	string playerName = 1;
-	string targetName = 2;
+	string targeName = 2;
 	bool setTo = 3;
 }
 
@@ -118,8 +125,7 @@ message ThrowResp{
 	bool success = 1;
 }
 
-
-message Event{
+message VideoEvent{
 	oneof event_oneof {
 		PrepareVideoEvent prepareVideo = 1;
 		PlayVideosEvent playVideos = 2;
@@ -127,7 +133,8 @@ message Event{
 }
 
 message PrepareVideoEvent{
-	repeated string url = 1;
+	string url = 1;
+	EnumVideoType videoType = 2;
 }
 
 message PlayVideosEvent{
@@ -136,7 +143,7 @@ message PlayVideosEvent{
 
 message TimedVideo{
 	int64 delay =1;
-	string url = 2;
+	EnumVideoType videoType = 2;
 	bool mirrored = 3;
 }
 
@@ -167,4 +174,13 @@ enum EnumTeams{
   SPECTATOR_TEAMS = 1;
   TEAM_A_TEAMS = 2;
   TEAM_B_TEAMS =3;
+}
+
+enum EnumVideoType{
+	UNKNOWN_VIDEOTYPE = 0;
+	SETUP_VIDEOTYPE = 1;
+	HIT_VIDEOTYPE = 2;
+	MISS_VIDEOTYPE = 3;
+	NEAR_MISS_VIDEOTYPE = 4;
+	STOP_VIDEOTYPE = 5;
 }

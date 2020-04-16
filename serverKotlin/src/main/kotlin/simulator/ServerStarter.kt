@@ -22,7 +22,6 @@ class ServerStarter {
     @Throws(IOException::class)
     private fun start() {
 
-
         val messageController = MessageController()
         val videoController = VideoController(messageController)
         val gameController = GameController(videoController)
