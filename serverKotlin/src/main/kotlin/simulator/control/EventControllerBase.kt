@@ -4,7 +4,7 @@ import kotlinx.event.event
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-open class EventController<Event> {
+open class EventControllerBase<Event> {
     protected val handlerLock = ReentrantLock()
     protected val onEvent = event<Event>()
 

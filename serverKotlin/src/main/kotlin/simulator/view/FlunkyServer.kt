@@ -190,7 +190,7 @@ class FlunkyServer(
                 action(event)
             } catch (e: StatusRuntimeException) {
                 if (e.status.code == Status.Code.CANCELLED) {
-                    println("Another stream bites the dust.")
+                    println("Another stream bites the dust. Message: \n ${e.message}")
                     deactiveableHandler.enabled = false
                     /*TODO delete handlers when connection gone but not while iterating
                          through handlers like in this position, because this would casue
