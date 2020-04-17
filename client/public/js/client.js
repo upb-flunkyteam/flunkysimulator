@@ -202,7 +202,7 @@ function abgeben(targetName) {
         }
     });
     console.log(request.toObject());
-    simulatorClient.abgeben(request, {}, function(err, response) {
+    simulatorClient.abgegeben(request, {}, function(err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
