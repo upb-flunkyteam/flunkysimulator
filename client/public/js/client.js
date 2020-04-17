@@ -36,9 +36,6 @@ jQuery(window).load(function () {
             throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
         }
     });
-    $('#abgebenbutton').click(function () {
-        abgeben(playerName);
-    });
     $('#playernamebutton').click(function () {
         changePlayername();
     });
