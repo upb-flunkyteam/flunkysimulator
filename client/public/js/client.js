@@ -32,9 +32,6 @@ jQuery(window).load(function () {
     $('#playernamebutton').click(function () {
         changePlayername();
     });
-    $('#chatbutton').click(function () {
-        
-    });
     $('#chatinput').bind("enterKey",function(e){
         sendMessage();
     });
@@ -58,7 +55,7 @@ jQuery(window).load(function () {
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     updateTeamDisplay();
     updateActionButtonDisplay();
-    simulatorClient = new SimulatorClient('https://viings.de:8443');
+    simulatorClient = new SimulatorClient('http://viings.de:8080');
     subscribeStreams();
     changePlayername();
 });
@@ -73,6 +70,9 @@ function subscribeStreams(){
     var logStream = simulatorClient.streamLog(logRequest, {});
     logStream.on('data', (response) => {
         processNewLog(response.getContent());
+    });
+    logStream.on('error', (response) => {
+        console.log(response);
     });
 }
 
@@ -246,6 +246,18 @@ function updateTeamDisplay() {
     }
 }
 
+function registerStateButtonCallbacks(){
+    $('.switchteamabutton').click(function () {
+        switchTeam('teama', $(this).parents('.playerbuttongroup').children('.namebutton').text());
+    });
+    $('.switchteambbutton').click(function () {
+        switchTeam('teamb', $(this).parents('.playerbuttongroup').children('.namebutton').text());
+    });
+    $('.switchspectatorbutton').click(function () {
+        switchTeam('spectator', $(this).parents('.playerbuttongroup').children('.namebutton').text());
+    });
+}
+
 function generatePlayerHTML(player, throwingPlayer) {
     disabled = '';
     if(player.abgegeben){
@@ -256,19 +268,19 @@ function generatePlayerHTML(player, throwingPlayer) {
         classes = ' btn-primary';
     }
     html = 
-        '<div class="btn-group btn-group-justified vspace" role="group">\n\
-            <div class="btn' + classes + '"' + disabled + '>'+player.name+'</div>\n\
+        '<div class="btn-group btn-group-justified vspace playerbuttongroup" role="group">\n\
+            <div class="btn namebutton' + classes + '"' + disabled + '>'+player.name+'</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n\
                     <span class="glyphicon glyphicon-transfer"></span>\n\
                 </button>\n\
                 <ul class="dropdown-menu">\n\
-                    <li><a href="">Linkes Team</a></li>\n\
-                    <li><a href="">Rechtes Team</a></li>\n\
-                    <li><a href="">Zuschauer</a></li>\n\
+                    <li><a href="#" class="switchteamabutton">Linkes Team</a></li>\n\
+                    <li><a href="#" class="switchteambbutton">Rechtes Team</a></li>\n\
+                    <li><a href="#" class="switchspectatorbutton">Zuschauer</a></li>\n\
                 </ul>\n\
             </div>\n\
-            <div class="btn btn-danger"><span class="glyphicon glyphicon-ban-circle"></span></div>\n\
+            <div class="btn btn-danger kickbutton"><span class="glyphicon glyphicon-ban-circle"></span></div>\n\
         </div>';
     return html;
 }
