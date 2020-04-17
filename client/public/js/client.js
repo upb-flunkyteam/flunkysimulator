@@ -10,7 +10,8 @@ const {EnumThrowStrength, EnumTeams, GameState,
     StreamStateReq, StreamStateResp, LogReq, LogResp, 
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
     ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
-    ModifyStrafbierCountReq, ModifyStrafbierCountResp
+    ModifyStrafbierCountReq, ModifyStrafbierCountResp, 
+    SelectThrowingPlayerReq, SelectThrowingPlayerResp
 } = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
@@ -34,6 +35,9 @@ jQuery(window).load(function () {
         if (actionButtonsEnabled) {
             throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
         }
+    });
+    $('#abgabebutton').click(function () {
+        abgeben();
     });
     $('#playernamebutton').click(function () {
         changePlayername();
@@ -177,6 +181,19 @@ function modifyStrafbierCount(team, increment) {
     });
 }
 
+function selectThrowingPlayer(targetName) {
+    var request = new SelectThrowingPlayerReq();
+    request.setPlayername(playerName);
+    request.setTargetname(targetName);
+    console.log(request.toObject());
+    simulatorClient.selectThrowingPlayer(request, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        }
+    });
+}
+
 function resetGame(){
     var request = new ResetGameReq();
     request.setPlayername(playerName);
@@ -281,6 +298,9 @@ function registerStateButtonCallbacks(){
     });
     $('.kickbutton').click(function () {
         kickPlayer($(this).parents('.playerbuttongroup').children('.namebutton').text());
+    });
+    $('.namebutton').click(function () {
+        selectThrowingPlayer($(this).text());
     });
     $('.strafbierteamabutton.reducebutton').click(function () {
         modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);

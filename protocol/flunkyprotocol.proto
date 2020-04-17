@@ -112,7 +112,7 @@ message AbgegebenResp{};
 
 message AbgegebenReq{
 	string playerName = 1;
-	string targeName = 2;
+	string targetName = 2;
 	bool setTo = 3;
 }
 
