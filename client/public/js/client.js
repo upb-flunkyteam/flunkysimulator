@@ -5,11 +5,16 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {EnumThrowStrength, GameState, ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp, StreamStateReq, StreamStateResp, LogReq, LogResp, SendMessageReq, SendMessageResp, ResetGameReq, ResetGameResp} = require('./flunkyprotocol_pb');
+const {EnumThrowStrength, EnumTeams, GameState, 
+    ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp, 
+    StreamStateReq, StreamStateResp, LogReq, LogResp, 
+    SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
+    ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp
+} = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
 var playerName = "";
-var currentTeamA = true;
+var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
 
@@ -53,7 +58,6 @@ jQuery(window).load(function () {
     });
     $('.video').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-    updateTeamDisplay();
     updateActionButtonDisplay();
     simulatorClient = new SimulatorClient('http://viings.de:8080');
     subscribeStreams();
@@ -99,8 +103,6 @@ function changePlayername(){
             console.log(err.code);
             console.log(err.message);
         } else {
-            //TODO(jdrees): Implement resetting the playerName if request was 
-            //not successful
             playerName = desiredPlayername;
         }
     });
@@ -133,6 +135,33 @@ function sendMessage(){
     $('#chatinput').val('');
 }
 
+function switchTeam(targetTeam, targetName) {
+    var request = new SwitchTeamReq();
+    request.setPlayername(playerName);
+    request.setTargetteam(targetTeam);
+    request.setTargetname(targetName);
+    console.log(request.toObject());
+    simulatorClient.switchTeam(request, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        }
+    });
+}
+
+function kickPlayer(targetName) {
+    var request = new KickPlayerReq();
+    request.setPlayername(playerName);
+    request.setTargetname(targetName);
+    console.log(request.toObject());
+    simulatorClient.switchTeam(request, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        }
+    });
+}
+
 function resetGame(){
     var request = new ResetGameReq();
     request.setPlayername(playerName);
@@ -147,32 +176,33 @@ function resetGame(){
 
 function processNewState(state){
     currentGameState = state.toObject();
+    console.log(currentGameState);
     if(currentGameState.throwingplayer === playerName){
         actionButtonsEnabled = true;
     }else{
         actionButtonsEnabled = false;
     }
-    currentTeamA = true;
-    currentGameState.playerteambList.forEach(function(player, index) {
-        if(player.name === currentGameState.throwingplayer){
-            currentTeamA = false;
-        }
-    });
-    console.log(currentGameState);
+    currentTeam = EnumTeams.UNKNOWN_TEAMS;
     $('#teamaarea, #teambarea, #spectatorarea').empty();
     currentGameState.playerteamaList.forEach(function(player, index) {    
         $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+        if(player.name === currentGameState.throwingplayer){
+            currentTeam = EnumTeams.TEAM_A_TEAMS;
+        }
     });
     currentGameState.playerteambList.forEach(function(player, index) {    
         $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+        if(player.name === currentGameState.throwingplayer){
+            currentTeam = EnumTeams.TEAM_B_TEAMS;
+        }
     });
     currentGameState.spectatorsList.forEach(function(player, index) {    
         $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
     });
+    registerStateButtonCallbacks();
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb));
     updateActionButtonDisplay();
-    updateTeamDisplay();
 }
 
 function processNewLog(content){
@@ -181,11 +211,6 @@ function processNewLog(content){
         return text + '\n' + content;
     });
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-}
-
-function switchTeams() {
-    currentTeamA = !currentTeamA;
-    updateTeamDisplay();
 }
 
 function playvideo(videofolder) {
@@ -229,32 +254,18 @@ function updateActionButtonDisplay() {
     actionButtons.prop('disabled', !actionButtonsEnabled);
 }
 
-function updateTeamDisplay() {
-    if (currentTeamA) {
-        activeteam = $('#teamadisplay');
-        inactiveteam = $('#teambdisplay');
-    } else {
-        activeteam = $('#teambdisplay');
-        inactiveteam = $('#teamadisplay');
-    }
-    activeteam.addClass('btn-info').removeClass('btn-default').prop('disabled', true);
-    inactiveteam.removeClass('btn-info').addClass('btn-default').prop('disabled', false);
-    if (currentTeamA) {
-        $('.video').addClass('flippedvideo');
-    }else{
-        $('.video').removeClass('flippedvideo');
-    }
-}
-
 function registerStateButtonCallbacks(){
     $('.switchteamabutton').click(function () {
-        switchTeam('teama', $(this).parents('.playerbuttongroup').children('.namebutton').text());
+        switchTeam(EnumTeams.TEAM_A_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').text());
     });
     $('.switchteambbutton').click(function () {
-        switchTeam('teamb', $(this).parents('.playerbuttongroup').children('.namebutton').text());
+        switchTeam(EnumTeams.TEAM_B_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').text());
     });
     $('.switchspectatorbutton').click(function () {
-        switchTeam('spectator', $(this).parents('.playerbuttongroup').children('.namebutton').text());
+        switchTeam(EnumTeams.SPECTATOR_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').text());
+    });
+    $('.kickbutton').click(function () {
+        kickPlayer($(this).parents('.playerbuttongroup').children('.namebutton').text());
     });
 }
 
