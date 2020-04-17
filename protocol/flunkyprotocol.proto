@@ -98,7 +98,7 @@ message KickPlayerResp{};
 
 message KickPlayerReq{
 	string playerName = 1;
-	string targeName = 2;
+	string targetName = 2;
 }
 
 
