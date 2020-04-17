@@ -9,7 +9,8 @@ const {EnumThrowStrength, EnumTeams, GameState,
     ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp, 
     StreamStateReq, StreamStateResp, LogReq, LogResp, 
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
-    ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp
+    ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
+    ModifyStrafbierCountReq, ModifyStrafbierCountResp
 } = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
@@ -162,6 +163,20 @@ function kickPlayer(targetName) {
     });
 }
 
+function modifyStrafbierCount(team, increment) {
+    var request = new ModifyStrafbierCountReq();
+    request.setPlayername(playerName);
+    request.setTargetteam(team);
+    request.setIncrement(increment);
+    console.log(request.toObject());
+    simulatorClient.modifyStrafbierCount(request, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        }
+    });
+}
+
 function resetGame(){
     var request = new ResetGameReq();
     request.setPlayername(playerName);
@@ -199,9 +214,9 @@ function processNewState(state){
     currentGameState.spectatorsList.forEach(function(player, index) {    
         $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
     });
+    $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
+    $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
     registerStateButtonCallbacks();
-    $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama));
-    $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb));
     updateActionButtonDisplay();
 }
 
@@ -267,6 +282,18 @@ function registerStateButtonCallbacks(){
     $('.kickbutton').click(function () {
         kickPlayer($(this).parents('.playerbuttongroup').children('.namebutton').text());
     });
+    $('.strafbierteamabutton.reducebutton').click(function () {
+        modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);
+    });
+    $('.strafbierteamabutton.increasebutton').click(function () {
+        modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, true);
+    });
+    $('.strafbierteambbutton.reducebutton').click(function () {
+        modifyStrafbierCount(EnumTeams.TEAM_B_TEAMS, false);
+    });
+    $('.strafbierteambbutton.increasebutton').click(function () {
+        modifyStrafbierCount(EnumTeams.TEAM_B_TEAMS, true);
+    });
 }
 
 function generatePlayerHTML(player, throwingPlayer) {
@@ -296,12 +323,18 @@ function generatePlayerHTML(player, throwingPlayer) {
     return html;
 }
 
-function generateStrafbierHTML(number){
+function generateStrafbierHTML(number, team){
+    teamclass = '';
+    if(team === EnumTeams.TEAM_A_TEAMS){
+        teamclass = ' strafbierteamabutton';
+    }else if(team === EnumTeams.TEAM_B_TEAMS){
+        teamclass = ' strafbierteambbutton';
+    }
     html = '<div class="btn-group vspace" role="group">';
     for(var i=0; i < number; i++){
-        html += '<div class="btn btn-default"><span class="glyphicon glyphicon-glass"></span></div>';
+        html += '<div class="btn btn-default reducebutton'+teamclass+'"><span class="glyphicon glyphicon-glass"></span></div>';
     }
-    html += '<div class="btn btn-default"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-glass"></span></div>';
+    html += '<div class="btn btn-default increasebutton'+teamclass+'"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-glass"></span></div>';
     html += '</div>';
     return html;
 }
