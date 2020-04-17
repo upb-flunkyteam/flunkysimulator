@@ -62,7 +62,7 @@ message SelectThrowingPlayerResp {}
 
 message SelectThrowingPlayerReq{
 	string playerName = 1;
-	string targeName = 2;
+	string targetName = 2;
 }
 
 message ModifyStrafbierCountResp{}
