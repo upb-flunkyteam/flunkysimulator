@@ -61,7 +61,7 @@ jQuery(window).load(function () {
     $('.video').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     updateActionButtonDisplay();
-    simulatorClient = new SimulatorClient('https://viings.de:8443');
+    simulatorClient = new SimulatorClient('http://viings.de:8080');
     subscribeStreams();
     changePlayername();
 });
