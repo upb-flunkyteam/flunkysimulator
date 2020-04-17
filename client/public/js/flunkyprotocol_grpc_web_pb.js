@@ -71,6 +71,166 @@ proto.endpoints.flunky.simulator.SimulatorPromiseClient =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
+ *   !proto.endpoints.flunky.simulator.ThrowReq,
+ *   !proto.endpoints.flunky.simulator.ThrowResp>}
+ */
+const methodDescriptor_Simulator_Throw = new grpc.web.MethodDescriptor(
+  '/endpoints.flunky.simulator.Simulator/Throw',
+  grpc.web.MethodType.UNARY,
+  proto.endpoints.flunky.simulator.ThrowReq,
+  proto.endpoints.flunky.simulator.ThrowResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.ThrowReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.ThrowResp.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.endpoints.flunky.simulator.ThrowReq,
+ *   !proto.endpoints.flunky.simulator.ThrowResp>}
+ */
+const methodInfo_Simulator_Throw = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.endpoints.flunky.simulator.ThrowResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.ThrowReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.ThrowResp.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.ThrowReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.endpoints.flunky.simulator.ThrowResp)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.ThrowResp>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.endpoints.flunky.simulator.SimulatorClient.prototype.throw =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/Throw',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_Throw,
+      callback);
+};
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.ThrowReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.endpoints.flunky.simulator.ThrowResp>}
+ *     A native promise that resolves to the response
+ */
+proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.throw =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/Throw',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_Throw);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.endpoints.flunky.simulator.AbgegebenReq,
+ *   !proto.endpoints.flunky.simulator.AbgegebenResp>}
+ */
+const methodDescriptor_Simulator_Abgegeben = new grpc.web.MethodDescriptor(
+  '/endpoints.flunky.simulator.Simulator/Abgegeben',
+  grpc.web.MethodType.UNARY,
+  proto.endpoints.flunky.simulator.AbgegebenReq,
+  proto.endpoints.flunky.simulator.AbgegebenResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.AbgegebenResp.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.endpoints.flunky.simulator.AbgegebenReq,
+ *   !proto.endpoints.flunky.simulator.AbgegebenResp>}
+ */
+const methodInfo_Simulator_Abgegeben = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.endpoints.flunky.simulator.AbgegebenResp,
+  /**
+   * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.endpoints.flunky.simulator.AbgegebenResp.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.endpoints.flunky.simulator.AbgegebenResp)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.AbgegebenResp>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.endpoints.flunky.simulator.SimulatorClient.prototype.abgegeben =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/Abgegeben',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_Abgegeben,
+      callback);
+};
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.endpoints.flunky.simulator.AbgegebenResp>}
+ *     A native promise that resolves to the response
+ */
+proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.abgegeben =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/Abgegeben',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_Abgegeben);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
  *   !proto.endpoints.flunky.simulator.RegisterPlayerReq,
  *   !proto.endpoints.flunky.simulator.RegisterPlayerResp>}
  */
@@ -305,166 +465,6 @@ proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.switchTeam =
       request,
       metadata || {},
       methodDescriptor_Simulator_SwitchTeam);
-};
-
-
-/**
- * @const
- * @type {!grpc.web.MethodDescriptor<
- *   !proto.endpoints.flunky.simulator.ThrowReq,
- *   !proto.endpoints.flunky.simulator.ThrowResp>}
- */
-const methodDescriptor_Simulator_Throw = new grpc.web.MethodDescriptor(
-  '/endpoints.flunky.simulator.Simulator/Throw',
-  grpc.web.MethodType.UNARY,
-  proto.endpoints.flunky.simulator.ThrowReq,
-  proto.endpoints.flunky.simulator.ThrowResp,
-  /**
-   * @param {!proto.endpoints.flunky.simulator.ThrowReq} request
-   * @return {!Uint8Array}
-   */
-  function(request) {
-    return request.serializeBinary();
-  },
-  proto.endpoints.flunky.simulator.ThrowResp.deserializeBinary
-);
-
-
-/**
- * @const
- * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.endpoints.flunky.simulator.ThrowReq,
- *   !proto.endpoints.flunky.simulator.ThrowResp>}
- */
-const methodInfo_Simulator_Throw = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.endpoints.flunky.simulator.ThrowResp,
-  /**
-   * @param {!proto.endpoints.flunky.simulator.ThrowReq} request
-   * @return {!Uint8Array}
-   */
-  function(request) {
-    return request.serializeBinary();
-  },
-  proto.endpoints.flunky.simulator.ThrowResp.deserializeBinary
-);
-
-
-/**
- * @param {!proto.endpoints.flunky.simulator.ThrowReq} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
- *     call metadata
- * @param {function(?grpc.web.Error, ?proto.endpoints.flunky.simulator.ThrowResp)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.ThrowResp>|undefined}
- *     The XHR Node Readable Stream
- */
-proto.endpoints.flunky.simulator.SimulatorClient.prototype.throw =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
-      '/endpoints.flunky.simulator.Simulator/Throw',
-      request,
-      metadata || {},
-      methodDescriptor_Simulator_Throw,
-      callback);
-};
-
-
-/**
- * @param {!proto.endpoints.flunky.simulator.ThrowReq} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
- *     call metadata
- * @return {!Promise<!proto.endpoints.flunky.simulator.ThrowResp>}
- *     A native promise that resolves to the response
- */
-proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.throw =
-    function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
-      '/endpoints.flunky.simulator.Simulator/Throw',
-      request,
-      metadata || {},
-      methodDescriptor_Simulator_Throw);
-};
-
-
-/**
- * @const
- * @type {!grpc.web.MethodDescriptor<
- *   !proto.endpoints.flunky.simulator.AbgegebenReq,
- *   !proto.endpoints.flunky.simulator.AbgegebenResp>}
- */
-const methodDescriptor_Simulator_Abgegeben = new grpc.web.MethodDescriptor(
-  '/endpoints.flunky.simulator.Simulator/Abgegeben',
-  grpc.web.MethodType.UNARY,
-  proto.endpoints.flunky.simulator.AbgegebenReq,
-  proto.endpoints.flunky.simulator.AbgegebenResp,
-  /**
-   * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request
-   * @return {!Uint8Array}
-   */
-  function(request) {
-    return request.serializeBinary();
-  },
-  proto.endpoints.flunky.simulator.AbgegebenResp.deserializeBinary
-);
-
-
-/**
- * @const
- * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.endpoints.flunky.simulator.AbgegebenReq,
- *   !proto.endpoints.flunky.simulator.AbgegebenResp>}
- */
-const methodInfo_Simulator_Abgegeben = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.endpoints.flunky.simulator.AbgegebenResp,
-  /**
-   * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request
-   * @return {!Uint8Array}
-   */
-  function(request) {
-    return request.serializeBinary();
-  },
-  proto.endpoints.flunky.simulator.AbgegebenResp.deserializeBinary
-);
-
-
-/**
- * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
- *     call metadata
- * @param {function(?grpc.web.Error, ?proto.endpoints.flunky.simulator.AbgegebenResp)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.AbgegebenResp>|undefined}
- *     The XHR Node Readable Stream
- */
-proto.endpoints.flunky.simulator.SimulatorClient.prototype.abgegeben =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
-      '/endpoints.flunky.simulator.Simulator/Abgegeben',
-      request,
-      metadata || {},
-      methodDescriptor_Simulator_Abgegeben,
-      callback);
-};
-
-
-/**
- * @param {!proto.endpoints.flunky.simulator.AbgegebenReq} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
- *     call metadata
- * @return {!Promise<!proto.endpoints.flunky.simulator.AbgegebenResp>}
- *     A native promise that resolves to the response
- */
-proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.abgegeben =
-    function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
-      '/endpoints.flunky.simulator.Simulator/Abgegeben',
-      request,
-      metadata || {},
-      methodDescriptor_Simulator_Abgegeben);
 };
 
 
@@ -866,75 +866,75 @@ proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.streamState =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.endpoints.flunky.simulator.StreamEventsReq,
- *   !proto.endpoints.flunky.simulator.StreamEventsResp>}
+ *   !proto.endpoints.flunky.simulator.StreamVideoEventsReq,
+ *   !proto.endpoints.flunky.simulator.StreamVideoEventsResp>}
  */
-const methodDescriptor_Simulator_StreamEvents = new grpc.web.MethodDescriptor(
-  '/endpoints.flunky.simulator.Simulator/StreamEvents',
+const methodDescriptor_Simulator_StreamVideoEvents = new grpc.web.MethodDescriptor(
+  '/endpoints.flunky.simulator.Simulator/StreamVideoEvents',
   grpc.web.MethodType.SERVER_STREAMING,
-  proto.endpoints.flunky.simulator.StreamEventsReq,
-  proto.endpoints.flunky.simulator.StreamEventsResp,
+  proto.endpoints.flunky.simulator.StreamVideoEventsReq,
+  proto.endpoints.flunky.simulator.StreamVideoEventsResp,
   /**
-   * @param {!proto.endpoints.flunky.simulator.StreamEventsReq} request
+   * @param {!proto.endpoints.flunky.simulator.StreamVideoEventsReq} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  proto.endpoints.flunky.simulator.StreamEventsResp.deserializeBinary
+  proto.endpoints.flunky.simulator.StreamVideoEventsResp.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.endpoints.flunky.simulator.StreamEventsReq,
- *   !proto.endpoints.flunky.simulator.StreamEventsResp>}
+ *   !proto.endpoints.flunky.simulator.StreamVideoEventsReq,
+ *   !proto.endpoints.flunky.simulator.StreamVideoEventsResp>}
  */
-const methodInfo_Simulator_StreamEvents = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.endpoints.flunky.simulator.StreamEventsResp,
+const methodInfo_Simulator_StreamVideoEvents = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.endpoints.flunky.simulator.StreamVideoEventsResp,
   /**
-   * @param {!proto.endpoints.flunky.simulator.StreamEventsReq} request
+   * @param {!proto.endpoints.flunky.simulator.StreamVideoEventsReq} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  proto.endpoints.flunky.simulator.StreamEventsResp.deserializeBinary
+  proto.endpoints.flunky.simulator.StreamVideoEventsResp.deserializeBinary
 );
 
 
 /**
- * @param {!proto.endpoints.flunky.simulator.StreamEventsReq} request The request proto
+ * @param {!proto.endpoints.flunky.simulator.StreamVideoEventsReq} request The request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.StreamEventsResp>}
+ * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.StreamVideoEventsResp>}
  *     The XHR Node Readable Stream
  */
-proto.endpoints.flunky.simulator.SimulatorClient.prototype.streamEvents =
+proto.endpoints.flunky.simulator.SimulatorClient.prototype.streamVideoEvents =
     function(request, metadata) {
   return this.client_.serverStreaming(this.hostname_ +
-      '/endpoints.flunky.simulator.Simulator/StreamEvents',
+      '/endpoints.flunky.simulator.Simulator/StreamVideoEvents',
       request,
       metadata || {},
-      methodDescriptor_Simulator_StreamEvents);
+      methodDescriptor_Simulator_StreamVideoEvents);
 };
 
 
 /**
- * @param {!proto.endpoints.flunky.simulator.StreamEventsReq} request The request proto
+ * @param {!proto.endpoints.flunky.simulator.StreamVideoEventsReq} request The request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.StreamEventsResp>}
+ * @return {!grpc.web.ClientReadableStream<!proto.endpoints.flunky.simulator.StreamVideoEventsResp>}
  *     The XHR Node Readable Stream
  */
-proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.streamEvents =
+proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.streamVideoEvents =
     function(request, metadata) {
   return this.client_.serverStreaming(this.hostname_ +
-      '/endpoints.flunky.simulator.Simulator/StreamEvents',
+      '/endpoints.flunky.simulator.Simulator/StreamVideoEvents',
       request,
       metadata || {},
-      methodDescriptor_Simulator_StreamEvents);
+      methodDescriptor_Simulator_StreamVideoEvents);
 };
 
 
