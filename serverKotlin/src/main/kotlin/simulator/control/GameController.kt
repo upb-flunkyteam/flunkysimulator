@@ -7,7 +7,7 @@ import kotlin.concurrent.withLock
 import kotlin.random.Random
 
 
-class GameController(private val videoController: VideoController) : EventController<GameController.GameStateEvent>() {
+class GameController(private val videoController: VideoController) : EventControllerBase<GameController.GameStateEvent>() {
 
     data class GameStateEvent(val state: GameState)
 
@@ -114,7 +114,7 @@ class GameController(private val videoController: VideoController) : EventContro
 
     fun resetGameAndShuffleTeams(): Boolean {
         gameStateLock.withLock {
-            val (newPlayers1, newPlayers2) = gameState.activePlayers
+            val (newPlayers1, newPlayers2) = gameState.players
                 .map { p -> p.copy(abgegeben = false) }
                 .shuffleSplitList()
 

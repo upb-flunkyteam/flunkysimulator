@@ -2,7 +2,7 @@ package simulator.control
 
 import kotlin.concurrent.withLock
 
-class MessageController: EventController<MessageController.MessageEvent>() {
+class MessageController: EventControllerBase<MessageController.MessageEvent>() {
 
     data class MessageEvent( val content: String)
 

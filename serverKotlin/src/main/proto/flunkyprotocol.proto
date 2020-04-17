@@ -34,7 +34,7 @@ service Simulator {
 
 	rpc StreamState(StreamStateReq) returns (stream StreamStateResp);
 	
-	rpc StreamEvents(StreamEventsReq) returns (stream StreamEventsResp);
+	rpc StreamVideoEvents(StreamVideoEventsReq) returns (stream StreamVideoEventsResp);
 	
 	rpc StreamLog(LogReq) returns (stream LogResp);
 
@@ -46,11 +46,11 @@ message LogResp{
 
 message LogReq{}
 
-message StreamEventsResp{
-	Event event = 1;
+message StreamVideoEventsResp{
+	VideoEvent event = 1;
 }
 
-message StreamEventsReq{}
+message StreamVideoEventsReq{}
 
 message StreamStateResp{
 	GameState state = 1;
@@ -125,8 +125,7 @@ message ThrowResp{
 	bool success = 1;
 }
 
-
-message Event{
+message VideoEvent{
 	oneof event_oneof {
 		PrepareVideoEvent prepareVideo = 1;
 		PlayVideosEvent playVideos = 2;
@@ -134,7 +133,8 @@ message Event{
 }
 
 message PrepareVideoEvent{
-	repeated string url = 1;
+	string url = 1;
+	EnumVideoType videoType = 2;
 }
 
 message PlayVideosEvent{
@@ -143,7 +143,7 @@ message PlayVideosEvent{
 
 message TimedVideo{
 	int64 delay =1;
-	string url = 2;
+	EnumVideoType videoType = 2;
 	bool mirrored = 3;
 }
 
@@ -170,8 +170,17 @@ enum EnumThrowStrength {
 }
 
 enum EnumTeams{
-  UNKNOWN_TEAMS= 0;
+  UNKNOWN_TEAMS = 0;
   SPECTATOR_TEAMS = 1;
   TEAM_A_TEAMS = 2;
   TEAM_B_TEAMS =3;
+}
+
+enum EnumVideoType{
+	UNKNOWN_VIDEOTYPE = 0;
+	SETUP_VIDEOTYPE = 1;
+	HIT_VIDEOTYPE = 2;
+	MISS_VIDEOTYPE = 3;
+	NEAR_MISS_VIDEOTYPE = 4;
+	STOP_VIDEOTYPE = 5;
 }
