@@ -3372,7 +3372,7 @@ proto.endpoints.flunky.simulator.AbgegebenReq.prototype.toObject = function(opt_
 proto.endpoints.flunky.simulator.AbgegebenReq.toObject = function(includeInstance, msg) {
   var f, obj = {
     playername: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    targename: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    targetname: jspb.Message.getFieldWithDefault(msg, 2, ""),
     setto: jspb.Message.getBooleanFieldWithDefault(msg, 3, false)
   };
 
@@ -3416,7 +3416,7 @@ proto.endpoints.flunky.simulator.AbgegebenReq.deserializeBinaryFromReader = func
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setTargename(value);
+      msg.setTargetname(value);
       break;
     case 3:
       var value = /** @type {boolean} */ (reader.readBool());
@@ -3458,7 +3458,7 @@ proto.endpoints.flunky.simulator.AbgegebenReq.serializeBinaryToWriter = function
       f
     );
   }
-  f = message.getTargename();
+  f = message.getTargetname();
   if (f.length > 0) {
     writer.writeString(
       2,
@@ -3494,10 +3494,10 @@ proto.endpoints.flunky.simulator.AbgegebenReq.prototype.setPlayername = function
 
 
 /**
- * optional string targeName = 2;
+ * optional string targetName = 2;
  * @return {string}
  */
-proto.endpoints.flunky.simulator.AbgegebenReq.prototype.getTargename = function() {
+proto.endpoints.flunky.simulator.AbgegebenReq.prototype.getTargetname = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
@@ -3506,7 +3506,7 @@ proto.endpoints.flunky.simulator.AbgegebenReq.prototype.getTargename = function(
  * @param {string} value
  * @return {!proto.endpoints.flunky.simulator.AbgegebenReq} returns this
  */
-proto.endpoints.flunky.simulator.AbgegebenReq.prototype.setTargename = function(value) {
+proto.endpoints.flunky.simulator.AbgegebenReq.prototype.setTargetname = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
 

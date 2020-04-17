@@ -10,8 +10,8 @@ const {EnumThrowStrength, EnumTeams, GameState,
     StreamStateReq, StreamStateResp, LogReq, LogResp, 
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
     ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
-    ModifyStrafbierCountReq, ModifyStrafbierCountResp, 
-    SelectThrowingPlayerReq, SelectThrowingPlayerResp
+    ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq, 
+    AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp
 } = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
@@ -36,8 +36,8 @@ jQuery(window).load(function () {
             throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
         }
     });
-    $('#abgabebutton').click(function () {
-        abgeben();
+    $('#abgebenbutton').click(function () {
+        abgeben(playerName);
     });
     $('#playernamebutton').click(function () {
         changePlayername();
@@ -194,6 +194,25 @@ function selectThrowingPlayer(targetName) {
     });
 }
 
+function abgeben(targetName) {
+    var request = new AbgegebenReq();
+    request.setPlayername(playerName);
+    request.setTargetname(targetName);
+    players = currentGameState.playerteamaList.concat(currentGameState.playerteambList);
+    players.forEach(function(player, index) { 
+        if(player.name === targetName){
+            request.setSetto(!player.abgegeben);
+        }
+    });
+    console.log(request.toObject());
+    simulatorClient.abgeben(request, {}, function(err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        }
+    });
+}
+
 function resetGame(){
     var request = new ResetGameReq();
     request.setPlayername(playerName);
@@ -299,6 +318,9 @@ function registerStateButtonCallbacks(){
     $('.kickbutton').click(function () {
         kickPlayer($(this).parents('.playerbuttongroup').children('.namebutton').text());
     });
+    $('.abgebenbutton').click(function () {
+        abgeben($(this).parents('.playerbuttongroup').children('.namebutton').text());
+    });
     $('.namebutton').click(function () {
         selectThrowingPlayer($(this).text());
     });
@@ -338,7 +360,8 @@ function generatePlayerHTML(player, throwingPlayer) {
                     <li><a href="#" class="switchspectatorbutton">Zuschauer</a></li>\n\
                 </ul>\n\
             </div>\n\
-            <div class="btn btn-danger kickbutton"><span class="glyphicon glyphicon-ban-circle"></span></div>\n\
+            \n\<div class="btn btn-default abgebenbutton"><span class="glyphicon glyphicon-ok-circle"></span></div>\n\
+            <div class="btn btn-default kickbutton"><span class="glyphicon glyphicon-ban-circle"></span></div>\n\
         </div>';
     return html;
 }
