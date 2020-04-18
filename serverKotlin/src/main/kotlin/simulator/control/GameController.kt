@@ -2,15 +2,22 @@ package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import simulator.shuffleSplitList
 import simulator.model.game.*
 import simulator.model.video.VideoInstructions
 import simulator.model.video.VideoType
 import kotlin.concurrent.withLock
 import kotlin.random.Random
+import kotlinx.coroutines.launch
 
 
-class GameController(private val videoController: VideoController) : EventControllerBase<GameController.GameStateEvent>() {
+class GameController(
+    private val videoController: VideoController,
+    private val messageController: MessageController
+) :
+    EventControllerBase<GameController.GameStateEvent>() {
 
     data class GameStateEvent(val state: GameState)
 
@@ -64,7 +71,7 @@ class GameController(private val videoController: VideoController) : EventContro
                 }
                 else -> return false
             }
-            if (Math.random() < probability) {
+            val hit = if (Math.random() < probability) {
                 videosToPlay += VideoInstructions(
                     VideoType.Hit,
                     mirrored = teamAThrows
@@ -72,6 +79,7 @@ class GameController(private val videoController: VideoController) : EventContro
                 val runningTime = (throwingTime + minimumDrinkingTime +
                         Math.random() * (maximumDrinkingTime - minimumDrinkingTime)) * 1000
                 videosToPlay += VideoInstructions(VideoType.Stop, runningTime.toLong())
+                true
             } else {
                 videosToPlay += if (Math.random() < closeMissProbability) {
                     VideoInstructions(
@@ -81,6 +89,7 @@ class GameController(private val videoController: VideoController) : EventContro
                 } else {
                     VideoInstructions(VideoType.Miss, mirrored = teamAThrows)
                 }
+                false
             }
             videoController.playVideos(videosToPlay)
 
@@ -90,6 +99,15 @@ class GameController(private val videoController: VideoController) : EventContro
             val nextThrowingPlayer = gameState.getNextThrowingPlayer(otherTeam)
 
             updateThrowingPlayer(nextThrowingPlayer)
+
+            GlobalScope.launch {
+                delay(10 * 1000)
+                if (hit){
+                    messageController.sendMessage(player.name, "hat für Team ${throwingTeam.name} getroffen.")
+                } else {
+                    messageController.sendMessage(player.name, "hat nicht für Team ${throwingTeam.name} getroffen.")
+                }
+            }
 
             return true
         }
@@ -132,7 +150,7 @@ class GameController(private val videoController: VideoController) : EventContro
             val teamA = if (randBool) newPlayers1 else newPlayers2
             val teamB = if (!randBool) newPlayers1 else newPlayers2
 
-            //determine starting team
+            // determine starting team
             val startingTeam = when {
                 teamA.count() > newPlayers2.count() -> teamB
                 teamB.count() < newPlayers2.count() -> teamA
@@ -151,14 +169,16 @@ class GameController(private val videoController: VideoController) : EventContro
                         + teamB.map { p -> p.copy(team = Team.B) }
             )
 
-            videoController.playVideos(listOf(
-                VideoInstructions(VideoType.Setup),
-                VideoInstructions(
-                    VideoType.Setup,
-                    delay = 5*1000,
-                    mirrored = true
-                ) //TODO get actual setup time
-            ))
+            videoController.playVideos(
+                listOf(
+                    VideoInstructions(VideoType.Setup),
+                    VideoInstructions(
+                        VideoType.Setup,
+                        delay = 5 * 1000,
+                        mirrored = true
+                    )
+                )
+            )
 
             return true
         }
@@ -167,6 +187,8 @@ class GameController(private val videoController: VideoController) : EventContro
     fun registerPlayer(name: String): Boolean {
         if (name.isEmpty())
             return false
+
+        GlobalScope.launch{videoController.refreshVideos()}
 
         gameStateLock.withLock {
             if (gameState.nameTaken(name))
@@ -178,6 +200,7 @@ class GameController(private val videoController: VideoController) : EventContro
 
             return true
         }
+
     }
 
     fun removePlayer(target: String): Boolean {
@@ -205,7 +228,7 @@ class GameController(private val videoController: VideoController) : EventContro
     }
 
     private fun updateThrowingPlayer(player: Player?) {
-        gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player?.name?: ""))
+        gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player?.name ?: ""))
     }
 
     private fun GameState.getNextThrowingPlayer(team: Team): Player? {
@@ -216,7 +239,7 @@ class GameController(private val videoController: VideoController) : EventContro
 
         val inGamePlayersWithIndex = players
             .mapIndexed { index, player -> player to index }
-            .filter { p -> p.first.team == team && !p.first.abgegeben}
+            .filter { p -> p.first.team == team && !p.first.abgegeben }
 
         if (!players.contains(previousThrower)) {
             return inGamePlayersWithIndex.firstOrNull()?.first

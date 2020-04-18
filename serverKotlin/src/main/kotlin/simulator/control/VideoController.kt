@@ -9,19 +9,14 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.withLock
 
+
 class VideoController(private val videoListUrl: String = "https://upbflunkyteamsimulator.herokuapp.com/videolist") :
-    EventControllerBase<VideoController.VideoEvent>() {
+    EventControllerBase<VideoEvent>() {
 
-    sealed class VideoEvent() {
-        data class PlayVideos(val videos: List<VideoInstructions>) :
-            VideoEvent()
-
-        data class PrepareVideo(val type: VideoType, val url: String?) :
-            VideoEvent()
-    }
+    private var lastVideoListRefresh: Long = 0
 
     private var videoUrls: Map<VideoType, List<String>> = VideoType.values()
-        .map { it to listOf<String>() }
+        .map { it to listOf<String>()}
         .toMap()
 
     private val preparedVideos: MutableMap<VideoType, String?> = VideoType.values()
@@ -46,6 +41,11 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
     }
 
     fun refreshVideos() {
+        if (lastVideoListRefresh + 5 * 60 * 1000 > System.currentTimeMillis())
+            return
+
+        lastVideoListRefresh = System.currentTimeMillis()
+
         loadVideoUrls()
 
         VideoType.values().forEach {
@@ -108,7 +108,7 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
 }
 
 fun main() {
-    val vc = VideoController()
+    //val vc = VideoController()
     //vc.sendGetRequest()
 }
 

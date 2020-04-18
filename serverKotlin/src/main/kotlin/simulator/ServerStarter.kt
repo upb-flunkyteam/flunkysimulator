@@ -24,8 +24,8 @@ class ServerStarter {
 
         val messageController = MessageController()
         val videoController = VideoController()
-        val gameController = GameController(videoController)
-        val flunkyServer = FlunkyServer(gameController, messageController)
+        val gameController = GameController(videoController,messageController)
+        val flunkyServer = FlunkyServer(gameController, messageController,videoController)
 
         // debug print
         gameController.addEventHandler { println(it) }

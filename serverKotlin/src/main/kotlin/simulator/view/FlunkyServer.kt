@@ -4,22 +4,28 @@ import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import simulator.DeactiveableHandler
 import simulator.control.GameController
 import simulator.control.MessageController
+import simulator.control.VideoController
+import simulator.control.VideoEvent
 
 class FlunkyServer(
     private val gameController: GameController,
-    private val messageController: MessageController
+    private val messageController: MessageController,
+    private val videoController: VideoController
 ) : SimulatorGrpc.SimulatorImplBase() {
 
     override fun throw_(request: ThrowReq?, responseObserver: StreamObserver<ThrowResp>?) {
 
-        if (gameController.throwBall(request!!.playerName, request.strength))
-            messageController.sendMessage(request.playerName, "hat ${request.strength} geworfen")
-        else
-            messageController.sendMessage(request.playerName, "darf nicht werfen")
-
+        GlobalScope.launch {
+            if (gameController.throwBall(request!!.playerName, request.strength))
+                messageController.sendMessage(request.playerName, "hat ${request.strength} geworfen")
+            else
+                messageController.sendMessage(request.playerName, "darf nicht werfen")
+        }
         responseObserver?.onNext(ThrowResp.getDefaultInstance())
         responseObserver?.onCompleted()
     }
@@ -148,7 +154,7 @@ class FlunkyServer(
 
         // output future states
         val handler =
-            registerHandler { event: GameController.GameStateEvent ->
+            buildRegisterHandler { event: GameController.GameStateEvent ->
                 //fails if stream is closed
                 responseObserver?.onNext(
                     StreamStateResp.newBuilder()
@@ -164,13 +170,22 @@ class FlunkyServer(
         request: StreamVideoEventsReq?,
         responseObserver: StreamObserver<StreamVideoEventsResp>?
     ) {
-        super.streamVideoEvents(request, responseObserver)
+        val handler =
+            buildRegisterHandler { event: VideoEvent ->
+                responseObserver?.onNext(
+                    StreamVideoEventsResp.newBuilder()
+                        .setEvent(event.toGrpc())
+                        .build()
+                )
+            }
+
+        videoController.addEventHandler (handler::doAction)
     }
 
     override fun streamLog(request: LogReq?, responseObserver: StreamObserver<LogResp>?) {
 
         val handler =
-            registerHandler { event: MessageController.MessageEvent ->
+            buildRegisterHandler { event: MessageController.MessageEvent ->
                 responseObserver?.onNext(
                     LogResp.newBuilder()
                         .setContent(event.content)
@@ -184,7 +199,7 @@ class FlunkyServer(
     /***
      * action should put something in a responseObserver
      */
-    private fun <Event> registerHandler(action: (Event) -> Unit): DeactiveableHandler<Event> =
+    private fun <Event> buildRegisterHandler(action: (Event) -> Unit): DeactiveableHandler<Event> =
         DeactiveableHandler({ event: Event,
                               deactiveableHandler: DeactiveableHandler<Event> ->
             try {
