@@ -1,4 +1,4 @@
-package simulator.model
+package simulator.model.game
 
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 

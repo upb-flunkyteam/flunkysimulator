@@ -2,7 +2,10 @@ package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
-import simulator.model.*
+import simulator.shuffleSplitList
+import simulator.model.game.*
+import simulator.model.video.VideoInstructions
+import simulator.model.video.VideoType
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 
@@ -62,13 +65,19 @@ class GameController(private val videoController: VideoController) : EventContro
                 else -> return false
             }
             if (Math.random() < probability) {
-                videosToPlay += VideoInstructions(VideoType.Hit, mirrored = teamAThrows)
-                val runningTime = throwingTime + minimumDrinkingTime +
-                        Math.random() * (maximumDrinkingTime - minimumDrinkingTime)
-                videosToPlay += VideoInstructions(VideoType.Stop, runningTime)
+                videosToPlay += VideoInstructions(
+                    VideoType.Hit,
+                    mirrored = teamAThrows
+                )
+                val runningTime = (throwingTime + minimumDrinkingTime +
+                        Math.random() * (maximumDrinkingTime - minimumDrinkingTime)) * 1000
+                videosToPlay += VideoInstructions(VideoType.Stop, runningTime.toLong())
             } else {
                 videosToPlay += if (Math.random() < closeMissProbability) {
-                    VideoInstructions(VideoType.CloseMiss, mirrored = teamAThrows)
+                    VideoInstructions(
+                        VideoType.CloseMiss,
+                        mirrored = teamAThrows
+                    )
                 } else {
                     VideoInstructions(VideoType.Miss, mirrored = teamAThrows)
                 }
@@ -144,7 +153,11 @@ class GameController(private val videoController: VideoController) : EventContro
 
             videoController.playVideos(listOf(
                 VideoInstructions(VideoType.Setup),
-                VideoInstructions(VideoType.Setup, delay = 5.0,mirrored = true) //TODO get actual setup time
+                VideoInstructions(
+                    VideoType.Setup,
+                    delay = 5*1000,
+                    mirrored = true
+                ) //TODO get actual setup time
             ))
 
             return true
@@ -193,13 +206,6 @@ class GameController(private val videoController: VideoController) : EventContro
 
     private fun updateThrowingPlayer(player: Player?) {
         gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player?.name?: ""))
-    }
-
-    private fun <E> List<E>.shuffleSplitList(): Pair<List<E>, List<E>> {
-        val shuffled = this.shuffled()
-
-        return shuffled.filterIndexed(predicate = { index, _ -> index % 2 == 1 }).toList() to
-                shuffled.filterIndexed(predicate = { index, _ -> index % 2 == 0 }).toList()
     }
 
     private fun GameState.getNextThrowingPlayer(team: Team): Player? {

@@ -23,7 +23,7 @@ class ServerStarter {
     private fun start() {
 
         val messageController = MessageController()
-        val videoController = VideoController(messageController)
+        val videoController = VideoController()
         val gameController = GameController(videoController)
         val flunkyServer = FlunkyServer(gameController, messageController)
 
