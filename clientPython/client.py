@@ -4,8 +4,8 @@ import flunkyprotocol_pb2_grpc
 import sys
 import random
 
-channel = grpc.insecure_channel('viings.de:11049')
-#channel = grpc.insecure_channel('localhost:11049')
+#channel = grpc.insecure_channel('viings.de:11049')
+channel = grpc.insecure_channel('localhost:11049')
 stub = flunkyprotocol_pb2_grpc.SimulatorStub(channel)
 
 players = 'hans jurgen marie lola jana'.split()
@@ -118,8 +118,27 @@ def playGame():
   pnames= [p.name for p in state.state.spectators]
 
 
-if (len(sys.argv) == 2 and sys.argv[1] == "listen"):
-  sys.stdout.write('llisten to stream') ; sys.stdout.flush()
-  req = proto.StreamStateReq()
-  for x in stub.StreamState(req):
-    sys.stdout.write(str(x)) ; sys.stdout.flush()
+if (len(sys.argv) == 2):
+  arg = sys.argv[1]
+  if(arg == "listenS"):
+    sys.stdout.write('listen to state stream  ') ; sys.stdout.flush()
+    req = proto.StreamStateReq()
+    for x in stub.StreamState(req):
+      sys.stdout.write(str(x)) ; sys.stdout.flush()
+      
+  if(arg == "listenL"):
+    sys.stdout.write('listen to log stream   ') ; sys.stdout.flush()
+    req = proto.LogReq()
+    for x in stub.StreamLog(req):
+      sys.stdout.write(str(x)) ; sys.stdout.flush()
+      
+  if(arg == "listenV"):
+    sys.stdout.write('listen to video event stream   ') ; sys.stdout.flush()
+    req = proto.StreamVideoEventsReq()
+    for x in stub.StreamVideoEvents(req):
+      sys.stdout.write(str(x)) ; sys.stdout.flush()
+    
+
+
+
+  
