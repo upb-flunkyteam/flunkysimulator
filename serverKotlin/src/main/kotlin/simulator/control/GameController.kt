@@ -164,8 +164,7 @@ class GameController(
                 roundState = RoundState(
                     throwingPlayer = startingTeam.firstOrNull()?.name
                 ),
-                players = gameState.Spectators
-                        + teamA.map { p -> p.copy(team = Team.A) }
+                players = teamA.map { p -> p.copy(team = Team.A) }
                         + teamB.map { p -> p.copy(team = Team.B) }
             )
 
