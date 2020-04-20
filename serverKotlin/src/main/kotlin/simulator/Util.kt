@@ -13,3 +13,8 @@ fun <E> List<E>.getRandomElement(): E? = if (this.isEmpty())
     null
 else
     this[Random.nextInt(this.size)]
+
+fun String.removeFirstAndLast(): String = if (this.length <= 1)
+    this
+else
+    this.subSequence(1, this.length-1).toString()

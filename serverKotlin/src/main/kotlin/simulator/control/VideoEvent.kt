@@ -23,7 +23,7 @@ sealed class VideoEvent() {
         }
     }
 
-    data class PrepareVideo(val type: VideoType, val url: String?) :
+    data class PrepareVideo(val type: VideoType, val url: String) :
         VideoEvent() {
         override fun toGrpc(): de.flunkyteam.endpoints.projects.simulator.VideoEvent {
             return de.flunkyteam.endpoints.projects.simulator.VideoEvent

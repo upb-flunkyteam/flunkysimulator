@@ -3,6 +3,7 @@ package simulator.control
 import simulator.getRandomElement
 import simulator.model.video.VideoInstructions
 import simulator.model.video.VideoType
+import simulator.removeFirstAndLast
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -16,7 +17,7 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
     private var lastVideoListRefresh: Long = 0
 
     private var videoUrls: Map<VideoType, List<String>> = VideoType.values()
-        .map { it to listOf<String>()}
+        .map { it to listOf<String>() }
         .toMap()
 
     private val preparedVideos: MutableMap<VideoType, String?> = VideoType.values()
@@ -60,26 +61,27 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
     }
 
     /***
-     * DOES NOT LOCK! But requires it to notify clients!
+     * DOES NOT LOCK by itself! But requires it to notify clients!
      */
     private fun setPreparedVideo(url: String?, type: VideoType) {
         preparedVideos[type] = url
-        if (handlerLock.isHeldByCurrentThread)
-            onEvent(VideoEvent.PrepareVideo(type,url))
+        if (handlerLock.isHeldByCurrentThread && url != null)
+            onEvent(VideoEvent.PrepareVideo(type, url))
     }
 
     /***
      * sendGetRequest, parse and save
      */
     private fun loadVideoUrls() {
-        //TODO sendGetReqest, parse and save
-
-        //dummy
-        videoUrls = VideoType.values().map { it to listOf("$it Bewegtbild","$it Bewegtbild 2") }.toMap()
-
+        try {
+            val videoListResp = sendGetRequest()
+            videoUrls = parseJson(videoListResp)
+        } catch (t: Throwable){
+            println("Error getting new video list: \n $t")
+        }
     }
 
-    private fun sendGetRequest(): String {
+    internal fun sendGetRequest(): String {
 
         val mURL = URL(videoListUrl)
 
@@ -87,8 +89,8 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
             // optional default is GET
             requestMethod = "GET"
 
-            println("URL : $url")
-            println("Response Code : $responseCode")
+            println("Update VideoList by URL : $url")
+            println("Update VideoList Response Code : $responseCode")
 
             BufferedReader(InputStreamReader(inputStream)).use {
                 val response = StringBuffer()
@@ -99,16 +101,40 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
                     inputLine = it.readLine()
                 }
                 it.close()
-                println("Response : $response")
+                //println("Response : $response")
 
                 return response.toString()
             }
         }
     }
+
+    internal fun parseJson(jsonString: String): Map<VideoType, List<String>> {
+        val withoutBraces = jsonString.removeFirstAndLast()
+        val elements = withoutBraces.split(",").map { it.removeFirstAndLast() }
+
+        return elements.map { path ->
+            val split = path.split("/")
+
+            val type = when (split[0]) {
+                "hit" -> VideoType.Hit
+                "closenohit" -> VideoType.CloseMiss
+                "nohit" -> VideoType.Miss
+                "closemiss" -> VideoType.CloseMiss
+                "miss" -> VideoType.Miss
+                "preparation" -> VideoType.Setup
+                "stop" -> VideoType.Stop
+                else -> error("Unknown Video path type $path")
+            }
+            type to path
+        }.groupBy { it.first }
+            .map { it.key to it.value.map { typeToUrl -> typeToUrl.second } }
+            .toMap()
+    }
 }
 
 fun main() {
-    //val vc = VideoController()
-    //vc.sendGetRequest()
+    val vc = VideoController()
+    val a = vc.parseJson(vc.sendGetRequest())
+    a.forEach { println("${it.key}: ${it.value}") }
 }
 
