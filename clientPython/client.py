@@ -4,8 +4,8 @@ import flunkyprotocol_pb2_grpc
 import sys
 import random
 
-#channel = grpc.insecure_channel('viings.de:11049')
-channel = grpc.insecure_channel('localhost:11049')
+channel = grpc.insecure_channel('flunky.viings.de:11049')
+#channel = grpc.insecure_channel('localhost:11049')
 stub = flunkyprotocol_pb2_grpc.SimulatorStub(channel)
 
 players = 'hans jurgen marie lola jana'.split()
@@ -64,7 +64,7 @@ def throwNext( strength = 1):
 def setAbgegeben(player, abgegeben = True):
   req = proto.AbgegebenReq()
   req.playerName = "jemand"
-  req.targeName = player
+  req.targetName = player
   req.setTo = abgegeben
   stub.Abgegeben(req)
 
