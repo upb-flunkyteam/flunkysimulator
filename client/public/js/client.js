@@ -5,7 +5,7 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {EnumThrowStrength, EnumTeams, GameState, 
+const {EnumThrowStrength, EnumTeams, EnumVideoType, GameState, 
     ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp, 
     StreamStateReq, StreamStateResp, LogReq, LogResp, 
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
@@ -95,16 +95,6 @@ function subscribeStreams(){
         console.log('Error in video event stream:');
         console.log(response);
     });
-}
-
-function startAction() {
-    actionButtonsEnabled = false;
-    updateActionButtonDisplay();
-}
-
-function endAction() {
-    actionButtonsEnabled = true;
-    updateActionButtonDisplay();
 }
 
 function changePlayername(){
@@ -280,42 +270,58 @@ function processNewVideoEvent(videoEvent){
     if(typeof videoEvent.preparevideo !== 'undefined'){
         console.log('Got prepare video event');
         console.log(videoEvent.preparevideo);
+        prepareVideo(videoEvent.preparevideo.url, videoEvent.preparevideo.videotype);
     }
     if(typeof videoEvent.playvideos !== 'undefined'){
         console.log('Got play video event');
         console.log(videoEvent.playvideos);
+        videoEvent.playvideos.videosList.forEach(function(video, index) { 
+            setTimeout(() => {
+                playVideo(video.videotype, video.mirrored);
+            }, video.delay);
+        });
     }
 }
 
-function playvideo(videofolder) {
-    // Abort all previously playing videos
-    stopvideos();
+function prepareVideo(url, videotype){
+    video = getVideoByType(videotype);
+    video.attr('src', url);
+    video[0].load();
+    // Force loading of the video by starting to play it muted and hidden
+    video.prop('muted', false).trigger('play');
+}
 
-    switch (videofolder) {
-        case 'preparation':
-            videos = $('.preparation');
-            break;
-        case 'hit':
-            videos = $('.hit');
-            break;
-        case 'nohit':
-            videos = $('.nohit');
-            break;
-        case 'closenohit':
-            videos = $('.closenohit');
-            break;
-        case 'stop':
-            videos = $('.stop');
-            break;
-        default:
-            return null;
+function playVideo(videotype, mirrored){
+    // Abort all previously playing videos
+    stopVideos();
+    video = getVideoByType(videotype);
+    if(mirrored){
+        video.addClass('mirroredvideo');
+    }else{
+        video.removeClass('mirroredvideo');
     }
-    const video = $(videos[Math.floor(Math.random() * videos.length)]);
-    video.show().trigger('play');
+    video.show().prop('muted', false).trigger('play');
     return video;
 }
 
-function stopvideos() {
+function getVideoByType(videotype){
+    switch (videotype) {
+        case EnumVideoType.HIT_VIDEOTYPE:
+            return $('.hit');
+        case EnumVideoType.MISS_VIDEOTYPE:
+            return $('.miss');
+        case EnumVideoType.NEAR_MISS_VIDEOTYPE:
+            return $('.nearmiss');
+        case EnumVideoType.SETUP_VIDEOTYPE:
+            return $('.setup');
+        case EnumVideoType.STOP_VIDEOTYPE:
+            return $('.stop');
+        default:
+            return null;
+    }
+}
+
+function stopVideos() {
     $('.video').each(function(key, value){
         value.pause();
         value.currentTime = 0;
