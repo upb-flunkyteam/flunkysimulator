@@ -21,19 +21,6 @@ var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
 
-(function($) {
-    $.fn.invisible = function() {
-        return this.each(function() {
-            $(this).css("visibility", "hidden");
-        });
-    };
-    $.fn.visible = function() {
-        return this.each(function() {
-            $(this).css("visibility", "visible");
-        });
-    };
-}(jQuery));
-
 jQuery(window).load(function () {
     $('#softthrowbutton').click(function () {
         if (actionButtonsEnabled) {
@@ -70,9 +57,9 @@ jQuery(window).load(function () {
         }
     });
     $('.video').on('ended', function () {
-        $(this).invisible();
+        $(this).hide();
     });
-    $('.video').invisible();
+    $('.video').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     updateActionButtonDisplay();
     simulatorClient = new SimulatorClient('https://flunky.viings.de:8443');
@@ -313,7 +300,7 @@ function playVideo(videotype, mirrored){
     }else{
         video.removeClass('mirroredvideo');
     }
-    video.visible().prop('muted', false).trigger('play');
+    video.show().prop('muted', false).trigger('play');
     return video;
 }
 
@@ -338,7 +325,7 @@ function stopVideos() {
     $('.video').each(function(key, value){
         value.pause();
         value.currentTime = 0;
-        $(value).invisible();
+        $(value).hide();
     });
 }
 
