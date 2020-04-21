@@ -57,7 +57,7 @@ jQuery(window).load(function () {
         }
     });
     $('.video').on('ended', function () {
-        stopvideos();
+        $(this).hide();
     });
     $('.video').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
@@ -288,7 +288,7 @@ function prepareVideo(url, videotype){
     video.attr('src', 'video/'+url);
     video[0].load();
     // Force loading of the video by starting to play it muted and hidden
-    video.prop('muted', false).trigger('play');
+    video.prop('muted', true).trigger('play');
 }
 
 function playVideo(videotype, mirrored){

@@ -8,36 +8,34 @@ head
     link(href='css/custom.css' rel='stylesheet' type='text/css')
 .container-fluid
     .row
-        .col-md-2
-            .box
-                .row
-                    .col-md-12
-                        h2 Aktionen
-                        .vspace
-                            .btn-group-vertical
-                                button#softthrowbutton.btn.btn-default Vorsichtig werfen
-                                button#mediumthrowbutton.btn.btn-default Werfen
-                                button#hardthrowbutton.btn.btn-default Kräftig werfen
-                        .vspace
-                            .btn-group-vertical
-                                button#resetbutton.btn.btn-danger Spiel neu starten
-                .row
-                    #statearea.col-md-12.hidden-xs
-                        h3 Linkes Team
-                        #teamaarea
-                        h3 Rechtes Team
-                        #teambarea
-                        h3 Zuschauer
-                        #spectatorarea
-                        
-        .col-md-7
+        .col-md-7.col-md-push-2
             #mainvideobox
                     video.hit.video(src='video/hit/jonas1.webm' preload='auto') Getroffen!
                     video.miss.video(src='video/nohit/jonas1.webm') Nicht getroffen!
                     video.nearmiss.video(src='video/closenohit/elisa1.webm') Nicht getroffen!
                     video.setup.video(src='video/preparation/jonas1.webm') Wird aufgebaut...
                     video.stop.video(src='video/stop/jan1.webm' preload='auto') Stop!
-        .col-md-3.hidden-xs
+        .col-md-2.col-md-pull-7
+            .row
+                .col-md-12
+                    h2 Aktionen
+                    .vspace
+                        .btn-group-vertical
+                            button#softthrowbutton.btn.btn-default(disabled) Vorsichtig werfen
+                            button#mediumthrowbutton.btn.btn-default(disabled) Werfen
+                            button#hardthrowbutton.btn.btn-default(disabled) Kräftig werfen
+                    .vspace
+                        .btn-group-vertical
+                            button#resetbutton.btn.btn-danger Spiel neu starten
+            .row
+                #statearea.col-md-12
+                    h3 Linkes Team
+                    #teamaarea
+                    h3 Rechtes Team
+                    #teambarea
+                    h3 Zuschauer
+                    #spectatorarea
+        .col-md-3
             .vspace
                 h2 Chat
                 .vspace
