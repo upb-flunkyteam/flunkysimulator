@@ -5,13 +5,14 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {EnumThrowStrength, EnumTeams, GameState, 
+const {EnumThrowStrength, EnumTeams, EnumVideoType, GameState, 
     ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp, 
     StreamStateReq, StreamStateResp, LogReq, LogResp, 
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
     ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq, 
-    AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp
+    AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
+    StreamVideoEventsReq, StreamVideoEventsResp
 } = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
@@ -61,7 +62,7 @@ jQuery(window).load(function () {
     $('.video').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     updateActionButtonDisplay();
-    simulatorClient = new SimulatorClient('http://viings.de:8080');
+    simulatorClient = new SimulatorClient('https://flunky.viings.de:8443');
     subscribeStreams();
     changePlayername();
 });
@@ -72,24 +73,28 @@ function subscribeStreams(){
     stateStream.on('data', (response) => {
         processNewState(response.getState());
     });
+    stateStream.on('error', (response) => {
+        console.log('Error in state stream:');
+        console.log(response);
+    });
     var logRequest = new LogReq();
     var logStream = simulatorClient.streamLog(logRequest, {});
     logStream.on('data', (response) => {
         processNewLog(response.getContent());
     });
     logStream.on('error', (response) => {
+        console.log('Error in log stream:');
         console.log(response);
     });
-}
-
-function startAction() {
-    actionButtonsEnabled = false;
-    updateActionButtonDisplay();
-}
-
-function endAction() {
-    actionButtonsEnabled = true;
-    updateActionButtonDisplay();
+    var videoEventsRequest = new StreamVideoEventsReq();
+    var videoEventStream = simulatorClient.streamVideoEvents(videoEventsRequest, {});
+    videoEventStream.on('data', (response) => {
+        processNewVideoEvent(response.getEvent().toObject());
+    });
+    videoEventStream.on('error', (response) => {
+        console.log('Error in video event stream:');
+        console.log(response);
+    });
 }
 
 function changePlayername(){
@@ -156,7 +161,7 @@ function kickPlayer(targetName) {
     request.setPlayername(playerName);
     request.setTargetname(targetName);
     console.log(request.toObject());
-    simulatorClient.switchTeam(request, {}, function(err, response) {
+    simulatorClient.kickPlayer(request, {}, function(err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -261,35 +266,62 @@ function processNewLog(content){
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
 }
 
-function playvideo(videofolder) {
-    // Abort all previously playing videos
-    stopvideos();
-
-    switch (videofolder) {
-        case 'preparation':
-            videos = $('.preparation');
-            break;
-        case 'hit':
-            videos = $('.hit');
-            break;
-        case 'nohit':
-            videos = $('.nohit');
-            break;
-        case 'closenohit':
-            videos = $('.closenohit');
-            break;
-        case 'stop':
-            videos = $('.stop');
-            break;
-        default:
-            return null;
+function processNewVideoEvent(videoEvent){
+    if(typeof videoEvent.preparevideo !== 'undefined'){
+        console.log('Got prepare video event');
+        console.log(videoEvent.preparevideo);
+        prepareVideo(videoEvent.preparevideo.url, videoEvent.preparevideo.videotype);
     }
-    const video = $(videos[Math.floor(Math.random() * videos.length)]);
-    video.show().trigger('play');
+    if(typeof videoEvent.playvideos !== 'undefined'){
+        console.log('Got play video event');
+        console.log(videoEvent.playvideos);
+        videoEvent.playvideos.videosList.forEach(function(video, index) { 
+            setTimeout(() => {
+                playVideo(video.videotype, video.mirrored);
+            }, video.delay);
+        });
+    }
+}
+
+function prepareVideo(url, videotype){
+    video = getVideoByType(videotype);
+    video.attr('src', 'video/'+url);
+    video[0].load();
+    // Force loading of the video by starting to play it muted and hidden
+    video.prop('muted', false).trigger('play');
+}
+
+function playVideo(videotype, mirrored){
+    // Abort all previously playing videos
+    stopVideos();
+    video = getVideoByType(videotype);
+    if(mirrored){
+        video.addClass('mirroredvideo');
+    }else{
+        video.removeClass('mirroredvideo');
+    }
+    video.show().prop('muted', false).trigger('play');
     return video;
 }
 
-function stopvideos() {
+function getVideoByType(videotype){
+    switch (videotype) {
+        case EnumVideoType.HIT_VIDEOTYPE:
+            return $('.hit');
+        case EnumVideoType.MISS_VIDEOTYPE:
+            return $('.miss');
+        case EnumVideoType.NEAR_MISS_VIDEOTYPE:
+            return $('.nearmiss');
+        case EnumVideoType.SETUP_VIDEOTYPE:
+            return $('.setup');
+        case EnumVideoType.STOP_VIDEOTYPE:
+            return $('.stop');
+        default:
+            return null;
+    }
+}
+
+function stopVideos() {
     $('.video').each(function(key, value){
         value.pause();
         value.currentTime = 0;
