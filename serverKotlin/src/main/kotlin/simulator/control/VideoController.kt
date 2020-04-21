@@ -25,7 +25,6 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
         .toMap()
         .toMutableMap()
 
-
     fun playVideos(instructions: List<VideoInstructions>) {
         val typesWhichNeedNewVideo = instructions
             .map { it.type }
@@ -59,6 +58,9 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
             }
         }
     }
+
+    fun getAllPreparedVideoEvents() = preparedVideos.mapNotNull { pair -> pair.value?.let { VideoEvent.PrepareVideo(pair.key,
+        it)}}
 
     /***
      * DOES NOT LOCK by itself! But requires it to notify clients!
