@@ -156,7 +156,7 @@ function kickPlayer(targetName) {
     request.setPlayername(playerName);
     request.setTargetname(targetName);
     console.log(request.toObject());
-    simulatorClient.switchTeam(request, {}, function(err, response) {
+    simulatorClient.kickPlayer(request, {}, function(err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
