@@ -11,7 +11,8 @@ const {EnumThrowStrength, EnumTeams, GameState,
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
     ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq, 
-    AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp
+    AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
+    StreamVideoEventsReq, StreamVideoEventsResp
 } = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
@@ -72,12 +73,26 @@ function subscribeStreams(){
     stateStream.on('data', (response) => {
         processNewState(response.getState());
     });
+    stateStream.on('error', (response) => {
+        console.log('Error in state stream:');
+        console.log(response);
+    });
     var logRequest = new LogReq();
     var logStream = simulatorClient.streamLog(logRequest, {});
     logStream.on('data', (response) => {
         processNewLog(response.getContent());
     });
     logStream.on('error', (response) => {
+        console.log('Error in log stream:');
+        console.log(response);
+    });
+    var videoEventsRequest = new StreamVideoEventsReq();
+    var videoEventStream = simulatorClient.streamVideoEvents(videoEventsRequest, {});
+    videoEventStream.on('data', (response) => {
+        processNewVideoEvent(response.getEvent().toObject());
+    });
+    videoEventStream.on('error', (response) => {
+        console.log('Error in video event stream:');
         console.log(response);
     });
 }
@@ -259,6 +274,17 @@ function processNewLog(content){
         return text + '\n' + content;
     });
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
+}
+
+function processNewVideoEvent(videoEvent){
+    if(typeof videoEvent.preparevideo !== 'undefined'){
+        console.log('Got prepare video event');
+        console.log(videoEvent.preparevideo);
+    }
+    if(typeof videoEvent.playvideos !== 'undefined'){
+        console.log('Got play video event');
+        console.log(videoEvent.playvideos);
+    }
 }
 
 function playvideo(videofolder) {
