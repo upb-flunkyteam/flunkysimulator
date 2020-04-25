@@ -61,7 +61,6 @@ jQuery(window).load(function () {
     });
     $('.video').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-    updateActionButtonDisplay();
     simulatorClient = new SimulatorClient('https://flunky.viings.de:8443');
     subscribeStreams();
     changePlayername();
