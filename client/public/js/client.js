@@ -20,6 +20,7 @@ var playerName = "";
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
+var lowBandwidth = false;
 
 jQuery(window).load(function () {
     $('#softthrowbutton').click(function () {
@@ -50,6 +51,9 @@ jQuery(window).load(function () {
     });
     $('#resetbutton').click(function () {
         resetGame();
+    });
+    $('#lowbandwidthbutton').change(function() {
+        lowBandwidth = !$(this).prop('checked');
     });
     $('#teamadisplay, #teambdisplay').click(function () {
         if (actionButtonsEnabled) {
@@ -269,16 +273,28 @@ function processNewVideoEvent(videoEvent){
     if(typeof videoEvent.preparevideo !== 'undefined'){
         console.log('Got prepare video event');
         console.log(videoEvent.preparevideo);
-        prepareVideo(videoEvent.preparevideo.url, videoEvent.preparevideo.videotype);
+        if(lowBandwidth){
+            console.log('Ignoring preparation request, we do not show videos');
+        }else{
+            prepareVideo(videoEvent.preparevideo.url, videoEvent.preparevideo.videotype);
+        }
     }
     if(typeof videoEvent.playvideos !== 'undefined'){
         console.log('Got play video event');
         console.log(videoEvent.playvideos);
-        videoEvent.playvideos.videosList.forEach(function(video, index) { 
-            setTimeout(() => {
-                playVideo(video.videotype, video.mirrored);
-            }, video.delay);
-        });
+        if(lowBandwidth){
+            videoEvent.playvideos.videosList.forEach(function(video, index) { 
+                setTimeout(() => {
+                    showCard(video.videotype, video.mirrored);
+                }, video.delay);
+            });
+        }else{
+            videoEvent.playvideos.videosList.forEach(function(video, index) { 
+                setTimeout(() => {
+                    playVideo(video.videotype, video.mirrored);
+                }, video.delay);
+            });
+        }
     }
 }
 
@@ -301,6 +317,10 @@ function playVideo(videotype, mirrored){
     }
     video.show().prop('muted', false).trigger('play');
     return video;
+}
+
+function showCard(videotype, mirrored){
+    
 }
 
 function getVideoByType(videotype){
