@@ -127,7 +127,7 @@ class FlunkyServer(
     override fun abgegeben(request: AbgegebenReq?, responseObserver: StreamObserver<AbgegebenResp>?) {
         if (gameController.setAbgegeben(request!!.targetName, request.setTo)) {
             val text =
-                "hat ${request.targetName}" + if (request.setTo) "s abgabe abgenommen." else " ein Bier geöffnet."
+                "hat ${request.targetName}" + if (request.setTo) "s Abgabe abgenommen." else " ein Bier geöffnet."
             messageController.sendMessage(request.playerName, text)
         } else
             messageController.sendMessage(
