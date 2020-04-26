@@ -102,7 +102,7 @@ class GameController(
 
             GlobalScope.launch {
                 delay(10 * 1000)
-                if (hit){
+                if (hit) {
                     messageController.sendMessage(player.name, "hat für Team ${throwingTeam.name} getroffen.")
                 } else {
                     messageController.sendMessage(player.name, "hat nicht für Team ${throwingTeam.name} getroffen.")
@@ -127,12 +127,22 @@ class GameController(
 
             return when (team) {
                 EnumTeams.TEAM_A_TEAMS -> {
-                    gameState = gameState.copy(strafbiereA = gameState.strafbiereA + diff)
-                    true
+                    val newCount = gameState.strafbiereA + diff
+                    if (newCount < 0)
+                        false
+                    else {
+                        gameState = gameState.copy(strafbiereA = newCount)
+                        true
+                    }
                 }
                 EnumTeams.TEAM_B_TEAMS -> {
-                    gameState = gameState.copy(strafbiereB = gameState.strafbiereB + diff)
-                    true
+                    val newCount = gameState.strafbiereB + diff
+                    if (newCount < 0)
+                        false
+                    else {
+                        gameState = gameState.copy(strafbiereB = newCount)
+                        true
+                    }
                 }
                 else -> false
             }
@@ -187,7 +197,7 @@ class GameController(
         if (name.isEmpty())
             return false
 
-        GlobalScope.launch{videoController.refreshVideos()}
+        GlobalScope.launch { videoController.refreshVideos() }
 
         gameStateLock.withLock {
             if (gameState.nameTaken(name))
