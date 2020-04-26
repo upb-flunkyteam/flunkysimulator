@@ -215,7 +215,10 @@ class GameController(
     fun removePlayer(target: String): Boolean {
         gameStateLock.withLock {
             val player = gameState.getPlayer(target) ?: return false
-            gameState = gameState.removePlayer(player)
+            val newGameState = gameState.removePlayer(player)
+            if (newGameState.roundState.throwingPlayer == player.name)
+                newGameState.copy(roundState = RoundState())
+            gameState = newGameState
             return true
         }
     }
