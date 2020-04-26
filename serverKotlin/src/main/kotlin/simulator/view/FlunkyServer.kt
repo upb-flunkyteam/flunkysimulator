@@ -200,6 +200,7 @@ class FlunkyServer(
                 responseObserver?.onNext(
                     LogResp.newBuilder()
                         .setContent(event.content)
+                        .setSender(event.sender)
                         .build()
                 )
             }

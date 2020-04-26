@@ -4,14 +4,13 @@ import kotlin.concurrent.withLock
 
 class MessageController: EventControllerBase<MessageController.MessageEvent>() {
 
-    data class MessageEvent( val content: String)
+    data class MessageEvent( val content: String, val sender: String)
 
     private val onMessage = onEvent
 
     fun sendMessage(from: String, content: String){
-        val message = "$from $content"
         handlerLock.withLock {
-            onMessage(MessageEvent(message))
+            onMessage(MessageEvent(content, from))
         }
     }
 }

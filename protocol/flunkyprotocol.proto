@@ -45,6 +45,7 @@ service Simulator {
 
 message LogResp{
 	string content = 1;
+	string sender = 2;
 }
 
 message LogReq{}
