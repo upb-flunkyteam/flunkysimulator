@@ -22,7 +22,7 @@ class FlunkyServer(
 
         GlobalScope.launch {
             if (gameController.throwBall(request!!.playerName, request.strength))
-                messageController.sendMessage(request.playerName, "hat ${request.strength} geworfen")
+                messageController.sendMessage(request.playerName, "hat ${request.strength.toPrettyString()} geworfen")
             else
                 messageController.sendMessage(request.playerName, "darf nicht werfen")
         }
@@ -230,4 +230,12 @@ class FlunkyServer(
                     throw e
             }
         })
+
+    private fun EnumThrowStrength.toPrettyString() = when(this){
+        EnumThrowStrength.UNKNOWN_THROW_STRENGTH -> "unbekannt"
+        EnumThrowStrength.SOFT_THROW_STRENGTH -> "normal"
+        EnumThrowStrength.MEDIUM_THROW_STRENGTH -> "mittel"
+        EnumThrowStrength.HARD_THROW_STRENGTH -> "stark"
+        EnumThrowStrength.UNRECOGNIZED -> "unbekannt"
+    }
 }

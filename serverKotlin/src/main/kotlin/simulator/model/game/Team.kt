@@ -6,7 +6,13 @@ enum class Team {
     Spectator, A, B
 }
 
-fun Team.getOtherTeam() = when (this) {
+fun Team.positionalName() = when(this){
+    Team.A -> "Links"
+    Team.B -> "Rechts"
+    Team.Spectator -> "Zuschauer"
+}
+
+fun Team.otherTeam() = when (this) {
     Team.A -> Team.B
     Team.B -> Team.A
     else -> throw IllegalArgumentException("There is no other Team for $this.")

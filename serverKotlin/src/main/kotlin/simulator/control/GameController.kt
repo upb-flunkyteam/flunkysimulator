@@ -11,6 +11,7 @@ import simulator.model.video.VideoType
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 import kotlinx.coroutines.launch
+import java.util.concurrent.locks.ReentrantLock
 
 
 class GameController(
@@ -95,18 +96,25 @@ class GameController(
 
             lastThrowingPlayer[throwingTeam] = player
 
-            val otherTeam = throwingTeam.getOtherTeam()
+            val otherTeam = throwingTeam.otherTeam()
             val nextThrowingPlayer = gameState.getNextThrowingPlayer(otherTeam)
 
-            updateThrowingPlayer(nextThrowingPlayer)
+
 
             GlobalScope.launch {
-                delay(10 * 1000)
+                if (hit)
+                    delay(5 * 1000)
+                else
+                    delay(3 * 1000)
+
+
                 if (hit) {
-                    messageController.sendMessage(player.name, "hat für Team ${throwingTeam.name} getroffen.")
+                    messageController.sendMessage(player.name, "hat für Team ${throwingTeam.positionalName()} getroffen.")
                 } else {
-                    messageController.sendMessage(player.name, "hat nicht für Team ${throwingTeam.name} getroffen.")
+                    messageController.sendMessage(player.name, "hat nicht für Team ${throwingTeam.positionalName()} getroffen.")
                 }
+                updateThrowingPlayer(nextThrowingPlayer)
+                messageController.sendMessage(player.name, "ist der/die nächste Wefer.")
             }
 
             return true
