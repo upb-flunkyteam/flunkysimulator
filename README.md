@@ -13,10 +13,6 @@ Den lokalen Branch "videos", der nicht im Github-Repository vorhanden ist, auf H
 
 `git push -f heroku videos:master`
 
-Den lokalen Branch "videos", der nicht im Github-Repository vorhanden ist, auf Heroku deployen
-
-`git push -f heroku videos:master`
-
 Die javascript-resourcen aus commonJS zusammenbauen
 
 `npm run-script build --dev`
