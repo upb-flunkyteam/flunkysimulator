@@ -90,7 +90,7 @@ function subscribeStreams(){
     var logRequest = new LogReq();
     var logStream = simulatorClient.streamLog(logRequest, {});
     logStream.on('data', (response) => {
-        processNewLog(response.getContent());
+        processNewLog(response.getSender(), response.getContent());
     });
     logStream.on('error', (response) => {
         console.log('Error in log stream:');
@@ -268,10 +268,10 @@ function processNewState(state){
     updateActionButtonDisplay();
 }
 
-function processNewLog(content){
+function processNewLog(sender, content){
     console.log("New log message: " + content);
     $('#logbox').val(function(i, text) {
-        return text + '\n' + content;
+        return text + '\n' + sender + ' ' + content;
     });
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
 }
