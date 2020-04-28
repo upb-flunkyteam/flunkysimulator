@@ -456,20 +456,23 @@ function registerStateButtonCallbacks(){
 
 function generatePlayerHTML(player, throwingPlayer) {
     disabled = '';
+    classes = ' btn-default';
+    name = player.name;
+    spacing = 'vspace-small';
     if(player.abgegeben){
         disabled = ' disabled="disabled"';
     }
-    classes = ' btn-default';
-    if(player.name === throwingPlayer){
+    if(name === throwingPlayer){
         classes = ' btn-primary';
     }
-    spacing = 'vspace-small';
-    if(player.name === playerName){
+    if(name === playerName){
         spacing = 'vspace';
+        name = '<b>' + name + '</b>';
     }
+    
     html = 
         '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
-            <div class="btn namebutton' + classes + '"' + disabled + '>'+player.name+'</div>\n\
+            <div class="btn namebutton' + classes + '"' + disabled + '>'+name+'</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n\
                     <span class="glyphicon glyphicon-transfer"></span>\n\
