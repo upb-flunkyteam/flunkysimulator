@@ -59,9 +59,9 @@ jQuery(window).load(function () {
     $('#resetbutton').click(function () {
         resetGame();
     });
-    desktop = window.matchMedia("(min-width: 992px)");
+    desktop = window.matchMedia("(min-width: 992px)").matches;
     if(desktop){
-        $('#lowbandwidthbutton').bootstrapToggle('on')
+        $('#lowbandwidthbutton').bootstrapToggle('on');
     }
     lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
     $('#lowbandwidthbutton').change(function() {
