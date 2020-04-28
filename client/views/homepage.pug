@@ -28,8 +28,8 @@ head
                 #teamaarea
                 h3 Zuschauer
                 #spectatorarea
-            .btn-group-vertical
-                button#resetbutton.btn.btn-danger Spiel neu starten
+            button#resetbutton.btn.btn-danger Spiel neu starten
+            input#lowbandwidthbutton(type="checkbox" checked data-toggle="toggle" data-on="Videomodus" data-off="Textmodus")
         .col-md-3
             .statearea
                 h3 Rechtes Team
@@ -40,5 +40,7 @@ head
 // Optional JavaScript
 script(src='js/jquery-2.2.4.js' type='text/javascript')
 script(src='js/bootstrap.min.js' type='text/javascript')
+// Toggle button
+script(src='js/bootstrap-toggle.js' type='text/javascript')
 // Main client-side JavaScript
 script(src='js/main.js' type='text/javascript')
