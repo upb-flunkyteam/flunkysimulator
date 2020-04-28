@@ -45,7 +45,7 @@ class FlunkyServer(
     override fun kickPlayer(request: KickPlayerReq?, responseObserver: StreamObserver<KickPlayerResp>?) {
         val name = request!!.targetName
 
-        if (gameController.removePlayer(name))
+        if (!request.playerName.isNotBlank() && gameController.removePlayer(name))
             messageController.sendMessage(request.playerName, "hat ${name} rausgeworfen.")
         else
             messageController.sendMessage(request.playerName, "konnte ${name} nicht rauswerfen.")
@@ -60,7 +60,7 @@ class FlunkyServer(
 
 
 
-        if (gameController.switchTeam(name, team))
+        if (!request.playerName.isNotBlank() && gameController.switchTeam(name, team))
             messageController.sendMessage(request.playerName, "hat $name nach ${team.toString()} verschoben.")
         else
             messageController.sendMessage(request.playerName, "konnte ${name} nicht verschieben.")
@@ -70,10 +70,10 @@ class FlunkyServer(
     }
 
     override fun modifyStrafbierCount(
-        request: ModifyStrafbierCountReq?,
+        request: ModifyStrafbierCountReq,
         responseObserver: StreamObserver<ModifyStrafbierCountResp>?
     ) {
-        if (gameController.modifyStrafbierCount(request!!.targetTeam, request.increment)) {
+        if (!request.playerName.isNotBlank() && gameController.modifyStrafbierCount(request.targetTeam, request.increment)) {
             val text = "hat ein Strafbier für ${request.targetTeam} " +
                     if (request.increment)
                         "hinzugefügt"
@@ -91,9 +91,9 @@ class FlunkyServer(
         responseObserver?.onCompleted()
     }
 
-    override fun resetGame(request: ResetGameReq?, responseObserver: StreamObserver<ResetGameResp>?) {
+    override fun resetGame(request: ResetGameReq, responseObserver: StreamObserver<ResetGameResp>?) {
 
-        if (gameController.resetGameAndShuffleTeams())
+        if (!request.playerName.isNotBlank() && gameController.resetGameAndShuffleTeams())
             messageController.sendMessage(
                 request!!.playerName,
                 "den Ground neu ausgemessen, die Kreide nachgezeichnet, die Teams gemischt, die Center nachgefüllt und den Ball aufgepumt."
@@ -106,10 +106,10 @@ class FlunkyServer(
     }
 
     override fun selectThrowingPlayer(
-        request: SelectThrowingPlayerReq?,
+        request: SelectThrowingPlayerReq,
         responseObserver: StreamObserver<SelectThrowingPlayerResp>?
     ) {
-        if (gameController.forceThrowingPlayer(request!!.targetName))
+        if (!request.playerName.isNotBlank() && gameController.forceThrowingPlayer(request!!.targetName))
             messageController.sendMessage(
                 request.playerName,
                 "hat ${request.targetName} als werfenden Spieler festgelegt."
@@ -124,8 +124,8 @@ class FlunkyServer(
         responseObserver?.onCompleted()
     }
 
-    override fun abgegeben(request: AbgegebenReq?, responseObserver: StreamObserver<AbgegebenResp>?) {
-        if (gameController.setAbgegeben(request!!.targetName, request.setTo)) {
+    override fun abgegeben(request: AbgegebenReq, responseObserver: StreamObserver<AbgegebenResp>?) {
+        if (!request.playerName.isNotBlank() && gameController.setAbgegeben(request!!.targetName, request.setTo)) {
             val text =
                 "hat ${request.targetName}" + if (request.setTo) "s Abgabe abgenommen." else " ein Bier geöffnet."
             messageController.sendMessage(request.playerName, text)
