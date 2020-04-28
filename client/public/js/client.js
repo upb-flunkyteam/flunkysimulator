@@ -52,6 +52,10 @@ jQuery(window).load(function () {
     $('#resetbutton').click(function () {
         resetGame();
     });
+    desktop = window.matchMedia("(min-width: 992px)");
+    if(desktop){
+        $('#lowbandwidthbutton').bootstrapToggle('on')
+    }
     lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
     $('#lowbandwidthbutton').change(function() {
         lowBandwidth = !$(this).prop('checked');
