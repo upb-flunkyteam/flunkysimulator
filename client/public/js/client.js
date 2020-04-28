@@ -52,6 +52,7 @@ jQuery(window).load(function () {
     $('#resetbutton').click(function () {
         resetGame();
     });
+    lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
     $('#lowbandwidthbutton').change(function() {
         lowBandwidth = !$(this).prop('checked');
     });
@@ -62,8 +63,10 @@ jQuery(window).load(function () {
     });
     $('.video').on('ended', function () {
         $(this).hide();
+        $('.logoposter').show();
     });
     $('.video').hide();
+    $('.poster').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     simulatorClient = new SimulatorClient('https://flunky.viings.de:8443');
     subscribeStreams();
@@ -284,9 +287,21 @@ function processNewVideoEvent(videoEvent){
         console.log(videoEvent.playvideos);
         if(lowBandwidth){
             videoEvent.playvideos.videosList.forEach(function(video, index) { 
-                setTimeout(() => {
-                    showCard(video.videotype, video.mirrored);
-                }, video.delay);
+                type = video.videotype;
+                if (type === EnumVideoType.HIT_VIDEOTYPE || type === EnumVideoType.MISS_VIDEOTYPE || type === EnumVideoType.NEAR_MISS_VIDEOTYPE){
+                    // Do not spoil the result just yet
+                    console.log('Spoiler alert!');
+                    setTimeout(() => {
+                        playPoster('throw', video.mirrored);
+                    }, video.delay);
+                    setTimeout(() => {
+                        playPoster(video.videotype, video.mirrored);
+                    }, video.delay + 2500);
+                }else{
+                    setTimeout(() => {
+                        playPoster(video.videotype, video.mirrored);
+                    }, video.delay);
+                }
             });
         }else{
             videoEvent.playvideos.videosList.forEach(function(video, index) { 
@@ -309,6 +324,7 @@ function prepareVideo(url, videotype){
 function playVideo(videotype, mirrored){
     // Abort all previously playing videos
     stopVideos();
+    $('.logoposter').hide();
     video = getVideoByType(videotype);
     if(mirrored){
         video.addClass('mirroredvideo');
@@ -319,22 +335,46 @@ function playVideo(videotype, mirrored){
     return video;
 }
 
-function showCard(videotype, mirrored){
-    
+function playPoster(videotype, mirrored){
+    // Hide all previous posters
+    $('.poster').hide();
+    $('.logoposter').hide();
+    poster = getPosterByType(videotype);
+    poster.show();
+    return poster;
+}
+
+function getPosterByType(videotype, mirrored){
+    switch (videotype) {
+        case EnumVideoType.HIT_VIDEOTYPE:
+            return $('.poster.hit');
+        case EnumVideoType.MISS_VIDEOTYPE:
+            return $('.poster.miss');
+        case EnumVideoType.NEAR_MISS_VIDEOTYPE:
+            return $('.poster.nearmiss');
+        case EnumVideoType.SETUP_VIDEOTYPE:
+            return $('.poster.setup');
+        case EnumVideoType.STOP_VIDEOTYPE:
+            return $('.poster.stop');
+        case 'throw':
+            return $('.poster.throw');
+        default:
+            return null;
+    }
 }
 
 function getVideoByType(videotype){
     switch (videotype) {
         case EnumVideoType.HIT_VIDEOTYPE:
-            return $('.hit');
+            return $('.video.hit');
         case EnumVideoType.MISS_VIDEOTYPE:
-            return $('.miss');
+            return $('.video.miss');
         case EnumVideoType.NEAR_MISS_VIDEOTYPE:
-            return $('.nearmiss');
+            return $('.video.nearmiss');
         case EnumVideoType.SETUP_VIDEOTYPE:
-            return $('.setup');
+            return $('.video.setup');
         case EnumVideoType.STOP_VIDEOTYPE:
-            return $('.stop');
+            return $('.video.stop');
         default:
             return null;
     }

@@ -2,7 +2,7 @@
     Created on : Mar 22, 2020, 8:21:12 PM
     Author     : jan
 */
-.video {
+.video, .poster, .logoposter{
   /* override other styles to make responsive */
   width: 100%    !important;
   height: auto   !important;

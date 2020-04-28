@@ -11,11 +11,18 @@ head
     .row
         .col-md-6.col-md-push-3
             #mainvideobox
-                video.hit.video(src='video/hit/jonas1.webm' preload='auto') Getroffen!
-                video.miss.video(src='video/nohit/jonas1.webm') Nicht getroffen!
-                video.nearmiss.video(src='video/closenohit/elisa1.webm') Nicht getroffen!
-                video.setup.video(src='video/preparation/jonas1.webm') Wird aufgebaut...
-                video.stop.video(src='video/stop/jan1.webm' preload='auto') Stop!
+                image.logoposter(src='picture/logoposter.jpg')
+                video.hit.video(src='' preload='auto') Getroffen!
+                video.miss.video(src='') Nicht getroffen!
+                video.nearmiss.video(src='') Nicht getroffen!
+                video.setup.video(src='') Wird aufgebaut...
+                video.stop.video(src='' preload='auto') Stop!
+                image.hit.poster(src='picture/hit.png')
+                image.miss.poster(src='picture/miss.png')
+                image.nearmiss.poster(src='picture/nearmiss.png')
+                image.setup.poster(src='picture/setup.png')
+                image.stop.poster(src='picture/stop.png')
+                image.throw.poster(src='picture/throw.png')
             input#playername.form-control(type="text" placeholder="Spielername")
             button#playernamebutton.btn.btn-default Registrieren
             .btn-group-horizontal
