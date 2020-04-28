@@ -337,11 +337,20 @@ function processNewVideoEvent(videoEvent){
                 }
             });
         }else{
-            videoEvent.playvideos.videosList.forEach(function(video, index) { 
+            videolist = videoEvent.playvideos.videosList
+            first = videolist[0];
+            if(videolist.length === 1){
                 setTimeout(() => {
-                    playVideo(video.videotype, video.mirrored);
-                }, video.delay);
-            });
+                    playVideo(first.videotype, first.mirrored);
+                }, first.delay);
+            }
+            if(videolist.length === 2){
+                setTimeout(() => {
+                    playVideo(first.videotype, first.mirrored);
+                }, first.delay);
+                second = videolist[1];
+                scheduleSecondVideo(first, second);
+            }
         }
     }
 }
@@ -366,6 +375,21 @@ function playVideo(videotype, mirrored){
     }
     video.show().prop('muted', false).trigger('play');
     return video;
+}
+
+function scheduleSecondVideo(first, second){
+    firstVideo = getVideoByType(first.videotype)[0];
+    if (firstVideo.currentTime >= 2.5) {
+        // Ready to play, we have played the first 2.5 seconds
+        setTimeout(() => {
+            playVideo(second.videotype, second.mirrored);
+        }, second.delay - first.delay-2500);
+     } else {
+        // Try again in 100ms
+        setTimeout(() => {
+            scheduleSecondVideo(first, second);
+        }, 100);
+     }
 }
 
 function playPoster(videotype, mirrored){
