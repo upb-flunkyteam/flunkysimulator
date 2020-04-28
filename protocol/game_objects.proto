@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package endpoints.flunky.simulator;
+
+option java_multiple_files = true;
+option java_outer_classname = "GameObjects";
+option java_package = "de.flunkyteam.endpoints.projects.simulator";
+
+message GameState{
+  repeated Player playerTeamA = 1;
+  repeated Player playerTeamB = 2;
+  repeated Player spectators = 3;
+  string throwingPlayer = 10;
+  int64 strafbierTeamA = 11;
+  int64 strafbierTeamB = 12;
+}
+
+message Player{
+  string name = 1;
+  bool abgegeben = 2;
+}
+
+
+enum EnumThrowStrength {
+  UNKNOWN_THROW_STRENGTH = 0;
+  SOFT_THROW_STRENGTH = 1;
+  MEDIUM_THROW_STRENGTH = 2;
+  HARD_THROW_STRENGTH = 3;
+}
+
+enum EnumTeams{
+  UNKNOWN_TEAMS = 0;
+  SPECTATOR_TEAMS = 1;
+  TEAM_A_TEAMS = 2;
+  TEAM_B_TEAMS =3;
+}
+
+enum EnumLoginErrorReason{
+  LOGIN_ERROR_REASON_UNKNOWN = 0;
+  // The name has leading or trailing whitespace.
+  LOGIN_ERROR_REASON_NOT_STRIPED = 1;
+  // The desired name is already taken.
+  LOGIN_ERROR_REASON_NAME_TAKEN = 2;
+  // The given secret does not match
+  LOGIN_ERROR_REASON_SECRET_MISMATCH = 3;
+}

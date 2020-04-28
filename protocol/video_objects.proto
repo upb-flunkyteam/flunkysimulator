@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package endpoints.flunky.simulator;
+
+option java_multiple_files = true;
+option java_outer_classname = "VideoObjects";
+option java_package = "de.flunkyteam.endpoints.projects.simulator";
+
+message VideoEvent{
+  oneof event_oneof {
+    PrepareVideoEvent prepareVideo = 1;
+    PlayVideosEvent playVideos = 2;
+  }
+}
+
+message PrepareVideoEvent{
+  string url = 1;
+  EnumVideoType videoType = 2;
+}
+
+message PlayVideosEvent{
+  repeated TimedVideo videos = 1;
+}
+
+message TimedVideo{
+  int64 delay =1;
+  EnumVideoType videoType = 2;
+  bool mirrored = 3;
+}
+enum EnumVideoType{
+  UNKNOWN_VIDEOTYPE = 0;
+  SETUP_VIDEOTYPE = 1;
+  HIT_VIDEOTYPE = 2;
+  MISS_VIDEOTYPE = 3;
+  NEAR_MISS_VIDEOTYPE = 4;
+  STOP_VIDEOTYPE = 5;
+}

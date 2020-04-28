@@ -22,7 +22,7 @@ class FlunkyServer(
 
         GlobalScope.launch {
             if (gameController.throwBall(request!!.playerName, request.strength))
-                messageController.sendMessage(request.playerName, "hat ${request.strength} geworfen")
+                messageController.sendMessage(request.playerName, "hat ${request.strength.toPrettyString()} geworfen")
             else
                 messageController.sendMessage(request.playerName, "darf nicht werfen")
         }
@@ -43,7 +43,7 @@ class FlunkyServer(
     }
 
     override fun kickPlayer(request: KickPlayerReq?, responseObserver: StreamObserver<KickPlayerResp>?) {
-        val name = request!!.targeName
+        val name = request!!.targetName
 
         if (gameController.removePlayer(name))
             messageController.sendMessage(request.playerName, "hat ${name} rausgeworfen.")
@@ -57,6 +57,8 @@ class FlunkyServer(
     override fun switchTeam(request: SwitchTeamReq?, responseObserver: StreamObserver<SwitchTeamResp>?) {
         val name = request!!.targetName
         val team = request.targetTeam
+
+
 
         if (gameController.switchTeam(name, team))
             messageController.sendMessage(request.playerName, "hat $name nach ${team.toString()} verschoben.")
@@ -107,15 +109,15 @@ class FlunkyServer(
         request: SelectThrowingPlayerReq?,
         responseObserver: StreamObserver<SelectThrowingPlayerResp>?
     ) {
-        if (gameController.forceThrowingPlayer(request!!.targeName))
+        if (gameController.forceThrowingPlayer(request!!.targetName))
             messageController.sendMessage(
                 request.playerName,
-                "hat ${request.targeName} als werfenden Spieler festgelegt."
+                "hat ${request.targetName} als werfenden Spieler festgelegt."
             )
         else
             messageController.sendMessage(
                 request.playerName,
-                "konnte ${request.targeName} nicht als Werfer festlegen. Spielt nicht mit oder nicht existent?"
+                "konnte ${request.targetName} nicht als Werfer festlegen. Spielt nicht mit oder nicht existent?"
             )
 
         responseObserver?.onNext(SelectThrowingPlayerResp.getDefaultInstance())
@@ -123,14 +125,14 @@ class FlunkyServer(
     }
 
     override fun abgegeben(request: AbgegebenReq?, responseObserver: StreamObserver<AbgegebenResp>?) {
-        if (gameController.setAbgegeben(request!!.targeName, request.setTo)) {
+        if (gameController.setAbgegeben(request!!.targetName, request.setTo)) {
             val text =
-                "hat ${request.targeName}" + if (request.setTo) "s abgabe abgenommen." else " ein Bier geöffnet."
+                "hat ${request.targetName}" + if (request.setTo) "s Abgabe abgenommen." else " ein Bier geöffnet."
             messageController.sendMessage(request.playerName, text)
         } else
             messageController.sendMessage(
                 request.playerName,
-                "konnte ${request.targeName} Abgabestatus nicht ändern."
+                "konnte ${request.targetName} Abgabestatus nicht ändern."
             )
 
         responseObserver?.onNext(AbgegebenResp.getDefaultInstance())
@@ -198,6 +200,7 @@ class FlunkyServer(
                 responseObserver?.onNext(
                     LogResp.newBuilder()
                         .setContent(event.content)
+                        .setSender(event.sender)
                         .build()
                 )
             }
@@ -228,4 +231,12 @@ class FlunkyServer(
                     throw e
             }
         })
+
+    private fun EnumThrowStrength.toPrettyString() = when(this){
+        EnumThrowStrength.UNKNOWN_THROW_STRENGTH -> "unbekannt"
+        EnumThrowStrength.SOFT_THROW_STRENGTH -> "normal"
+        EnumThrowStrength.MEDIUM_THROW_STRENGTH -> "mittel"
+        EnumThrowStrength.HARD_THROW_STRENGTH -> "stark"
+        EnumThrowStrength.UNRECOGNIZED -> "unbekannt"
+    }
 }

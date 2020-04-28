@@ -11,6 +11,7 @@ import simulator.model.video.VideoType
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 import kotlinx.coroutines.launch
+import java.util.concurrent.locks.ReentrantLock
 
 
 class GameController(
@@ -95,18 +96,25 @@ class GameController(
 
             lastThrowingPlayer[throwingTeam] = player
 
-            val otherTeam = throwingTeam.getOtherTeam()
+            val otherTeam = throwingTeam.otherTeam()
             val nextThrowingPlayer = gameState.getNextThrowingPlayer(otherTeam)
 
-            updateThrowingPlayer(nextThrowingPlayer)
+
 
             GlobalScope.launch {
-                delay(10 * 1000)
-                if (hit){
-                    messageController.sendMessage(player.name, "hat für Team ${throwingTeam.name} getroffen.")
+                if (hit)
+                    delay(5 * 1000)
+                else
+                    delay(3 * 1000)
+
+
+                if (hit) {
+                    messageController.sendMessage(player.name, "hat für Team ${throwingTeam.positionalName()} getroffen.")
                 } else {
-                    messageController.sendMessage(player.name, "hat nicht für Team ${throwingTeam.name} getroffen.")
+                    messageController.sendMessage(player.name, "hat nicht für Team ${throwingTeam.positionalName()} getroffen.")
                 }
+                updateThrowingPlayer(nextThrowingPlayer)
+                messageController.sendMessage(player.name, "ist der/die nächste Wefer.")
             }
 
             return true
@@ -127,12 +135,22 @@ class GameController(
 
             return when (team) {
                 EnumTeams.TEAM_A_TEAMS -> {
-                    gameState = gameState.copy(strafbiereA = gameState.strafbiereA + diff)
-                    true
+                    val newCount = gameState.strafbiereA + diff
+                    if (newCount < 0)
+                        false
+                    else {
+                        gameState = gameState.copy(strafbiereA = newCount)
+                        true
+                    }
                 }
                 EnumTeams.TEAM_B_TEAMS -> {
-                    gameState = gameState.copy(strafbiereB = gameState.strafbiereB + diff)
-                    true
+                    val newCount = gameState.strafbiereB + diff
+                    if (newCount < 0)
+                        false
+                    else {
+                        gameState = gameState.copy(strafbiereB = newCount)
+                        true
+                    }
                 }
                 else -> false
             }
@@ -187,7 +205,7 @@ class GameController(
         if (name.isEmpty())
             return false
 
-        GlobalScope.launch{videoController.refreshVideos()}
+        GlobalScope.launch { videoController.refreshVideos() }
 
         gameStateLock.withLock {
             if (gameState.nameTaken(name))
@@ -205,7 +223,10 @@ class GameController(
     fun removePlayer(target: String): Boolean {
         gameStateLock.withLock {
             val player = gameState.getPlayer(target) ?: return false
-            gameState = gameState.removePlayer(player)
+            val newGameState = gameState.removePlayer(player)
+            if (newGameState.roundState.throwingPlayer == player.name)
+                newGameState.copy(roundState = RoundState())
+            gameState = newGameState
             return true
         }
     }
