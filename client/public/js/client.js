@@ -32,8 +32,16 @@ jQuery(window).load(function () {
     $('#hardthrowbutton').click(function () {
         throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
     });
+    $('#playername').keyup(function(e){
+        if(e.keyCode === 13){
+            $(this).trigger("submission");
+        }
+    });
     $('#playernamebutton').click(function () {
-        changePlayername();
+        $('#playername').trigger("submission");
+    });
+    $('#playername').bind("submission",function(e){
+        changePlayername($('#playername').val());
     });
     $('#switchplayerbutton').click(function () {
         $('#registerform').show();
@@ -100,8 +108,7 @@ function subscribeStreams(){
     });
 }
 
-function changePlayername(){
-    var desiredPlayername = $('#playername').val();
+function changePlayername(desiredPlayername){
     if(desiredPlayername === ''){
         console.log("Warning: Cannot register empty player name");
         return;
