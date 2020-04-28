@@ -202,7 +202,7 @@ class GameController(
     }
 
     fun registerPlayer(name: String): Boolean {
-        if (name.isEmpty())
+        if (name.isBlank())
             return false
 
         GlobalScope.launch { videoController.refreshVideos() }
