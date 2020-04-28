@@ -20,28 +20,36 @@ var playerName = "";
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
+var lowBandwidth = false;
 
 jQuery(window).load(function () {
     $('#softthrowbutton').click(function () {
-        if (actionButtonsEnabled) {
-            throwing(EnumThrowStrength.SOFT_THROW_STRENGTH);
-        }
+        throwing(EnumThrowStrength.SOFT_THROW_STRENGTH);
     });
     $('#mediumthrowbutton').click(function () {
-        if (actionButtonsEnabled) {
-            throwing(EnumThrowStrength.MEDIUM_THROW_STRENGTH);
-        }
+        throwing(EnumThrowStrength.MEDIUM_THROW_STRENGTH);
     });
     $('#hardthrowbutton').click(function () {
-        if (actionButtonsEnabled) {
-            throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
+        throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
+    });
+    $('#playername').keyup(function(e){
+        if(e.keyCode === 13){
+            $(this).trigger("submission");
         }
     });
     $('#playernamebutton').click(function () {
-        changePlayername();
+        $('#playername').trigger("submission");
+    });
+    $('#playername').bind("submission",function(e){
+        changePlayername($('#playername').val());
+    });
+    $('#switchplayerbutton').click(function () {
+        $('#registerform').show();
+        $('#playernamebutton').text('Spielernamen ändern');
     });
     $('#chatinput').bind("enterKey",function(e){
-        sendMessage();
+        sendMessage($('#chatinput').val());
+        $('#chatinput').val('');
     });
     $('#chatinput').keyup(function(e){
         if(e.keyCode === 13){
@@ -51,26 +59,30 @@ jQuery(window).load(function () {
     $('#resetbutton').click(function () {
         resetGame();
     });
-    $('#teamadisplay, #teambdisplay').click(function () {
-        if (actionButtonsEnabled) {
-            switchTeams();
-        }
+    desktop = window.matchMedia("(min-width: 992px)").matches;
+    if(desktop){
+        $('#lowbandwidthbutton').bootstrapToggle('on');
+    }
+    lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
+    $('#lowbandwidthbutton').change(function() {
+        lowBandwidth = !$(this).prop('checked');
     });
     $('.video').on('ended', function () {
         $(this).hide();
+        $('.logoposter').show();
     });
     $('.video').hide();
+    $('.poster').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     simulatorClient = new SimulatorClient('https://flunky.viings.de:8443');
     subscribeStreams();
-    changePlayername();
 });
 
 function subscribeStreams(){
     var stateRequest = new StreamStateReq();
     var stateStream = simulatorClient.streamState(stateRequest, {});
     stateStream.on('data', (response) => {
-        processNewState(response.getState());
+        processNewState(response.getState().toObject());
     });
     stateStream.on('error', (response) => {
         console.log('Error in state stream:');
@@ -79,7 +91,7 @@ function subscribeStreams(){
     var logRequest = new LogReq();
     var logStream = simulatorClient.streamLog(logRequest, {});
     logStream.on('data', (response) => {
-        processNewLog(response.getContent());
+        processNewLog(response.getSender(), response.getContent());
     });
     logStream.on('error', (response) => {
         console.log('Error in log stream:');
@@ -96,12 +108,16 @@ function subscribeStreams(){
     });
 }
 
-function changePlayername(){
-    var request = new RegisterPlayerReq();
-    var desiredPlayername = $('#playername').val();
+function changePlayername(desiredPlayername){
     if(desiredPlayername === ''){
+        console.log("Warning: Cannot register empty player name");
         return;
     }
+    if(playerName){
+        // Discourage false flag attacks
+        sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
+    }
+    var request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
     simulatorClient.registerPlayer(request, {}, function(err, response) {
@@ -110,11 +126,18 @@ function changePlayername(){
             console.log(err.message);
         } else {
             playerName = desiredPlayername;
+            $('#registerform').hide();
+            // Force re-evaluation of game state, e.g. do I need to throw
+            processNewState(currentGameState);
         }
     });
 }
 
 function throwing(strength) {
+    // disable the buttons so they cannot be used twice
+    $('.throwbutton').prop('disabled', true);
+    // Remove annoying flashing
+    $('.actionbox').removeClass('flashingbackground');
     var request = new ThrowReq();
     request.setPlayername(playerName);
     request.setStrength(strength);
@@ -127,10 +150,10 @@ function throwing(strength) {
     });
 }
 
-function sendMessage(){
+function sendMessage(content){
     var request = new SendMessageReq();
     request.setPlayername(playerName);
-    request.setContent($('#chatinput').val());
+    request.setContent(content);
     console.log(request.toObject());
     simulatorClient.sendMessage(request, {}, function(err, response) {
         if (err) {
@@ -138,7 +161,6 @@ function sendMessage(){
             console.log(err.message);
         }
     });
-    $('#chatinput').val('');
 }
 
 function switchTeam(targetTeam, targetName) {
@@ -227,14 +249,10 @@ function resetGame(){
 }
 
 function processNewState(state){
-    currentGameState = state.toObject();
+    currentGameState = state;
     console.log(currentGameState);
-    if(currentGameState.throwingplayer === playerName){
-        actionButtonsEnabled = true;
-    }else{
-        actionButtonsEnabled = false;
-    }
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
+    
     $('#teamaarea, #teambarea, #spectatorarea').empty();
     currentGameState.playerteamaList.forEach(function(player, index) {    
         $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
@@ -253,14 +271,36 @@ function processNewState(state){
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
+    
+    if(currentGameState.throwingplayer === playerName){
+        // It's my turn, display the throwing buttons!
+        $('#throwactionbuttons').show();
+        $('.throwbutton').prop('disabled', false);
+        $('#throwerdisplayarea').hide();
+        // Make sure user notices
+        $('.actionbox').addClass('flashingbackground');
+    }else{
+        // Update the box displaying who is currently throwing
+        throwingText = '<b>' + currentGameState.throwingplayer + '</b> wirft';
+        if(currentTeam === EnumTeams.TEAM_A_TEAMS){
+            $('#throwingplayer').addClass('text-left').removeClass('text-right');
+            throwingText = '<span class="glyphicon glyphicon-chevron-left"></span>' + throwingText;
+        }else{
+            $('#throwingplayer').addClass('text-right').removeClass('text-left');
+            throwingText = throwingText + '<span class="glyphicon glyphicon-chevron-right"></span>';
+        }
+        $('#throwingplayer').html(throwingText);
+        $('#throwactionbuttons').hide();
+        $('#throwerdisplayarea').show();
+    }
+    
     registerStateButtonCallbacks();
-    updateActionButtonDisplay();
 }
 
-function processNewLog(content){
+function processNewLog(sender, content){
     console.log("New log message: " + content);
     $('#logbox').val(function(i, text) {
-        return text + '\n' + content;
+        return text + '\n' + sender + ' ' + content;
     });
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
 }
@@ -269,16 +309,40 @@ function processNewVideoEvent(videoEvent){
     if(typeof videoEvent.preparevideo !== 'undefined'){
         console.log('Got prepare video event');
         console.log(videoEvent.preparevideo);
-        prepareVideo(videoEvent.preparevideo.url, videoEvent.preparevideo.videotype);
+        if(lowBandwidth){
+            console.log('Ignoring preparation request, we do not show videos');
+        }else{
+            prepareVideo(videoEvent.preparevideo.url, videoEvent.preparevideo.videotype);
+        }
     }
     if(typeof videoEvent.playvideos !== 'undefined'){
         console.log('Got play video event');
         console.log(videoEvent.playvideos);
-        videoEvent.playvideos.videosList.forEach(function(video, index) { 
-            setTimeout(() => {
-                playVideo(video.videotype, video.mirrored);
-            }, video.delay);
-        });
+        if(lowBandwidth){
+            videoEvent.playvideos.videosList.forEach(function(video, index) { 
+                type = video.videotype;
+                if (type === EnumVideoType.HIT_VIDEOTYPE || type === EnumVideoType.MISS_VIDEOTYPE || type === EnumVideoType.NEAR_MISS_VIDEOTYPE){
+                    // Do not spoil the result just yet
+                    console.log('Spoiler alert!');
+                    setTimeout(() => {
+                        playPoster('throw', video.mirrored);
+                    }, video.delay);
+                    setTimeout(() => {
+                        playPoster(video.videotype, video.mirrored);
+                    }, video.delay + 2500);
+                }else{
+                    setTimeout(() => {
+                        playPoster(video.videotype, video.mirrored);
+                    }, video.delay);
+                }
+            });
+        }else{
+            videoEvent.playvideos.videosList.forEach(function(video, index) { 
+                setTimeout(() => {
+                    playVideo(video.videotype, video.mirrored);
+                }, video.delay);
+            });
+        }
     }
 }
 
@@ -293,6 +357,7 @@ function prepareVideo(url, videotype){
 function playVideo(videotype, mirrored){
     // Abort all previously playing videos
     stopVideos();
+    $('.logoposter').hide();
     video = getVideoByType(videotype);
     if(mirrored){
         video.addClass('mirroredvideo');
@@ -303,18 +368,46 @@ function playVideo(videotype, mirrored){
     return video;
 }
 
+function playPoster(videotype, mirrored){
+    // Hide all previous posters
+    $('.poster').hide();
+    $('.logoposter').hide();
+    poster = getPosterByType(videotype);
+    poster.show();
+    return poster;
+}
+
+function getPosterByType(videotype, mirrored){
+    switch (videotype) {
+        case EnumVideoType.HIT_VIDEOTYPE:
+            return $('.poster.hit');
+        case EnumVideoType.MISS_VIDEOTYPE:
+            return $('.poster.miss');
+        case EnumVideoType.NEAR_MISS_VIDEOTYPE:
+            return $('.poster.nearmiss');
+        case EnumVideoType.SETUP_VIDEOTYPE:
+            return $('.poster.setup');
+        case EnumVideoType.STOP_VIDEOTYPE:
+            return $('.poster.stop');
+        case 'throw':
+            return $('.poster.throw');
+        default:
+            return null;
+    }
+}
+
 function getVideoByType(videotype){
     switch (videotype) {
         case EnumVideoType.HIT_VIDEOTYPE:
-            return $('.hit');
+            return $('.video.hit');
         case EnumVideoType.MISS_VIDEOTYPE:
-            return $('.miss');
+            return $('.video.miss');
         case EnumVideoType.NEAR_MISS_VIDEOTYPE:
-            return $('.nearmiss');
+            return $('.video.nearmiss');
         case EnumVideoType.SETUP_VIDEOTYPE:
-            return $('.setup');
+            return $('.video.setup');
         case EnumVideoType.STOP_VIDEOTYPE:
-            return $('.stop');
+            return $('.video.stop');
         default:
             return null;
     }
@@ -326,11 +419,6 @@ function stopVideos() {
         value.currentTime = 0;
         $(value).hide();
     });
-}
-
-function updateActionButtonDisplay() {
-    actionButtons = $('#mediumthrowbutton, #preparebutton, #softthrowbutton, #hardthrowbutton');
-    actionButtons.prop('disabled', !actionButtonsEnabled);
 }
 
 function registerStateButtonCallbacks(){
@@ -368,16 +456,23 @@ function registerStateButtonCallbacks(){
 
 function generatePlayerHTML(player, throwingPlayer) {
     disabled = '';
+    classes = ' btn-default';
+    name = player.name;
+    spacing = 'vspace-small';
     if(player.abgegeben){
         disabled = ' disabled="disabled"';
     }
-    classes = ' btn-default';
-    if(player.name === throwingPlayer){
+    if(name === throwingPlayer){
         classes = ' btn-primary';
     }
+    if(name === playerName){
+        spacing = 'vspace';
+        name = '<b>' + name + '</b>';
+    }
+    
     html = 
-        '<div class="btn-group btn-group-justified vspace playerbuttongroup" role="group">\n\
-            <div class="btn namebutton' + classes + '"' + disabled + '>'+player.name+'</div>\n\
+        '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
+            <div class="btn namebutton' + classes + '"' + disabled + '>'+name+'</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n\
                     <span class="glyphicon glyphicon-transfer"></span>\n\

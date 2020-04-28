@@ -13,17 +13,13 @@ Den lokalen Branch "videos", der nicht im Github-Repository vorhanden ist, auf H
 
 `git push -f heroku videos:master`
 
-Den lokalen Branch "videos", der nicht im Github-Repository vorhanden ist, auf Heroku deployen
-
-`git push -f heroku videos:master`
-
 Die javascript-resourcen aus commonJS zusammenbauen
 
 `npm run-script build --dev`
 
 Aus protobuffer-Definitionen die commonJS-Bindings generieren
 
-`protoc -I=./protocol flunkyprotocol.proto --js_out=import_style=commonjs:./client/public/js/ --grpc-web_out=mode=grpcwebtext,import_style=commonjs:./client/public/js/`
+`protoc -I=./protocol flunkyprotocol.proto game_objects.proto video_objects.proto --js_out=import_style=commonjs:./client/public/js/ --grpc-web_out=mode=grpcwebtext,import_style=commonjs:./client/public/js/`
 
 ### Server
 

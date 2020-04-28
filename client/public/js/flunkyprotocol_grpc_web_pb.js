@@ -11,6 +11,10 @@
 const grpc = {};
 grpc.web = require('grpc-web');
 
+
+var game_objects_pb = require('./game_objects_pb.js')
+
+var video_objects_pb = require('./video_objects_pb.js')
 const proto = {};
 proto.endpoints = {};
 proto.endpoints.flunky = {};
