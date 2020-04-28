@@ -24,25 +24,24 @@ var lowBandwidth = false;
 
 jQuery(window).load(function () {
     $('#softthrowbutton').click(function () {
-        if (actionButtonsEnabled) {
-            throwing(EnumThrowStrength.SOFT_THROW_STRENGTH);
-        }
+        throwing(EnumThrowStrength.SOFT_THROW_STRENGTH);
     });
     $('#mediumthrowbutton').click(function () {
-        if (actionButtonsEnabled) {
-            throwing(EnumThrowStrength.MEDIUM_THROW_STRENGTH);
-        }
+        throwing(EnumThrowStrength.MEDIUM_THROW_STRENGTH);
     });
     $('#hardthrowbutton').click(function () {
-        if (actionButtonsEnabled) {
-            throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
-        }
+        throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
     });
     $('#playernamebutton').click(function () {
         changePlayername();
     });
+    $('#switchplayerbutton').click(function () {
+        $('#registerform').show();
+        $('#playernamebutton').text('Spielernamen ändern');
+    });
     $('#chatinput').bind("enterKey",function(e){
-        sendMessage();
+        sendMessage($('#chatinput').val());
+        $('#chatinput').val('');
     });
     $('#chatinput').keyup(function(e){
         if(e.keyCode === 13){
@@ -74,7 +73,6 @@ jQuery(window).load(function () {
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     simulatorClient = new SimulatorClient('https://flunky.viings.de:8443');
     subscribeStreams();
-    changePlayername();
 });
 
 function subscribeStreams(){
@@ -108,11 +106,16 @@ function subscribeStreams(){
 }
 
 function changePlayername(){
-    var request = new RegisterPlayerReq();
     var desiredPlayername = $('#playername').val();
     if(desiredPlayername === ''){
+        console.log("Warning: Cannot register empty player name");
         return;
     }
+    if(playerName){
+        // Discourage false flag attacks
+        sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
+    }
+    var request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
     simulatorClient.registerPlayer(request, {}, function(err, response) {
@@ -121,11 +124,14 @@ function changePlayername(){
             console.log(err.message);
         } else {
             playerName = desiredPlayername;
+            $('#registerform').hide();
         }
     });
 }
 
 function throwing(strength) {
+    // disable the buttons so they cannot be used twice
+    $('.throwbutton').prop('disabled', true);
     var request = new ThrowReq();
     request.setPlayername(playerName);
     request.setStrength(strength);
@@ -138,10 +144,10 @@ function throwing(strength) {
     });
 }
 
-function sendMessage(){
+function sendMessage(content){
     var request = new SendMessageReq();
     request.setPlayername(playerName);
-    request.setContent($('#chatinput').val());
+    request.setContent(content);
     console.log(request.toObject());
     simulatorClient.sendMessage(request, {}, function(err, response) {
         if (err) {
@@ -149,7 +155,6 @@ function sendMessage(){
             console.log(err.message);
         }
     });
-    $('#chatinput').val('');
 }
 
 function switchTeam(targetTeam, targetName) {
@@ -240,12 +245,8 @@ function resetGame(){
 function processNewState(state){
     currentGameState = state.toObject();
     console.log(currentGameState);
-    if(currentGameState.throwingplayer === playerName){
-        actionButtonsEnabled = true;
-    }else{
-        actionButtonsEnabled = false;
-    }
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
+    
     $('#teamaarea, #teambarea, #spectatorarea').empty();
     currentGameState.playerteamaList.forEach(function(player, index) {    
         $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
@@ -264,8 +265,28 @@ function processNewState(state){
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
+    
+    if(currentGameState.throwingplayer === playerName){
+        // It's my turn, display the throwing buttons!
+        $('#throwactionbuttons').show();
+        $('.throwbutton').prop('disabled', false);
+        $('#throwerdisplayarea').hide();
+    }else{
+        // Update the box displaying who is currently throwing
+        throwingText = '<b>' + currentGameState.throwingplayer + '</b> wirft';
+        if(currentTeam === EnumTeams.TEAM_A_TEAMS){
+            $('#throwingplayer').addClass('text-left').removeClass('text-right');
+            throwingText = '<span class="glyphicon glyphicon-chevron-left"></span>' + throwingText;
+        }else{
+            $('#throwingplayer').addClass('text-right').removeClass('text-left');
+            throwingText = throwingText + '<span class="glyphicon glyphicon-chevron-right"></span>';
+        }
+        $('#throwingplayer').html(throwingText);
+        $('#throwactionbuttons').hide();
+        $('#throwerdisplayarea').show();
+    }
+    
     registerStateButtonCallbacks();
-    updateActionButtonDisplay();
 }
 
 function processNewLog(sender, content){
@@ -390,11 +411,6 @@ function stopVideos() {
         value.currentTime = 0;
         $(value).hide();
     });
-}
-
-function updateActionButtonDisplay() {
-    actionButtons = $('#mediumthrowbutton, #preparebutton, #softthrowbutton, #hardthrowbutton');
-    actionButtons.prop('disabled', !actionButtonsEnabled);
 }
 
 function registerStateButtonCallbacks(){

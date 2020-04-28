@@ -23,19 +23,25 @@ head
                 image.setup.poster(src='picture/setup.png')
                 image.stop.poster(src='picture/stop.png')
                 image.throw.poster(src='picture/throw.png')
-            input#playername.form-control(type="text" placeholder="Spielername")
-            button#playernamebutton.btn.btn-default Registrieren
-            .btn-group-horizontal
-                button#softthrowbutton.btn.btn-default(disabled) Vorsichtig werfen
-                button#mediumthrowbutton.btn.btn-default(disabled) Werfen
-                button#hardthrowbutton.btn.btn-default(disabled) Kräftig werfen
+            .actionbox.well
+                #registerform
+                    input#playername.form-control(type="text" placeholder="Spielername")
+                    button#playernamebutton.btn.btn-default Spiel beitreten
+                #throwactionbuttons
+                    .btn-group-horizontal
+                        button#softthrowbutton.btn.btn-default.throwbutton Vorsichtig werfen
+                        button#mediumthrowbutton.btn.btn-default.throwbutton Werfen
+                        button#hardthrowbutton.btn.btn-default.throwbutton Kräftig werfen
+                #throwerdisplayarea
+                    p#throwingplayer
         .col-md-3.col-md-pull-6
             .statearea
                 h3 Linkes Team
                 #teamaarea
                 h3 Zuschauer
                 #spectatorarea
-            button#resetbutton.btn.btn-danger Spiel neu starten
+            button#resetbutton.btn.btn-default Spiel neu starten
+            button#switchplayerbutton.btn.btn-default Spieler wechseln
             input#lowbandwidthbutton(type="checkbox" checked="false" data-toggle="toggle" data-on="Videomodus" data-off="Textmodus")
         .col-md-3
             .statearea
