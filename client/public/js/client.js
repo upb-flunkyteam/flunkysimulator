@@ -59,11 +59,6 @@ jQuery(window).load(function () {
     $('#lowbandwidthbutton').change(function() {
         lowBandwidth = !$(this).prop('checked');
     });
-    $('#teamadisplay, #teambdisplay').click(function () {
-        if (actionButtonsEnabled) {
-            switchTeams();
-        }
-    });
     $('.video').on('ended', function () {
         $(this).hide();
         $('.logoposter').show();
@@ -79,7 +74,7 @@ function subscribeStreams(){
     var stateRequest = new StreamStateReq();
     var stateStream = simulatorClient.streamState(stateRequest, {});
     stateStream.on('data', (response) => {
-        processNewState(response.getState());
+        processNewState(response.getState().toObject());
     });
     stateStream.on('error', (response) => {
         console.log('Error in state stream:');
@@ -125,6 +120,8 @@ function changePlayername(){
         } else {
             playerName = desiredPlayername;
             $('#registerform').hide();
+            // Force re-evaluation of game state, e.g. do I need to throw
+            processNewState(currentGameState);
         }
     });
 }
@@ -132,6 +129,8 @@ function changePlayername(){
 function throwing(strength) {
     // disable the buttons so they cannot be used twice
     $('.throwbutton').prop('disabled', true);
+    // Remove annoying flashing
+    $('.actionbox').removeClass('flashingbackground');
     var request = new ThrowReq();
     request.setPlayername(playerName);
     request.setStrength(strength);
@@ -243,7 +242,7 @@ function resetGame(){
 }
 
 function processNewState(state){
-    currentGameState = state.toObject();
+    currentGameState = state;
     console.log(currentGameState);
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
     
@@ -271,6 +270,8 @@ function processNewState(state){
         $('#throwactionbuttons').show();
         $('.throwbutton').prop('disabled', false);
         $('#throwerdisplayarea').hide();
+        // Make sure user notices
+        $('.actionbox').addClass('flashingbackground');
     }else{
         // Update the box displaying who is currently throwing
         throwingText = '<b>' + currentGameState.throwingplayer + '</b> wirft';
@@ -455,8 +456,12 @@ function generatePlayerHTML(player, throwingPlayer) {
     if(player.name === throwingPlayer){
         classes = ' btn-primary';
     }
+    spacing = 'vspace-small';
+    if(player.name === playerName){
+        spacing = 'vspace';
+    }
     html = 
-        '<div class="btn-group btn-group-justified vspace playerbuttongroup" role="group">\n\
+        '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
             <div class="btn namebutton' + classes + '"' + disabled + '>'+player.name+'</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n\

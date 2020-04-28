@@ -10,7 +10,7 @@ head
 .container-fluid
     .row
         .col-md-6.col-md-push-3
-            #mainvideobox
+            #mainvideobox.vspace
                 image.logoposter(src='picture/logoposter.jpg')
                 video.hit.video(src='' preload='auto') Getroffen!
                 video.miss.video(src='') Nicht getroffen!
@@ -23,16 +23,18 @@ head
                 image.setup.poster(src='picture/setup.png')
                 image.stop.poster(src='picture/stop.png')
                 image.throw.poster(src='picture/throw.png')
-            .actionbox.well
-                #registerform
-                    input#playername.form-control(type="text" placeholder="Spielername")
-                    button#playernamebutton.btn.btn-default Spiel beitreten
-                #throwactionbuttons
-                    .btn-group-horizontal
+            .actionbox.well.vspace
+                #registerform.vspace
+                    .input-group
+                        input#playername.form-control(type="text" placeholder="Spielername")
+                        span.input-group-btn
+                            button#playernamebutton.btn.btn-default Spiel beitreten
+                #throwactionbuttons.largetext
+                    .btn-group(role='group')
                         button#softthrowbutton.btn.btn-default.throwbutton Vorsichtig werfen
                         button#mediumthrowbutton.btn.btn-default.throwbutton Werfen
                         button#hardthrowbutton.btn.btn-default.throwbutton Kräftig werfen
-                #throwerdisplayarea
+                #throwerdisplayarea.largetext
                     p#throwingplayer
         .col-md-3.col-md-pull-6
             .statearea
