@@ -130,8 +130,6 @@ enum EnumLoginStatus{
 	LOGIN_STATUS_SECRET_MISMATCH = 3;
 	// The name is empty
 	LOGIN_STATUS_EMPTY = 4;
-	// The name has leading or trailing whitespace.
-	LOGIN_STATUS_NOT_STRIPED = 5;
 }
 
 

@@ -210,22 +210,19 @@ class GameController(
         if (name.isEmpty())
             return LoginResp(EnumLoginStatus.LOGIN_STATUS_EMPTY)
 
-        if (name.trim() != name)
-            return LoginResp(EnumLoginStatus.LOGIN_STATUS_NOT_STRIPED)
-
         GlobalScope.launch { videoController.refreshVideos() }
 
-        val escapedName = escapeHtml4(name)
+        val escapedAndTrimmedName = escapeHtml4(name.trim())
 
         gameStateLock.withLock {
-            if (gameState.nameTaken(escapedName))
+            if (gameState.nameTaken(escapedAndTrimmedName))
                 return LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN)
 
-            val player = Player(escapedName)
+            val player = Player(escapedAndTrimmedName)
 
             gameState = gameState.addPlayer(player)
 
-            return LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, escapedName)
+            return LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, escapedAndTrimmedName)
         }
     }
 
