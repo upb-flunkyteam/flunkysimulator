@@ -31,15 +31,17 @@ class FlunkyServer(
         responseObserver?.onCompleted()
     }
 
-    override fun registerPlayer(request: RegisterPlayerReq?, responseObserver: StreamObserver<RegisterPlayerResp>?) {
-        val name = request!!.playerName
+    override fun registerPlayer(request: RegisterPlayerReq, responseObserver: StreamObserver<RegisterPlayerResp>) {
+        val name = request.playerName
 
-        if (gameController.registerPlayer(name))
+        val loginStatus = gameController.registerPlayer(name)
+
+        if (loginStatus == EnumLoginStatus.LOGIN_STATUS_SUCCESS)
             messageController.sendMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
-        //else
-        //messageController.sendMessage(request.playerName, "konnte sich nicht registrieren. Name schon vergeben?")
 
-        responseObserver!!.onNext(RegisterPlayerResp.getDefaultInstance())
+        responseObserver.onNext(RegisterPlayerResp.newBuilder()
+            .setStatus(loginStatus)
+            .build())
         responseObserver.onCompleted()
     }
 

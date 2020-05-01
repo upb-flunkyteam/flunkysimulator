@@ -1,5 +1,7 @@
 package simulator.control
 
+import de.flunkyteam.endpoints.projects.simulator.EnumLoginErrorReason
+import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
 import kotlinx.coroutines.GlobalScope
@@ -201,24 +203,28 @@ class GameController(
         }
     }
 
-    fun registerPlayer(name: String): Boolean {
-        if (name.isBlank())
-            return false
+
+    fun registerPlayer(name: String): EnumLoginStatus {
+        if (name.isEmpty())
+            return EnumLoginStatus.LOGIN_STATUS_EMPTY
+
+        if (name.trim() != name)
+            return EnumLoginStatus.LOGIN_STATUS_NOT_STRIPED
 
         GlobalScope.launch { videoController.refreshVideos() }
 
         gameStateLock.withLock {
             if (gameState.nameTaken(name))
-                return false
+                return EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN
 
             val player = Player(name)
 
             gameState = gameState.addPlayer(player)
 
-            return true
+            return EnumLoginStatus.LOGIN_STATUS_SUCCESS
         }
-
     }
+
 
     fun removePlayer(target: String): Boolean {
         gameStateLock.withLock {
