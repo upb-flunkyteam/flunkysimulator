@@ -16,7 +16,7 @@ const {EnumThrowStrength, EnumTeams, EnumVideoType, GameState,
 } = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
-var playerName = "";
+var playerName = null;
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
@@ -57,7 +57,9 @@ jQuery(window).load(function () {
         }
     });
     $('#resetbutton').click(function () {
-        resetGame();
+        if(confirm('Möchtest du wirklich das Spiel für alle Teilnehmenden neu starten?')){
+            resetGame();
+        }
     });
     desktop = window.matchMedia("(min-width: 992px)").matches;
     if(desktop){
@@ -280,6 +282,8 @@ function processNewState(state){
         // Make sure user notices
         $('.actionbox').addClass('flashingbackground');
     }else{
+        // Remove annoying flashing
+        $('.actionbox').removeClass('flashingbackground');
         // Update the box displaying who is currently throwing
         throwingText = '<b>' + currentGameState.throwingplayer + '</b> wirft';
         if(currentTeam === EnumTeams.TEAM_A_TEAMS){
@@ -337,7 +341,7 @@ function processNewVideoEvent(videoEvent){
                 }
             });
         }else{
-            videolist = videoEvent.playvideos.videosList
+            videolist = videoEvent.playvideos.videosList;
             first = videolist[0];
             if(videolist.length === 1){
                 setTimeout(() => {
