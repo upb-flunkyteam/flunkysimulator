@@ -12,131 +12,65 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
+import game_objects_pb2 as game__objects__pb2
+import video_objects_pb2 as video__objects__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='flunkyprotocol.proto',
   package='endpoints.flunky.simulator',
   syntax='proto3',
-  serialized_options=b'\n*de.flunkyteam.endpoints.projects.simulatorB\016SimulatorProtoP\001',
-  serialized_pb=b'\n\x14\x66lunkyprotocol.proto\x12\x1a\x65ndpoints.flunky.simulator\"\x1a\n\x07LogResp\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\t\"\x08\n\x06LogReq\"N\n\x15StreamVideoEventsResp\x12\x35\n\x05\x65vent\x18\x01 \x01(\x0b\x32&.endpoints.flunky.simulator.VideoEvent\"\x16\n\x14StreamVideoEventsReq\"G\n\x0fStreamStateResp\x12\x34\n\x05state\x18\x01 \x01(\x0b\x32%.endpoints.flunky.simulator.GameState\"\x10\n\x0eStreamStateReq\"\x1a\n\x18SelectThrowingPlayerResp\"A\n\x17SelectThrowingPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\"\x1a\n\x18ModifyStrafbierCountResp\"{\n\x17ModifyStrafbierCountReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x39\n\ntargetTeam\x18\x02 \x01(\x0e\x32%.endpoints.flunky.simulator.EnumTeams\x12\x11\n\tincrement\x18\x03 \x01(\x08\"\x11\n\x0fSendMessageResp\"5\n\x0eSendMessageReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"\x0f\n\rResetGameResp\"\"\n\x0cResetGameReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\"\x10\n\x0eSwitchTeamResp\"r\n\rSwitchTeamReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\x12\x39\n\ntargetTeam\x18\x03 \x01(\x0e\x32%.endpoints.flunky.simulator.EnumTeams\"\x10\n\x0eKickPlayerResp\"7\n\rKickPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\"\x14\n\x12RegisterPlayerResp\"\'\n\x11RegisterPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\"\x0f\n\rAbgegebenResp\"E\n\x0c\x41\x62gegebenReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\x12\r\n\x05setTo\x18\x03 \x01(\x08\"_\n\x08ThrowReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12?\n\x08strength\x18\x02 \x01(\x0e\x32-.endpoints.flunky.simulator.EnumThrowStrength\"\x1c\n\tThrowResp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"\xa5\x01\n\nVideoEvent\x12\x45\n\x0cprepareVideo\x18\x01 \x01(\x0b\x32-.endpoints.flunky.simulator.PrepareVideoEventH\x00\x12\x41\n\nplayVideos\x18\x02 \x01(\x0b\x32+.endpoints.flunky.simulator.PlayVideosEventH\x00\x42\r\n\x0b\x65vent_oneof\"^\n\x11PrepareVideoEvent\x12\x0b\n\x03url\x18\x01 \x01(\t\x12<\n\tvideoType\x18\x02 \x01(\x0e\x32).endpoints.flunky.simulator.EnumVideoType\"I\n\x0fPlayVideosEvent\x12\x36\n\x06videos\x18\x01 \x03(\x0b\x32&.endpoints.flunky.simulator.TimedVideo\"k\n\nTimedVideo\x12\r\n\x05\x64\x65lay\x18\x01 \x01(\x03\x12<\n\tvideoType\x18\x02 \x01(\x0e\x32).endpoints.flunky.simulator.EnumVideoType\x12\x10\n\x08mirrored\x18\x03 \x01(\x08\"\xfd\x01\n\tGameState\x12\x37\n\x0bplayerTeamA\x18\x01 \x03(\x0b\x32\".endpoints.flunky.simulator.Player\x12\x37\n\x0bplayerTeamB\x18\x02 \x03(\x0b\x32\".endpoints.flunky.simulator.Player\x12\x36\n\nspectators\x18\x03 \x03(\x0b\x32\".endpoints.flunky.simulator.Player\x12\x16\n\x0ethrowingPlayer\x18\n \x01(\t\x12\x16\n\x0estrafbierTeamA\x18\x0b \x01(\x03\x12\x16\n\x0estrafbierTeamB\x18\x0c \x01(\x03\")\n\x06Player\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\tabgegeben\x18\x02 \x01(\x08*|\n\x11\x45numThrowStrength\x12\x1a\n\x16UNKNOWN_THROW_STRENGTH\x10\x00\x12\x17\n\x13SOFT_THROW_STRENGTH\x10\x01\x12\x19\n\x15MEDIUM_THROW_STRENGTH\x10\x02\x12\x17\n\x13HARD_THROW_STRENGTH\x10\x03*W\n\tEnumTeams\x12\x11\n\rUNKNOWN_TEAMS\x10\x00\x12\x13\n\x0fSPECTATOR_TEAMS\x10\x01\x12\x10\n\x0cTEAM_A_TEAMS\x10\x02\x12\x10\n\x0cTEAM_B_TEAMS\x10\x03*\x8f\x01\n\rEnumVideoType\x12\x15\n\x11UNKNOWN_VIDEOTYPE\x10\x00\x12\x13\n\x0fSETUP_VIDEOTYPE\x10\x01\x12\x11\n\rHIT_VIDEOTYPE\x10\x02\x12\x12\n\x0eMISS_VIDEOTYPE\x10\x03\x12\x17\n\x13NEAR_MISS_VIDEOTYPE\x10\x04\x12\x12\n\x0eSTOP_VIDEOTYPE\x10\x05\x32\x8e\n\n\tSimulator\x12T\n\x05Throw\x12$.endpoints.flunky.simulator.ThrowReq\x1a%.endpoints.flunky.simulator.ThrowResp\x12`\n\tAbgegeben\x12(.endpoints.flunky.simulator.AbgegebenReq\x1a).endpoints.flunky.simulator.AbgegebenResp\x12o\n\x0eRegisterPlayer\x12-.endpoints.flunky.simulator.RegisterPlayerReq\x1a..endpoints.flunky.simulator.RegisterPlayerResp\x12\x63\n\nKickPlayer\x12).endpoints.flunky.simulator.KickPlayerReq\x1a*.endpoints.flunky.simulator.KickPlayerResp\x12\x63\n\nSwitchTeam\x12).endpoints.flunky.simulator.SwitchTeamReq\x1a*.endpoints.flunky.simulator.SwitchTeamResp\x12`\n\tResetGame\x12(.endpoints.flunky.simulator.ResetGameReq\x1a).endpoints.flunky.simulator.ResetGameResp\x12\x81\x01\n\x14SelectThrowingPlayer\x12\x33.endpoints.flunky.simulator.SelectThrowingPlayerReq\x1a\x34.endpoints.flunky.simulator.SelectThrowingPlayerResp\x12\x81\x01\n\x14ModifyStrafbierCount\x12\x33.endpoints.flunky.simulator.ModifyStrafbierCountReq\x1a\x34.endpoints.flunky.simulator.ModifyStrafbierCountResp\x12\x66\n\x0bSendMessage\x12*.endpoints.flunky.simulator.SendMessageReq\x1a+.endpoints.flunky.simulator.SendMessageResp\x12h\n\x0bStreamState\x12*.endpoints.flunky.simulator.StreamStateReq\x1a+.endpoints.flunky.simulator.StreamStateResp0\x01\x12z\n\x11StreamVideoEvents\x12\x30.endpoints.flunky.simulator.StreamVideoEventsReq\x1a\x31.endpoints.flunky.simulator.StreamVideoEventsResp0\x01\x12V\n\tStreamLog\x12\".endpoints.flunky.simulator.LogReq\x1a#.endpoints.flunky.simulator.LogResp0\x01\x42>\n*de.flunkyteam.endpoints.projects.simulatorB\x0eSimulatorProtoP\x01\x62\x06proto3'
-)
+  serialized_options=b'\n*de.flunkyteam.endpoints.projects.simulatorB\010ProtocolP\001',
+  serialized_pb=b'\n\x14\x66lunkyprotocol.proto\x12\x1a\x65ndpoints.flunky.simulator\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12game_objects.proto\x1a\x13video_objects.proto\"*\n\x07LogResp\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\t\x12\x0e\n\x06sender\x18\x02 \x01(\t\"\x08\n\x06LogReq\"N\n\x15StreamVideoEventsResp\x12\x35\n\x05\x65vent\x18\x01 \x01(\x0b\x32&.endpoints.flunky.simulator.VideoEvent\"\x16\n\x14StreamVideoEventsReq\"G\n\x0fStreamStateResp\x12\x34\n\x05state\x18\x01 \x01(\x0b\x32%.endpoints.flunky.simulator.GameState\"\x10\n\x0eStreamStateReq\"\x1a\n\x18SelectThrowingPlayerResp\"A\n\x17SelectThrowingPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\"\x1a\n\x18ModifyStrafbierCountResp\"{\n\x17ModifyStrafbierCountReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x39\n\ntargetTeam\x18\x02 \x01(\x0e\x32%.endpoints.flunky.simulator.EnumTeams\x12\x11\n\tincrement\x18\x03 \x01(\x08\"\x11\n\x0fSendMessageResp\"5\n\x0eSendMessageReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"\x0f\n\rResetGameResp\"\"\n\x0cResetGameReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\"\x10\n\x0eSwitchTeamResp\"r\n\rSwitchTeamReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\x12\x39\n\ntargetTeam\x18\x03 \x01(\x0e\x32%.endpoints.flunky.simulator.EnumTeams\"\x10\n\x0eKickPlayerResp\"7\n\rKickPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\"Q\n\x12RegisterPlayerResp\x12;\n\x06status\x18\x01 \x01(\x0e\x32+.endpoints.flunky.simulator.EnumLoginStatus\"\'\n\x11RegisterPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\"\x0f\n\rAbgegebenResp\"E\n\x0c\x41\x62gegebenReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\x12\r\n\x05setTo\x18\x03 \x01(\x08\"_\n\x08ThrowReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12?\n\x08strength\x18\x02 \x01(\x0e\x32-.endpoints.flunky.simulator.EnumThrowStrength\"\x1c\n\tThrowResp\x12\x0f\n\x07success\x18\x01 \x01(\x08*\xba\x01\n\x0f\x45numLoginStatus\x12\x18\n\x14LOGIN_STATUS_UNKNOWN\x10\x00\x12\x18\n\x14LOGIN_STATUS_SUCCESS\x10\x01\x12\x1b\n\x17LOGIN_STATUS_NAME_TAKEN\x10\x02\x12 \n\x1cLOGIN_STATUS_SECRET_MISMATCH\x10\x03\x12\x16\n\x12LOGIN_STATUS_EMPTY\x10\x04\x12\x1c\n\x18LOGIN_STATUS_NOT_STRIPED\x10\x05\x32\xcb\n\n\tSimulator\x12T\n\x05Throw\x12$.endpoints.flunky.simulator.ThrowReq\x1a%.endpoints.flunky.simulator.ThrowResp\x12`\n\tAbgegeben\x12(.endpoints.flunky.simulator.AbgegebenReq\x1a).endpoints.flunky.simulator.AbgegebenResp\x12o\n\x0eRegisterPlayer\x12-.endpoints.flunky.simulator.RegisterPlayerReq\x1a..endpoints.flunky.simulator.RegisterPlayerResp\x12\x63\n\nKickPlayer\x12).endpoints.flunky.simulator.KickPlayerReq\x1a*.endpoints.flunky.simulator.KickPlayerResp\x12\x63\n\nSwitchTeam\x12).endpoints.flunky.simulator.SwitchTeamReq\x1a*.endpoints.flunky.simulator.SwitchTeamResp\x12`\n\tResetGame\x12(.endpoints.flunky.simulator.ResetGameReq\x1a).endpoints.flunky.simulator.ResetGameResp\x12\x81\x01\n\x14SelectThrowingPlayer\x12\x33.endpoints.flunky.simulator.SelectThrowingPlayerReq\x1a\x34.endpoints.flunky.simulator.SelectThrowingPlayerResp\x12\x81\x01\n\x14ModifyStrafbierCount\x12\x33.endpoints.flunky.simulator.ModifyStrafbierCountReq\x1a\x34.endpoints.flunky.simulator.ModifyStrafbierCountResp\x12\x66\n\x0bSendMessage\x12*.endpoints.flunky.simulator.SendMessageReq\x1a+.endpoints.flunky.simulator.SendMessageResp\x12h\n\x0bStreamState\x12*.endpoints.flunky.simulator.StreamStateReq\x1a+.endpoints.flunky.simulator.StreamStateResp0\x01\x12z\n\x11StreamVideoEvents\x12\x30.endpoints.flunky.simulator.StreamVideoEventsReq\x1a\x31.endpoints.flunky.simulator.StreamVideoEventsResp0\x01\x12V\n\tStreamLog\x12\".endpoints.flunky.simulator.LogReq\x1a#.endpoints.flunky.simulator.LogResp0\x01\x12;\n\tHardReset\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.EmptyB8\n*de.flunkyteam.endpoints.projects.simulatorB\x08ProtocolP\x01\x62\x06proto3'
+  ,
+  dependencies=[google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,game__objects__pb2.DESCRIPTOR,video__objects__pb2.DESCRIPTOR,])
 
-_ENUMTHROWSTRENGTH = _descriptor.EnumDescriptor(
-  name='EnumThrowStrength',
-  full_name='endpoints.flunky.simulator.EnumThrowStrength',
+_ENUMLOGINSTATUS = _descriptor.EnumDescriptor(
+  name='EnumLoginStatus',
+  full_name='endpoints.flunky.simulator.EnumLoginStatus',
   filename=None,
   file=DESCRIPTOR,
   values=[
     _descriptor.EnumValueDescriptor(
-      name='UNKNOWN_THROW_STRENGTH', index=0, number=0,
+      name='LOGIN_STATUS_UNKNOWN', index=0, number=0,
       serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='SOFT_THROW_STRENGTH', index=1, number=1,
+      name='LOGIN_STATUS_SUCCESS', index=1, number=1,
       serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='MEDIUM_THROW_STRENGTH', index=2, number=2,
+      name='LOGIN_STATUS_NAME_TAKEN', index=2, number=2,
       serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='HARD_THROW_STRENGTH', index=3, number=3,
+      name='LOGIN_STATUS_SECRET_MISMATCH', index=3, number=3,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='LOGIN_STATUS_EMPTY', index=4, number=4,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='LOGIN_STATUS_NOT_STRIPED', index=5, number=5,
       serialized_options=None,
       type=None),
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1894,
-  serialized_end=2018,
+  serialized_start=1295,
+  serialized_end=1481,
 )
-_sym_db.RegisterEnumDescriptor(_ENUMTHROWSTRENGTH)
+_sym_db.RegisterEnumDescriptor(_ENUMLOGINSTATUS)
 
-EnumThrowStrength = enum_type_wrapper.EnumTypeWrapper(_ENUMTHROWSTRENGTH)
-_ENUMTEAMS = _descriptor.EnumDescriptor(
-  name='EnumTeams',
-  full_name='endpoints.flunky.simulator.EnumTeams',
-  filename=None,
-  file=DESCRIPTOR,
-  values=[
-    _descriptor.EnumValueDescriptor(
-      name='UNKNOWN_TEAMS', index=0, number=0,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='SPECTATOR_TEAMS', index=1, number=1,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='TEAM_A_TEAMS', index=2, number=2,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='TEAM_B_TEAMS', index=3, number=3,
-      serialized_options=None,
-      type=None),
-  ],
-  containing_type=None,
-  serialized_options=None,
-  serialized_start=2020,
-  serialized_end=2107,
-)
-_sym_db.RegisterEnumDescriptor(_ENUMTEAMS)
-
-EnumTeams = enum_type_wrapper.EnumTypeWrapper(_ENUMTEAMS)
-_ENUMVIDEOTYPE = _descriptor.EnumDescriptor(
-  name='EnumVideoType',
-  full_name='endpoints.flunky.simulator.EnumVideoType',
-  filename=None,
-  file=DESCRIPTOR,
-  values=[
-    _descriptor.EnumValueDescriptor(
-      name='UNKNOWN_VIDEOTYPE', index=0, number=0,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='SETUP_VIDEOTYPE', index=1, number=1,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='HIT_VIDEOTYPE', index=2, number=2,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='MISS_VIDEOTYPE', index=3, number=3,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='NEAR_MISS_VIDEOTYPE', index=4, number=4,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='STOP_VIDEOTYPE', index=5, number=5,
-      serialized_options=None,
-      type=None),
-  ],
-  containing_type=None,
-  serialized_options=None,
-  serialized_start=2110,
-  serialized_end=2253,
-)
-_sym_db.RegisterEnumDescriptor(_ENUMVIDEOTYPE)
-
-EnumVideoType = enum_type_wrapper.EnumTypeWrapper(_ENUMVIDEOTYPE)
-UNKNOWN_THROW_STRENGTH = 0
-SOFT_THROW_STRENGTH = 1
-MEDIUM_THROW_STRENGTH = 2
-HARD_THROW_STRENGTH = 3
-UNKNOWN_TEAMS = 0
-SPECTATOR_TEAMS = 1
-TEAM_A_TEAMS = 2
-TEAM_B_TEAMS = 3
-UNKNOWN_VIDEOTYPE = 0
-SETUP_VIDEOTYPE = 1
-HIT_VIDEOTYPE = 2
-MISS_VIDEOTYPE = 3
-NEAR_MISS_VIDEOTYPE = 4
-STOP_VIDEOTYPE = 5
+EnumLoginStatus = enum_type_wrapper.EnumTypeWrapper(_ENUMLOGINSTATUS)
+LOGIN_STATUS_UNKNOWN = 0
+LOGIN_STATUS_SUCCESS = 1
+LOGIN_STATUS_NAME_TAKEN = 2
+LOGIN_STATUS_SECRET_MISMATCH = 3
+LOGIN_STATUS_EMPTY = 4
+LOGIN_STATUS_NOT_STRIPED = 5
 
 
 
@@ -154,6 +88,13 @@ _LOGRESP = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='sender', full_name='endpoints.flunky.simulator.LogResp.sender', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -166,8 +107,8 @@ _LOGRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=52,
-  serialized_end=78,
+  serialized_start=122,
+  serialized_end=164,
 )
 
 
@@ -190,8 +131,8 @@ _LOGREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=80,
-  serialized_end=88,
+  serialized_start=166,
+  serialized_end=174,
 )
 
 
@@ -221,8 +162,8 @@ _STREAMVIDEOEVENTSRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=90,
-  serialized_end=168,
+  serialized_start=176,
+  serialized_end=254,
 )
 
 
@@ -245,8 +186,8 @@ _STREAMVIDEOEVENTSREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=170,
-  serialized_end=192,
+  serialized_start=256,
+  serialized_end=278,
 )
 
 
@@ -276,8 +217,8 @@ _STREAMSTATERESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=194,
-  serialized_end=265,
+  serialized_start=280,
+  serialized_end=351,
 )
 
 
@@ -300,8 +241,8 @@ _STREAMSTATEREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=267,
-  serialized_end=283,
+  serialized_start=353,
+  serialized_end=369,
 )
 
 
@@ -324,8 +265,8 @@ _SELECTTHROWINGPLAYERRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=285,
-  serialized_end=311,
+  serialized_start=371,
+  serialized_end=397,
 )
 
 
@@ -362,8 +303,8 @@ _SELECTTHROWINGPLAYERREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=313,
-  serialized_end=378,
+  serialized_start=399,
+  serialized_end=464,
 )
 
 
@@ -386,8 +327,8 @@ _MODIFYSTRAFBIERCOUNTRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=380,
-  serialized_end=406,
+  serialized_start=466,
+  serialized_end=492,
 )
 
 
@@ -431,8 +372,8 @@ _MODIFYSTRAFBIERCOUNTREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=408,
-  serialized_end=531,
+  serialized_start=494,
+  serialized_end=617,
 )
 
 
@@ -455,8 +396,8 @@ _SENDMESSAGERESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=533,
-  serialized_end=550,
+  serialized_start=619,
+  serialized_end=636,
 )
 
 
@@ -493,8 +434,8 @@ _SENDMESSAGEREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=552,
-  serialized_end=605,
+  serialized_start=638,
+  serialized_end=691,
 )
 
 
@@ -517,8 +458,8 @@ _RESETGAMERESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=607,
-  serialized_end=622,
+  serialized_start=693,
+  serialized_end=708,
 )
 
 
@@ -548,8 +489,8 @@ _RESETGAMEREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=624,
-  serialized_end=658,
+  serialized_start=710,
+  serialized_end=744,
 )
 
 
@@ -572,8 +513,8 @@ _SWITCHTEAMRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=660,
-  serialized_end=676,
+  serialized_start=746,
+  serialized_end=762,
 )
 
 
@@ -617,8 +558,8 @@ _SWITCHTEAMREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=678,
-  serialized_end=792,
+  serialized_start=764,
+  serialized_end=878,
 )
 
 
@@ -641,8 +582,8 @@ _KICKPLAYERRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=794,
-  serialized_end=810,
+  serialized_start=880,
+  serialized_end=896,
 )
 
 
@@ -679,8 +620,8 @@ _KICKPLAYERREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=812,
-  serialized_end=867,
+  serialized_start=898,
+  serialized_end=953,
 )
 
 
@@ -691,6 +632,13 @@ _REGISTERPLAYERRESP = _descriptor.Descriptor(
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
+    _descriptor.FieldDescriptor(
+      name='status', full_name='endpoints.flunky.simulator.RegisterPlayerResp.status', index=0,
+      number=1, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -703,8 +651,8 @@ _REGISTERPLAYERRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=869,
-  serialized_end=889,
+  serialized_start=955,
+  serialized_end=1036,
 )
 
 
@@ -734,8 +682,8 @@ _REGISTERPLAYERREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=891,
-  serialized_end=930,
+  serialized_start=1038,
+  serialized_end=1077,
 )
 
 
@@ -758,8 +706,8 @@ _ABGEGEBENRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=932,
-  serialized_end=947,
+  serialized_start=1079,
+  serialized_end=1094,
 )
 
 
@@ -803,8 +751,8 @@ _ABGEGEBENREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=949,
-  serialized_end=1018,
+  serialized_start=1096,
+  serialized_end=1165,
 )
 
 
@@ -841,8 +789,8 @@ _THROWREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1020,
-  serialized_end=1115,
+  serialized_start=1167,
+  serialized_end=1262,
 )
 
 
@@ -872,288 +820,16 @@ _THROWRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1117,
-  serialized_end=1145,
+  serialized_start=1264,
+  serialized_end=1292,
 )
 
-
-_VIDEOEVENT = _descriptor.Descriptor(
-  name='VideoEvent',
-  full_name='endpoints.flunky.simulator.VideoEvent',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='prepareVideo', full_name='endpoints.flunky.simulator.VideoEvent.prepareVideo', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='playVideos', full_name='endpoints.flunky.simulator.VideoEvent.playVideos', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-    _descriptor.OneofDescriptor(
-      name='event_oneof', full_name='endpoints.flunky.simulator.VideoEvent.event_oneof',
-      index=0, containing_type=None, fields=[]),
-  ],
-  serialized_start=1148,
-  serialized_end=1313,
-)
-
-
-_PREPAREVIDEOEVENT = _descriptor.Descriptor(
-  name='PrepareVideoEvent',
-  full_name='endpoints.flunky.simulator.PrepareVideoEvent',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='url', full_name='endpoints.flunky.simulator.PrepareVideoEvent.url', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='videoType', full_name='endpoints.flunky.simulator.PrepareVideoEvent.videoType', index=1,
-      number=2, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1315,
-  serialized_end=1409,
-)
-
-
-_PLAYVIDEOSEVENT = _descriptor.Descriptor(
-  name='PlayVideosEvent',
-  full_name='endpoints.flunky.simulator.PlayVideosEvent',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='videos', full_name='endpoints.flunky.simulator.PlayVideosEvent.videos', index=0,
-      number=1, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1411,
-  serialized_end=1484,
-)
-
-
-_TIMEDVIDEO = _descriptor.Descriptor(
-  name='TimedVideo',
-  full_name='endpoints.flunky.simulator.TimedVideo',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='delay', full_name='endpoints.flunky.simulator.TimedVideo.delay', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='videoType', full_name='endpoints.flunky.simulator.TimedVideo.videoType', index=1,
-      number=2, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='mirrored', full_name='endpoints.flunky.simulator.TimedVideo.mirrored', index=2,
-      number=3, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1486,
-  serialized_end=1593,
-)
-
-
-_GAMESTATE = _descriptor.Descriptor(
-  name='GameState',
-  full_name='endpoints.flunky.simulator.GameState',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='playerTeamA', full_name='endpoints.flunky.simulator.GameState.playerTeamA', index=0,
-      number=1, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='playerTeamB', full_name='endpoints.flunky.simulator.GameState.playerTeamB', index=1,
-      number=2, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='spectators', full_name='endpoints.flunky.simulator.GameState.spectators', index=2,
-      number=3, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='throwingPlayer', full_name='endpoints.flunky.simulator.GameState.throwingPlayer', index=3,
-      number=10, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='strafbierTeamA', full_name='endpoints.flunky.simulator.GameState.strafbierTeamA', index=4,
-      number=11, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='strafbierTeamB', full_name='endpoints.flunky.simulator.GameState.strafbierTeamB', index=5,
-      number=12, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1596,
-  serialized_end=1849,
-)
-
-
-_PLAYER = _descriptor.Descriptor(
-  name='Player',
-  full_name='endpoints.flunky.simulator.Player',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='name', full_name='endpoints.flunky.simulator.Player.name', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='abgegeben', full_name='endpoints.flunky.simulator.Player.abgegeben', index=1,
-      number=2, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1851,
-  serialized_end=1892,
-)
-
-_STREAMVIDEOEVENTSRESP.fields_by_name['event'].message_type = _VIDEOEVENT
-_STREAMSTATERESP.fields_by_name['state'].message_type = _GAMESTATE
-_MODIFYSTRAFBIERCOUNTREQ.fields_by_name['targetTeam'].enum_type = _ENUMTEAMS
-_SWITCHTEAMREQ.fields_by_name['targetTeam'].enum_type = _ENUMTEAMS
-_THROWREQ.fields_by_name['strength'].enum_type = _ENUMTHROWSTRENGTH
-_VIDEOEVENT.fields_by_name['prepareVideo'].message_type = _PREPAREVIDEOEVENT
-_VIDEOEVENT.fields_by_name['playVideos'].message_type = _PLAYVIDEOSEVENT
-_VIDEOEVENT.oneofs_by_name['event_oneof'].fields.append(
-  _VIDEOEVENT.fields_by_name['prepareVideo'])
-_VIDEOEVENT.fields_by_name['prepareVideo'].containing_oneof = _VIDEOEVENT.oneofs_by_name['event_oneof']
-_VIDEOEVENT.oneofs_by_name['event_oneof'].fields.append(
-  _VIDEOEVENT.fields_by_name['playVideos'])
-_VIDEOEVENT.fields_by_name['playVideos'].containing_oneof = _VIDEOEVENT.oneofs_by_name['event_oneof']
-_PREPAREVIDEOEVENT.fields_by_name['videoType'].enum_type = _ENUMVIDEOTYPE
-_PLAYVIDEOSEVENT.fields_by_name['videos'].message_type = _TIMEDVIDEO
-_TIMEDVIDEO.fields_by_name['videoType'].enum_type = _ENUMVIDEOTYPE
-_GAMESTATE.fields_by_name['playerTeamA'].message_type = _PLAYER
-_GAMESTATE.fields_by_name['playerTeamB'].message_type = _PLAYER
-_GAMESTATE.fields_by_name['spectators'].message_type = _PLAYER
+_STREAMVIDEOEVENTSRESP.fields_by_name['event'].message_type = video__objects__pb2._VIDEOEVENT
+_STREAMSTATERESP.fields_by_name['state'].message_type = game__objects__pb2._GAMESTATE
+_MODIFYSTRAFBIERCOUNTREQ.fields_by_name['targetTeam'].enum_type = game__objects__pb2._ENUMTEAMS
+_SWITCHTEAMREQ.fields_by_name['targetTeam'].enum_type = game__objects__pb2._ENUMTEAMS
+_REGISTERPLAYERRESP.fields_by_name['status'].enum_type = _ENUMLOGINSTATUS
+_THROWREQ.fields_by_name['strength'].enum_type = game__objects__pb2._ENUMTHROWSTRENGTH
 DESCRIPTOR.message_types_by_name['LogResp'] = _LOGRESP
 DESCRIPTOR.message_types_by_name['LogReq'] = _LOGREQ
 DESCRIPTOR.message_types_by_name['StreamVideoEventsResp'] = _STREAMVIDEOEVENTSRESP
@@ -1178,15 +854,7 @@ DESCRIPTOR.message_types_by_name['AbgegebenResp'] = _ABGEGEBENRESP
 DESCRIPTOR.message_types_by_name['AbgegebenReq'] = _ABGEGEBENREQ
 DESCRIPTOR.message_types_by_name['ThrowReq'] = _THROWREQ
 DESCRIPTOR.message_types_by_name['ThrowResp'] = _THROWRESP
-DESCRIPTOR.message_types_by_name['VideoEvent'] = _VIDEOEVENT
-DESCRIPTOR.message_types_by_name['PrepareVideoEvent'] = _PREPAREVIDEOEVENT
-DESCRIPTOR.message_types_by_name['PlayVideosEvent'] = _PLAYVIDEOSEVENT
-DESCRIPTOR.message_types_by_name['TimedVideo'] = _TIMEDVIDEO
-DESCRIPTOR.message_types_by_name['GameState'] = _GAMESTATE
-DESCRIPTOR.message_types_by_name['Player'] = _PLAYER
-DESCRIPTOR.enum_types_by_name['EnumThrowStrength'] = _ENUMTHROWSTRENGTH
-DESCRIPTOR.enum_types_by_name['EnumTeams'] = _ENUMTEAMS
-DESCRIPTOR.enum_types_by_name['EnumVideoType'] = _ENUMVIDEOTYPE
+DESCRIPTOR.enum_types_by_name['EnumLoginStatus'] = _ENUMLOGINSTATUS
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 LogResp = _reflection.GeneratedProtocolMessageType('LogResp', (_message.Message,), {
@@ -1357,48 +1025,6 @@ ThrowResp = _reflection.GeneratedProtocolMessageType('ThrowResp', (_message.Mess
   })
 _sym_db.RegisterMessage(ThrowResp)
 
-VideoEvent = _reflection.GeneratedProtocolMessageType('VideoEvent', (_message.Message,), {
-  'DESCRIPTOR' : _VIDEOEVENT,
-  '__module__' : 'flunkyprotocol_pb2'
-  # @@protoc_insertion_point(class_scope:endpoints.flunky.simulator.VideoEvent)
-  })
-_sym_db.RegisterMessage(VideoEvent)
-
-PrepareVideoEvent = _reflection.GeneratedProtocolMessageType('PrepareVideoEvent', (_message.Message,), {
-  'DESCRIPTOR' : _PREPAREVIDEOEVENT,
-  '__module__' : 'flunkyprotocol_pb2'
-  # @@protoc_insertion_point(class_scope:endpoints.flunky.simulator.PrepareVideoEvent)
-  })
-_sym_db.RegisterMessage(PrepareVideoEvent)
-
-PlayVideosEvent = _reflection.GeneratedProtocolMessageType('PlayVideosEvent', (_message.Message,), {
-  'DESCRIPTOR' : _PLAYVIDEOSEVENT,
-  '__module__' : 'flunkyprotocol_pb2'
-  # @@protoc_insertion_point(class_scope:endpoints.flunky.simulator.PlayVideosEvent)
-  })
-_sym_db.RegisterMessage(PlayVideosEvent)
-
-TimedVideo = _reflection.GeneratedProtocolMessageType('TimedVideo', (_message.Message,), {
-  'DESCRIPTOR' : _TIMEDVIDEO,
-  '__module__' : 'flunkyprotocol_pb2'
-  # @@protoc_insertion_point(class_scope:endpoints.flunky.simulator.TimedVideo)
-  })
-_sym_db.RegisterMessage(TimedVideo)
-
-GameState = _reflection.GeneratedProtocolMessageType('GameState', (_message.Message,), {
-  'DESCRIPTOR' : _GAMESTATE,
-  '__module__' : 'flunkyprotocol_pb2'
-  # @@protoc_insertion_point(class_scope:endpoints.flunky.simulator.GameState)
-  })
-_sym_db.RegisterMessage(GameState)
-
-Player = _reflection.GeneratedProtocolMessageType('Player', (_message.Message,), {
-  'DESCRIPTOR' : _PLAYER,
-  '__module__' : 'flunkyprotocol_pb2'
-  # @@protoc_insertion_point(class_scope:endpoints.flunky.simulator.Player)
-  })
-_sym_db.RegisterMessage(Player)
-
 
 DESCRIPTOR._options = None
 
@@ -1408,8 +1034,8 @@ _SIMULATOR = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=2256,
-  serialized_end=3550,
+  serialized_start=1484,
+  serialized_end=2839,
   methods=[
   _descriptor.MethodDescriptor(
     name='Throw',
@@ -1517,6 +1143,15 @@ _SIMULATOR = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_LOGREQ,
     output_type=_LOGRESP,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='HardReset',
+    full_name='endpoints.flunky.simulator.Simulator.HardReset',
+    index=12,
+    containing_service=None,
+    input_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
+    output_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
     serialized_options=None,
   ),
 ])
