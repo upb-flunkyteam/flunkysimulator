@@ -112,11 +112,27 @@ message KickPlayerReq{
 }
 
 
-message RegisterPlayerResp{}
+message RegisterPlayerResp{
+	EnumLoginStatus status = 1;
+}
 
 message RegisterPlayerReq{
 	string playerName = 1;
 }
+
+enum EnumLoginStatus{
+	LOGIN_STATUS_UNKNOWN = 0;
+	LOGIN_STATUS_SUCCESS = 1;
+	// The desired name is already taken.
+	LOGIN_STATUS_NAME_TAKEN = 2;
+	// The given secret does not match
+	LOGIN_STATUS_SECRET_MISMATCH = 3;
+	// The name is empty
+	LOGIN_STATUS_EMPTY = 4;
+	// The name has leading or trailing whitespace.
+	LOGIN_STATUS_NOT_STRIPED = 5;
+}
+
 
 message AbgegebenResp{};
 
