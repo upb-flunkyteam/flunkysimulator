@@ -114,6 +114,7 @@ message KickPlayerReq{
 
 message RegisterPlayerResp{
 	EnumLoginStatus status = 1;
+	string registeredName = 2;
 }
 
 message RegisterPlayerReq{

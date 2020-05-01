@@ -1,6 +1,5 @@
 package simulator.control
 
-import de.flunkyteam.endpoints.projects.simulator.EnumLoginErrorReason
 import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
@@ -13,7 +12,9 @@ import simulator.model.video.VideoType
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 import kotlinx.coroutines.launch
-import java.util.concurrent.locks.ReentrantLock
+import org.apache.commons.text.StringEscapeUtils.escapeHtml4
+
+
 
 
 class GameController(
@@ -203,25 +204,28 @@ class GameController(
         }
     }
 
+    data class LoginResp(val status: EnumLoginStatus, val registeredName: String = "")
 
-    fun registerPlayer(name: String): EnumLoginStatus {
+    fun registerPlayer(name: String): LoginResp {
         if (name.isEmpty())
-            return EnumLoginStatus.LOGIN_STATUS_EMPTY
+            return LoginResp(EnumLoginStatus.LOGIN_STATUS_EMPTY)
 
         if (name.trim() != name)
-            return EnumLoginStatus.LOGIN_STATUS_NOT_STRIPED
+            return LoginResp(EnumLoginStatus.LOGIN_STATUS_NOT_STRIPED)
 
         GlobalScope.launch { videoController.refreshVideos() }
 
-        gameStateLock.withLock {
-            if (gameState.nameTaken(name))
-                return EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN
+        val escapedName = escapeHtml4(name)
 
-            val player = Player(name)
+        gameStateLock.withLock {
+            if (gameState.nameTaken(escapedName))
+                return LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN)
+
+            val player = Player(escapedName)
 
             gameState = gameState.addPlayer(player)
 
-            return EnumLoginStatus.LOGIN_STATUS_SUCCESS
+            return LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, escapedName)
         }
     }
 

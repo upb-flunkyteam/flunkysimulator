@@ -36,11 +36,12 @@ class FlunkyServer(
 
         val loginStatus = gameController.registerPlayer(name)
 
-        if (loginStatus == EnumLoginStatus.LOGIN_STATUS_SUCCESS)
+        if (loginStatus.status == EnumLoginStatus.LOGIN_STATUS_SUCCESS)
             messageController.sendMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
 
         responseObserver.onNext(RegisterPlayerResp.newBuilder()
-            .setStatus(loginStatus)
+            .setStatus(loginStatus.status)
+            .setRegisteredName(loginStatus.registeredName)
             .build())
         responseObserver.onCompleted()
     }
