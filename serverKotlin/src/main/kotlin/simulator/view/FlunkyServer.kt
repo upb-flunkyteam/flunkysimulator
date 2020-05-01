@@ -39,10 +39,12 @@ class FlunkyServer(
         if (loginStatus.status == EnumLoginStatus.LOGIN_STATUS_SUCCESS)
             messageController.sendMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
 
-        responseObserver.onNext(RegisterPlayerResp.newBuilder()
-            .setStatus(loginStatus.status)
-            .setRegisteredName(loginStatus.registeredName)
-            .build())
+        responseObserver.onNext(
+            RegisterPlayerResp.newBuilder()
+                .setStatus(loginStatus.status)
+                .setRegisteredName(loginStatus.registeredName)
+                .build()
+        )
         responseObserver.onCompleted()
     }
 
@@ -77,7 +79,11 @@ class FlunkyServer(
         request: ModifyStrafbierCountReq,
         responseObserver: StreamObserver<ModifyStrafbierCountResp>?
     ) {
-        if (!request.playerName.isNotBlank() && gameController.modifyStrafbierCount(request.targetTeam, request.increment)) {
+        if (!request.playerName.isNotBlank() && gameController.modifyStrafbierCount(
+                request.targetTeam,
+                request.increment
+            )
+        ) {
             val text = "hat ein Strafbier für ${request.targetTeam} " +
                     if (request.increment)
                         "hinzugefügt"
@@ -130,8 +136,14 @@ class FlunkyServer(
 
     override fun abgegeben(request: AbgegebenReq, responseObserver: StreamObserver<AbgegebenResp>?) {
         if (!request.playerName.isNotBlank() && gameController.setAbgegeben(request.targetName, request.setTo)) {
-            val text =
-                "hat ${request.targetName}" + if (request.setTo) "s Abgabe abgenommen." else " ein Bier geöffnet."
+            var text =
+                "hat ${request.targetName}"
+            if (request.setTo) {
+                if (!request.targetName.endsWith("s"))
+                    text += "s"
+                text += " Abgabe abgenommen."
+            } else
+                text += " ein Bier geöffnet."
             messageController.sendMessage(request.playerName, text)
         } else
             messageController.sendMessage(
@@ -242,7 +254,7 @@ class FlunkyServer(
             }
         })
 
-    private fun EnumThrowStrength.toPrettyString() = when(this){
+    private fun EnumThrowStrength.toPrettyString() = when (this) {
         EnumThrowStrength.UNKNOWN_THROW_STRENGTH -> "unbekannt"
         EnumThrowStrength.SOFT_THROW_STRENGTH -> "normal"
         EnumThrowStrength.MEDIUM_THROW_STRENGTH -> "mittel"
