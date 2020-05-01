@@ -106,7 +106,7 @@ class FlunkyServer(
         if (request.playerName.isNotBlank() && gameController.resetGameAndShuffleTeams())
             messageController.sendMessage(
                 request.playerName,
-                "den Ground neu ausgemessen, die Kreide nachgezeichnet, die Teams gemischt, die Center nachgefüllt und den Ball aufgepumt."
+                "hat den Ground neu ausgemessen, die Kreide nachgezeichnet, die Teams gemischt, die Center nachgefüllt und den Ball aufgepumt."
             )
         else
             messageController.sendMessage(request.playerName, "konnte das Spiel nicht neustarten")
