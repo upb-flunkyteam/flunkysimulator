@@ -14,7 +14,7 @@ def registerPlayer(name):
   req = proto.RegisterPlayerReq()
   req.playerName = name
 
-  stub.RegisterPlayer(req)
+  return stub.RegisterPlayer(req)
 
 def kickPlayer(name):
   req = proto.KickPlayerReq()

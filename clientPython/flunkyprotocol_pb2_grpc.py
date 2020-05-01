@@ -2,6 +2,7 @@
 import grpc
 
 import flunkyprotocol_pb2 as flunkyprotocol__pb2
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
 class SimulatorStub(object):
@@ -75,6 +76,11 @@ class SimulatorStub(object):
         '/endpoints.flunky.simulator.Simulator/StreamLog',
         request_serializer=flunkyprotocol__pb2.LogReq.SerializeToString,
         response_deserializer=flunkyprotocol__pb2.LogResp.FromString,
+        )
+    self.HardReset = channel.unary_unary(
+        '/endpoints.flunky.simulator.Simulator/HardReset',
+        request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+        response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
         )
 
 
@@ -169,6 +175,14 @@ class SimulatorServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def HardReset(self, request, context):
+    """Debug rpcs
+
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_SimulatorServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -231,6 +245,11 @@ def add_SimulatorServicer_to_server(servicer, server):
           servicer.StreamLog,
           request_deserializer=flunkyprotocol__pb2.LogReq.FromString,
           response_serializer=flunkyprotocol__pb2.LogResp.SerializeToString,
+      ),
+      'HardReset': grpc.unary_unary_rpc_method_handler(
+          servicer.HardReset,
+          request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+          response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
