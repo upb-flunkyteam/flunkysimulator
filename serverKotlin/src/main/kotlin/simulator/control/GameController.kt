@@ -1,5 +1,6 @@
 package simulator.control
 
+import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
 import kotlinx.coroutines.GlobalScope
@@ -11,7 +12,9 @@ import simulator.model.video.VideoType
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 import kotlinx.coroutines.launch
-import java.util.concurrent.locks.ReentrantLock
+import org.apache.commons.text.StringEscapeUtils.escapeHtml4
+
+
 
 
 class GameController(
@@ -84,7 +87,7 @@ class GameController(
             } else {
                 videosToPlay += if (Math.random() < closeMissProbability) {
                     VideoInstructions(
-                        VideoType.CloseMiss,
+                        VideoType.Miss, // remove close miss until we have more "riechen" videos
                         mirrored = teamAThrows
                     )
                 } else {
@@ -201,24 +204,28 @@ class GameController(
         }
     }
 
-    fun registerPlayer(name: String): Boolean {
-        if (name.isBlank())
-            return false
+    data class LoginResp(val status: EnumLoginStatus, val registeredName: String = "")
+
+    fun registerPlayer(name: String): LoginResp {
+        if (name.isEmpty())
+            return LoginResp(EnumLoginStatus.LOGIN_STATUS_EMPTY)
 
         GlobalScope.launch { videoController.refreshVideos() }
 
-        gameStateLock.withLock {
-            if (gameState.nameTaken(name))
-                return false
+        val escapedAndTrimmedName = escapeHtml4(name.trim())
 
-            val player = Player(name)
+        gameStateLock.withLock {
+            if (gameState.nameTaken(escapedAndTrimmedName))
+                return LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN)
+
+            val player = Player(escapedAndTrimmedName)
 
             gameState = gameState.addPlayer(player)
 
-            return true
+            return LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, escapedAndTrimmedName)
         }
-
     }
+
 
     fun removePlayer(target: String): Boolean {
         gameStateLock.withLock {
@@ -273,6 +280,12 @@ class GameController(
         return (inGamePlayersWithIndex.firstOrNull { (_, i) -> i > indexOfLast }
             ?: inGamePlayersWithIndex.first())
             .first
+    }
+
+    fun hardReset() {
+        gameStateLock.withLock {
+            gameState = GameState()
+        }
     }
 }
 

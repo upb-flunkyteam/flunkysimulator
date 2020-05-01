@@ -1,5 +1,6 @@
 package simulator.view
 
+import com.google.protobuf.Empty
 import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -30,15 +31,20 @@ class FlunkyServer(
         responseObserver?.onCompleted()
     }
 
-    override fun registerPlayer(request: RegisterPlayerReq?, responseObserver: StreamObserver<RegisterPlayerResp>?) {
-        val name = request!!.playerName
+    override fun registerPlayer(request: RegisterPlayerReq, responseObserver: StreamObserver<RegisterPlayerResp>) {
+        val name = request.playerName
 
-        if (gameController.registerPlayer(name))
+        val loginStatus = gameController.registerPlayer(name)
+
+        if (loginStatus.status == EnumLoginStatus.LOGIN_STATUS_SUCCESS)
             messageController.sendMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
-        //else
-        //messageController.sendMessage(request.playerName, "konnte sich nicht registrieren. Name schon vergeben?")
 
-        responseObserver!!.onNext(RegisterPlayerResp.getDefaultInstance())
+        responseObserver.onNext(
+            RegisterPlayerResp.newBuilder()
+                .setStatus(loginStatus.status)
+                .setRegisteredName(loginStatus.registeredName)
+                .build()
+        )
         responseObserver.onCompleted()
     }
 
@@ -73,7 +79,11 @@ class FlunkyServer(
         request: ModifyStrafbierCountReq,
         responseObserver: StreamObserver<ModifyStrafbierCountResp>?
     ) {
-        if (!request.playerName.isNotBlank() && gameController.modifyStrafbierCount(request.targetTeam, request.increment)) {
+        if (!request.playerName.isNotBlank() && gameController.modifyStrafbierCount(
+                request.targetTeam,
+                request.increment
+            )
+        ) {
             val text = "hat ein Strafbier für ${request.targetTeam} " +
                     if (request.increment)
                         "hinzugefügt"
@@ -95,11 +105,11 @@ class FlunkyServer(
 
         if (!request.playerName.isNotBlank() && gameController.resetGameAndShuffleTeams())
             messageController.sendMessage(
-                request!!.playerName,
+                request.playerName,
                 "den Ground neu ausgemessen, die Kreide nachgezeichnet, die Teams gemischt, die Center nachgefüllt und den Ball aufgepumt."
             )
         else
-            messageController.sendMessage(request!!.playerName, "konnte das Spiel nicht neustarten")
+            messageController.sendMessage(request.playerName, "konnte das Spiel nicht neustarten")
 
         responseObserver?.onNext(ResetGameResp.getDefaultInstance())
         responseObserver?.onCompleted()
@@ -109,7 +119,7 @@ class FlunkyServer(
         request: SelectThrowingPlayerReq,
         responseObserver: StreamObserver<SelectThrowingPlayerResp>?
     ) {
-        if (!request.playerName.isNotBlank() && gameController.forceThrowingPlayer(request!!.targetName))
+        if (!request.playerName.isNotBlank() && gameController.forceThrowingPlayer(request.targetName))
             messageController.sendMessage(
                 request.playerName,
                 "hat ${request.targetName} als werfenden Spieler festgelegt."
@@ -125,9 +135,15 @@ class FlunkyServer(
     }
 
     override fun abgegeben(request: AbgegebenReq, responseObserver: StreamObserver<AbgegebenResp>?) {
-        if (!request.playerName.isNotBlank() && gameController.setAbgegeben(request!!.targetName, request.setTo)) {
-            val text =
-                "hat ${request.targetName}" + if (request.setTo) "s Abgabe abgenommen." else " ein Bier geöffnet."
+        if (!request.playerName.isNotBlank() && gameController.setAbgegeben(request.targetName, request.setTo)) {
+            var text =
+                "hat ${request.targetName}"
+            if (request.setTo) {
+                if (!request.targetName.endsWith("s"))
+                    text += "s"
+                text += " Abgabe abgenommen."
+            } else
+                text += " ein Bier geöffnet."
             messageController.sendMessage(request.playerName, text)
         } else
             messageController.sendMessage(
@@ -206,6 +222,12 @@ class FlunkyServer(
             }
 
         messageController.addEventHandler(handler::doAction)
+
+
+    }
+
+    override fun hardReset(request: Empty?, responseObserver: StreamObserver<Empty>?) {
+        gameController.hardReset()
     }
 
     /***
@@ -232,7 +254,7 @@ class FlunkyServer(
             }
         })
 
-    private fun EnumThrowStrength.toPrettyString() = when(this){
+    private fun EnumThrowStrength.toPrettyString() = when (this) {
         EnumThrowStrength.UNKNOWN_THROW_STRENGTH -> "unbekannt"
         EnumThrowStrength.SOFT_THROW_STRENGTH -> "normal"
         EnumThrowStrength.MEDIUM_THROW_STRENGTH -> "mittel"

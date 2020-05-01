@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package endpoints.flunky.simulator;
 
+import "google/protobuf/empty.proto";
+
 import "game_objects.proto";
 import "video_objects.proto";
 
@@ -40,6 +42,10 @@ service Simulator {
 	rpc StreamVideoEvents(StreamVideoEventsReq) returns (stream StreamVideoEventsResp);
 	
 	rpc StreamLog(LogReq) returns (stream LogResp);
+
+	// Debug rpcs
+
+	rpc HardReset(google.protobuf.Empty) returns (google.protobuf.Empty);
 
 }
 
@@ -106,11 +112,26 @@ message KickPlayerReq{
 }
 
 
-message RegisterPlayerResp{}
+message RegisterPlayerResp{
+	EnumLoginStatus status = 1;
+	string registeredName = 2;
+}
 
 message RegisterPlayerReq{
 	string playerName = 1;
 }
+
+enum EnumLoginStatus{
+	LOGIN_STATUS_UNKNOWN = 0;
+	LOGIN_STATUS_SUCCESS = 1;
+	// The desired name is already taken.
+	LOGIN_STATUS_NAME_TAKEN = 2;
+	// The given secret does not match
+	LOGIN_STATUS_SECRET_MISMATCH = 3;
+	// The name is empty
+	LOGIN_STATUS_EMPTY = 4;
+}
+
 
 message AbgegebenResp{};
 
