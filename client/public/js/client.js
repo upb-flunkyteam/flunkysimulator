@@ -57,7 +57,9 @@ jQuery(window).load(function () {
         }
     });
     $('#resetbutton').click(function () {
-        resetGame();
+        if(confirm('Möchtest du wirklich das Spiel für alle Teilnehmenden neu starten?')){
+            resetGame();
+        }
     });
     desktop = window.matchMedia("(min-width: 992px)").matches;
     if(desktop){
