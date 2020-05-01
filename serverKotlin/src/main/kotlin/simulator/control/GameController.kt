@@ -274,5 +274,11 @@ class GameController(
             ?: inGamePlayersWithIndex.first())
             .first
     }
+
+    fun hardReset() {
+        gameStateLock.withLock {
+            gameState = GameState()
+        }
+    }
 }
 

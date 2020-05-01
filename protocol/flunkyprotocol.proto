@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package endpoints.flunky.simulator;
 
+import "google/protobuf/empty.proto";
+
 import "game_objects.proto";
 import "video_objects.proto";
 
@@ -40,6 +42,10 @@ service Simulator {
 	rpc StreamVideoEvents(StreamVideoEventsReq) returns (stream StreamVideoEventsResp);
 	
 	rpc StreamLog(LogReq) returns (stream LogResp);
+
+	// Debug rpcs
+
+	rpc HardReset(google.protobuf.Empty) returns (google.protobuf.Empty);
 
 }
 

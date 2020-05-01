@@ -1,5 +1,6 @@
 package simulator.view
 
+import com.google.protobuf.Empty
 import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -95,11 +96,11 @@ class FlunkyServer(
 
         if (!request.playerName.isNotBlank() && gameController.resetGameAndShuffleTeams())
             messageController.sendMessage(
-                request!!.playerName,
+                request.playerName,
                 "den Ground neu ausgemessen, die Kreide nachgezeichnet, die Teams gemischt, die Center nachgefüllt und den Ball aufgepumt."
             )
         else
-            messageController.sendMessage(request!!.playerName, "konnte das Spiel nicht neustarten")
+            messageController.sendMessage(request.playerName, "konnte das Spiel nicht neustarten")
 
         responseObserver?.onNext(ResetGameResp.getDefaultInstance())
         responseObserver?.onCompleted()
@@ -109,7 +110,7 @@ class FlunkyServer(
         request: SelectThrowingPlayerReq,
         responseObserver: StreamObserver<SelectThrowingPlayerResp>?
     ) {
-        if (!request.playerName.isNotBlank() && gameController.forceThrowingPlayer(request!!.targetName))
+        if (!request.playerName.isNotBlank() && gameController.forceThrowingPlayer(request.targetName))
             messageController.sendMessage(
                 request.playerName,
                 "hat ${request.targetName} als werfenden Spieler festgelegt."
@@ -125,7 +126,7 @@ class FlunkyServer(
     }
 
     override fun abgegeben(request: AbgegebenReq, responseObserver: StreamObserver<AbgegebenResp>?) {
-        if (!request.playerName.isNotBlank() && gameController.setAbgegeben(request!!.targetName, request.setTo)) {
+        if (!request.playerName.isNotBlank() && gameController.setAbgegeben(request.targetName, request.setTo)) {
             val text =
                 "hat ${request.targetName}" + if (request.setTo) "s Abgabe abgenommen." else " ein Bier geöffnet."
             messageController.sendMessage(request.playerName, text)
@@ -206,6 +207,12 @@ class FlunkyServer(
             }
 
         messageController.addEventHandler(handler::doAction)
+
+
+    }
+
+    override fun hardReset(request: Empty?, responseObserver: StreamObserver<Empty>?) {
+        gameController.hardReset()
     }
 
     /***
