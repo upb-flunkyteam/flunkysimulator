@@ -87,7 +87,7 @@ class GameController(
             } else {
                 videosToPlay += if (Math.random() < closeMissProbability) {
                     VideoInstructions(
-                        VideoType.CloseMiss,
+                        VideoType.Miss, // remove close miss until we have more "riechen" videos
                         mirrored = teamAThrows
                     )
                 } else {
