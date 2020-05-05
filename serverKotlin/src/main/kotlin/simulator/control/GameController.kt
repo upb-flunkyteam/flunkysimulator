@@ -217,7 +217,8 @@ class GameController(
         val escapedAndTrimmedName = escapeHtml4(name.trim())
 
         gameStateLock.withLock {
-            //if (gameState.nameTaken(escapedAndTrimmedName))
+            if (gameState.nameTaken(escapedAndTrimmedName))
+                return LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS)
             //    return LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN)
 
             val player = Player(escapedAndTrimmedName)
