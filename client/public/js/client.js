@@ -5,12 +5,12 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {EnumThrowStrength, EnumTeams, EnumVideoType, GameState, 
-    ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp, 
-    StreamStateReq, StreamStateResp, LogReq, LogResp, 
+const {EnumThrowStrength, EnumTeams, EnumVideoType, EnumLoginStatus, GameState,
+    ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp,
+    StreamStateReq, StreamStateResp, LogReq, LogResp,
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
     ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
-    ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq, 
+    ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
     AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
     StreamVideoEventsReq, StreamVideoEventsResp
 } = require('./flunkyprotocol_pb');
@@ -32,41 +32,41 @@ jQuery(window).load(function () {
     $('#hardthrowbutton').click(function () {
         throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
     });
-    $('#playername').keyup(function(e){
-        if(e.keyCode === 13){
+    $('#playername').keyup(function (e) {
+        if (e.keyCode === 13) {
             $(this).trigger("submission");
         }
     });
     $('#playernamebutton').click(function () {
         $('#playername').trigger("submission");
     });
-    $('#playername').bind("submission",function(e){
+    $('#playername').bind("submission", function (e) {
         changePlayername($('#playername').val());
     });
     $('#switchplayerbutton').click(function () {
         $('#registerform').show();
         $('#playernamebutton').text('Spielernamen ändern');
     });
-    $('#chatinput').bind("enterKey",function(e){
+    $('#chatinput').bind("enterKey", function (e) {
         sendMessage($('#chatinput').val());
         $('#chatinput').val('');
     });
-    $('#chatinput').keyup(function(e){
-        if(e.keyCode === 13){
+    $('#chatinput').keyup(function (e) {
+        if (e.keyCode === 13) {
             $(this).trigger("enterKey");
         }
     });
     $('#resetbutton').click(function () {
-        if(confirm('Möchtest du wirklich das Spiel für alle Teilnehmenden neu starten?')){
+        if (confirm('Möchtest du wirklich das Spiel für alle Teilnehmenden neu starten?')) {
             resetGame();
         }
     });
     desktop = window.matchMedia("(min-width: 992px)").matches;
-    if(desktop){
+    if (desktop) {
         $('#lowbandwidthbutton').bootstrapToggle('on');
     }
     lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
-    $('#lowbandwidthbutton').change(function() {
+    $('#lowbandwidthbutton').change(function () {
         lowBandwidth = !$(this).prop('checked');
     });
     $('.video').on('ended', function () {
@@ -80,7 +80,7 @@ jQuery(window).load(function () {
     subscribeStreams();
 });
 
-function subscribeStreams(){
+function subscribeStreams() {
     var stateRequest = new StreamStateReq();
     var stateStream = simulatorClient.streamState(stateRequest, {});
     stateStream.on('data', (response) => {
@@ -110,15 +110,13 @@ function subscribeStreams(){
     });
 }
 
-function changePlayername(desiredPlayername){
-    if(desiredPlayername === ''){
+function changePlayername(desiredPlayername) {
+    if (desiredPlayername === '') {
         console.log("Warning: Cannot register empty player name");
         return;
     }
 
-    
     /*
-
     https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
 
     & --> &amp;
@@ -128,12 +126,12 @@ function changePlayername(desiredPlayername){
     ' --> &#x27;     
     / --> &#x2F;   
 
-    I don't know how the html template looks like but better escape stuff like {{  }} and ` `
+    Better also escape stuff like {{  }} and ` `
     */
 
    desiredPlayername =  desiredPlayername.replace(/[<>/"'${}&`]+/g,"");
 
-    if(playerName){
+    if (playerName) {
         // Discourage false flag attacks
         sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
     }    
@@ -143,15 +141,34 @@ function changePlayername(desiredPlayername){
     var request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
-    simulatorClient.registerPlayer(request, {}, function(err, response) {
+    simulatorClient.registerPlayer(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
         } else {
-            playerName = desiredPlayername;
-            $('#registerform').hide();
-            // Force re-evaluation of game state, e.g. do I need to throw
-            processNewState(currentGameState);
+            response = response.toObject();
+            console.log(response);
+            switch (response.status) {
+                case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
+                    playerName = response.registeredname;
+                    $('#playername').text(playerName);
+                    $('#registerform').hide();
+                    // Force re-evaluation of game state, e.g. do I need to throw
+                    processNewState(currentGameState);
+                    break;
+                case EnumLoginStatus.LOGIN_STATUS_EMPTY:
+                    window.alert('Registrierung fehlgeschlagen! Dein Benutzername ist leer.');
+                    break;
+                case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
+                    window.alert('Registrierung fehlgeschlagen! Der Benutzername ist bereits vergeben.');
+                    break;
+                case EnumLoginStatus.LOGIN_STATUS_SECRET_MISMATCH:
+                    window.alert('Registrierung fehlgeschlagen! Passwort falsch.');
+                    break;
+                case EnumLoginStatus.LOGIN_STATUS_UNKNOWN:
+                    window.alert('Registrierung fehlgeschlagen!');
+                    break;
+            }
         }
     });
 }
@@ -165,7 +182,7 @@ function throwing(strength) {
     request.setPlayername(playerName);
     request.setStrength(strength);
     console.log(request.toObject());
-    simulatorClient.throw(request, {}, function(err, response) {
+    simulatorClient.throw(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -173,12 +190,12 @@ function throwing(strength) {
     });
 }
 
-function sendMessage(content){
+function sendMessage(content) {
     var request = new SendMessageReq();
     request.setPlayername(playerName);
     request.setContent(content);
     console.log(request.toObject());
-    simulatorClient.sendMessage(request, {}, function(err, response) {
+    simulatorClient.sendMessage(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -192,7 +209,7 @@ function switchTeam(targetTeam, targetName) {
     request.setTargetteam(targetTeam);
     request.setTargetname(targetName);
     console.log(request.toObject());
-    simulatorClient.switchTeam(request, {}, function(err, response) {
+    simulatorClient.switchTeam(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -205,7 +222,7 @@ function kickPlayer(targetName) {
     request.setPlayername(playerName);
     request.setTargetname(targetName);
     console.log(request.toObject());
-    simulatorClient.kickPlayer(request, {}, function(err, response) {
+    simulatorClient.kickPlayer(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -219,7 +236,7 @@ function modifyStrafbierCount(team, increment) {
     request.setTargetteam(team);
     request.setIncrement(increment);
     console.log(request.toObject());
-    simulatorClient.modifyStrafbierCount(request, {}, function(err, response) {
+    simulatorClient.modifyStrafbierCount(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -232,7 +249,7 @@ function selectThrowingPlayer(targetName) {
     request.setPlayername(playerName);
     request.setTargetname(targetName);
     console.log(request.toObject());
-    simulatorClient.selectThrowingPlayer(request, {}, function(err, response) {
+    simulatorClient.selectThrowingPlayer(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -245,13 +262,13 @@ function abgeben(targetName) {
     request.setPlayername(playerName);
     request.setTargetname(targetName);
     players = currentGameState.playerteamaList.concat(currentGameState.playerteambList);
-    players.forEach(function(player, index) { 
-        if(player.name === targetName){
+    players.forEach(function (player, index) {
+        if (player.name === targetName) {
             request.setSetto(!player.abgegeben);
         }
     });
     console.log(request.toObject());
-    simulatorClient.abgegeben(request, {}, function(err, response) {
+    simulatorClient.abgegeben(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -259,11 +276,11 @@ function abgeben(targetName) {
     });
 }
 
-function resetGame(){
+function resetGame() {
     var request = new ResetGameReq();
     request.setPlayername(playerName);
     console.log(request.toObject());
-    simulatorClient.resetGame(request, {}, function(err, response) {
+    simulatorClient.resetGame(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -271,46 +288,46 @@ function resetGame(){
     });
 }
 
-function processNewState(state){
+function processNewState(state) {
     currentGameState = state;
     console.log(currentGameState);
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
-    
+
     $('#teamaarea, #teambarea, #spectatorarea').empty();
-    currentGameState.playerteamaList.forEach(function(player, index) {    
+    currentGameState.playerteamaList.forEach(function (player, index) {
         $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
-        if(player.name === currentGameState.throwingplayer){
+        if (player.name === currentGameState.throwingplayer) {
             currentTeam = EnumTeams.TEAM_A_TEAMS;
         }
     });
-    currentGameState.playerteambList.forEach(function(player, index) {    
+    currentGameState.playerteambList.forEach(function (player, index) {
         $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
-        if(player.name === currentGameState.throwingplayer){
+        if (player.name === currentGameState.throwingplayer) {
             currentTeam = EnumTeams.TEAM_B_TEAMS;
         }
     });
-    currentGameState.spectatorsList.forEach(function(player, index) {    
+    currentGameState.spectatorsList.forEach(function (player, index) {
         $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
-    
-    if(currentGameState.throwingplayer === playerName){
+
+    if (currentGameState.throwingplayer === playerName) {
         // It's my turn, display the throwing buttons!
         $('#throwactionbuttons').show();
         $('.throwbutton').prop('disabled', false);
         $('#throwerdisplayarea').hide();
         // Make sure user notices
         $('.actionbox').addClass('flashingbackground');
-    }else{
+    } else {
         // Remove annoying flashing
         $('.actionbox').removeClass('flashingbackground');
         // Update the box displaying who is currently throwing
         throwingText = '<b>' + currentGameState.throwingplayer + '</b> wirft';
-        if(currentTeam === EnumTeams.TEAM_A_TEAMS){
+        if (currentTeam === EnumTeams.TEAM_A_TEAMS) {
             $('#throwingplayer').addClass('text-left').removeClass('text-right');
             throwingText = '<span class="glyphicon glyphicon-chevron-left"></span>' + throwingText;
-        }else{
+        } else {
             $('#throwingplayer').addClass('text-right').removeClass('text-left');
             throwingText = throwingText + '<span class="glyphicon glyphicon-chevron-right"></span>';
         }
@@ -318,35 +335,35 @@ function processNewState(state){
         $('#throwactionbuttons').hide();
         $('#throwerdisplayarea').show();
     }
-    
+
     registerStateButtonCallbacks();
 }
 
-function processNewLog(sender, content){
+function processNewLog(sender, content) {
     console.log("New log message: " + content);
-    $('#logbox').val(function(i, text) {
+    $('#logbox').val(function (i, text) {
         return text + '\n' + sender + ' ' + content;
     });
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
 }
 
-function processNewVideoEvent(videoEvent){
-    if(typeof videoEvent.preparevideo !== 'undefined'){
+function processNewVideoEvent(videoEvent) {
+    if (typeof videoEvent.preparevideo !== 'undefined') {
         console.log('Got prepare video event');
         console.log(videoEvent.preparevideo);
-        if(lowBandwidth){
+        if (lowBandwidth) {
             console.log('Ignoring preparation request, we do not show videos');
-        }else{
+        } else {
             prepareVideo(videoEvent.preparevideo.url, videoEvent.preparevideo.videotype);
         }
     }
-    if(typeof videoEvent.playvideos !== 'undefined'){
+    if (typeof videoEvent.playvideos !== 'undefined') {
         console.log('Got play video event');
         console.log(videoEvent.playvideos);
-        if(lowBandwidth){
-            videoEvent.playvideos.videosList.forEach(function(video, index) { 
+        if (lowBandwidth) {
+            videoEvent.playvideos.videosList.forEach(function (video, index) {
                 type = video.videotype;
-                if (type === EnumVideoType.HIT_VIDEOTYPE || type === EnumVideoType.MISS_VIDEOTYPE || type === EnumVideoType.NEAR_MISS_VIDEOTYPE){
+                if (type === EnumVideoType.HIT_VIDEOTYPE || type === EnumVideoType.MISS_VIDEOTYPE || type === EnumVideoType.NEAR_MISS_VIDEOTYPE) {
                     // Do not spoil the result just yet
                     console.log('Spoiler alert!');
                     setTimeout(() => {
@@ -355,21 +372,21 @@ function processNewVideoEvent(videoEvent){
                     setTimeout(() => {
                         playPoster(video.videotype, video.mirrored);
                     }, video.delay + 2500);
-                }else{
+                } else {
                     setTimeout(() => {
                         playPoster(video.videotype, video.mirrored);
                     }, video.delay);
                 }
             });
-        }else{
+        } else {
             videolist = videoEvent.playvideos.videosList;
             first = videolist[0];
-            if(videolist.length === 1){
+            if (videolist.length === 1) {
                 setTimeout(() => {
                     playVideo(first.videotype, first.mirrored);
                 }, first.delay);
             }
-            if(videolist.length === 2){
+            if (videolist.length === 2) {
                 setTimeout(() => {
                     playVideo(first.videotype, first.mirrored);
                 }, first.delay);
@@ -380,44 +397,44 @@ function processNewVideoEvent(videoEvent){
     }
 }
 
-function prepareVideo(url, videotype){
+function prepareVideo(url, videotype) {
     video = getVideoByType(videotype);
-    video.attr('src', 'video/'+url);
+    video.attr('src', 'video/' + url);
     video[0].load();
     // Force loading of the video by starting to play it muted and hidden
     video.prop('muted', true).trigger('play');
 }
 
-function playVideo(videotype, mirrored){
+function playVideo(videotype, mirrored) {
     // Abort all previously playing videos
     stopVideos();
     $('.logoposter').hide();
     video = getVideoByType(videotype);
-    if(mirrored){
+    if (mirrored) {
         video.addClass('mirroredvideo');
-    }else{
+    } else {
         video.removeClass('mirroredvideo');
     }
     video.show().prop('muted', false).trigger('play');
     return video;
 }
 
-function scheduleSecondVideo(first, second){
+function scheduleSecondVideo(first, second) {
     firstVideo = getVideoByType(first.videotype)[0];
     if (firstVideo.currentTime >= 2.5) {
         // Ready to play, we have played the first 2.5 seconds
         setTimeout(() => {
             playVideo(second.videotype, second.mirrored);
-        }, second.delay - first.delay-2500);
-     } else {
+        }, second.delay - first.delay - 2500);
+    } else {
         // Try again in 100ms
         setTimeout(() => {
             scheduleSecondVideo(first, second);
         }, 100);
-     }
+    }
 }
 
-function playPoster(videotype, mirrored){
+function playPoster(videotype, mirrored) {
     // Hide all previous posters
     $('.poster').hide();
     $('.logoposter').hide();
@@ -426,7 +443,7 @@ function playPoster(videotype, mirrored){
     return poster;
 }
 
-function getPosterByType(videotype, mirrored){
+function getPosterByType(videotype, mirrored) {
     switch (videotype) {
         case EnumVideoType.HIT_VIDEOTYPE:
             return $('.poster.hit');
@@ -445,7 +462,7 @@ function getPosterByType(videotype, mirrored){
     }
 }
 
-function getVideoByType(videotype){
+function getVideoByType(videotype) {
     switch (videotype) {
         case EnumVideoType.HIT_VIDEOTYPE:
             return $('.video.hit');
@@ -463,14 +480,14 @@ function getVideoByType(videotype){
 }
 
 function stopVideos() {
-    $('.video').each(function(key, value){
+    $('.video').each(function (key, value) {
         value.pause();
         value.currentTime = 0;
         $(value).hide();
     });
 }
 
-function registerStateButtonCallbacks(){
+function registerStateButtonCallbacks() {
     $('.switchteamabutton').click(function () {
         switchTeam(EnumTeams.TEAM_A_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').text());
     });
@@ -508,20 +525,20 @@ function generatePlayerHTML(player, throwingPlayer) {
     classes = ' btn-default';
     name = player.name;
     spacing = 'vspace-small';
-    if(player.abgegeben){
+    if (player.abgegeben) {
         disabled = ' disabled="disabled"';
     }
-    if(name === throwingPlayer){
+    if (name === throwingPlayer) {
         classes = ' btn-primary';
     }
-    if(name === playerName){
+    if (name === playerName) {
         spacing = 'vspace';
         name = '<b>' + name + '</b>';
     }
-    
-    html = 
-        '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
-            <div class="btn namebutton' + classes + '"' + disabled + '>'+name+'</div>\n\
+
+    html =
+            '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
+            <div class="btn namebutton' + classes + '"' + disabled + '>' + name + '</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n\
                     <span class="glyphicon glyphicon-transfer"></span>\n\
@@ -536,20 +553,20 @@ function generatePlayerHTML(player, throwingPlayer) {
             <div class="btn btn-default kickbutton"><span class="glyphicon glyphicon-ban-circle"></span></div>\n\
         </div>';
     return html;
-}
-
-function generateStrafbierHTML(number, team){
+}<script>
+<script>
+function generateStrafbierHTML(number, team) {
     teamclass = '';
-    if(team === EnumTeams.TEAM_A_TEAMS){
+    if (team === EnumTeams.TEAM_A_TEAMS) {
         teamclass = ' strafbierteamabutton';
-    }else if(team === EnumTeams.TEAM_B_TEAMS){
+    } else if (team === EnumTeams.TEAM_B_TEAMS) {
         teamclass = ' strafbierteambbutton';
     }
     html = '<div class="btn-group vspace" role="group">';
-    for(var i=0; i < number; i++){
-        html += '<div class="btn btn-default reducebutton'+teamclass+'"><span class="glyphicon glyphicon-glass"></span></div>';
+    for (var i = 0; i < number; i++) {
+        html += '<div class="btn btn-default reducebutton' + teamclass + '"><span class="glyphicon glyphicon-glass"></span></div>';
     }
-    html += '<div class="btn btn-default increasebutton'+teamclass+'"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-glass"></span></div>';
+    html += '<div class="btn btn-default increasebutton' + teamclass + '"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-glass"></span></div>';
     html += '</div>';
     return html;
 }

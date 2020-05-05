@@ -12,6 +12,8 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
+var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js')
+
 var game_objects_pb = require('./game_objects_pb.js')
 
 var video_objects_pb = require('./video_objects_pb.js')
@@ -1014,6 +1016,86 @@ proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.streamLog =
       request,
       metadata || {},
       methodDescriptor_Simulator_StreamLog);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodDescriptor_Simulator_HardReset = new grpc.web.MethodDescriptor(
+  '/endpoints.flunky.simulator.Simulator/HardReset',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodInfo_Simulator_HardReset = new grpc.web.AbstractClientBase.MethodInfo(
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.endpoints.flunky.simulator.SimulatorClient.prototype.hardReset =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/HardReset',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_HardReset,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     A native promise that resolves to the response
+ */
+proto.endpoints.flunky.simulator.SimulatorPromiseClient.prototype.hardReset =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/endpoints.flunky.simulator.Simulator/HardReset',
+      request,
+      metadata || {},
+      methodDescriptor_Simulator_HardReset);
 };
 
 
