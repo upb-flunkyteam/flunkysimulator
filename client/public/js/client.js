@@ -21,6 +21,7 @@ var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
 var lowBandwidth = false;
+var preparedVideos = {};
 
 jQuery(window).load(function () {
     $('#softthrowbutton').click(function () {
@@ -68,6 +69,7 @@ jQuery(window).load(function () {
     lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
     $('#lowbandwidthbutton').change(function () {
         lowBandwidth = !$(this).prop('checked');
+        changeLowBandwidthMode();
     });
     $('.video').on('ended', function () {
         $(this).hide();
@@ -116,17 +118,6 @@ function changePlayername(desiredPlayername) {
         return;
     }
 
-    /*
-     https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
-     & --> &amp;
-     < --> &lt;
-     > --> &gt;
-     " --> &quot;
-     ' --> &#x27;     
-     / --> &#x2F;   
-     Better also escape stuff like {{  }} and ` `
-     */
-    desiredPlayername = desiredPlayername.replace(/[<>/"'${}&`]+/g, "");
     if (playerName) {
         // Discourage false flag attacks, the player was already registered
         sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
@@ -344,9 +335,8 @@ function processNewVideoEvent(videoEvent) {
     if (typeof videoEvent.preparevideo !== 'undefined') {
         console.log('Got prepare video event');
         console.log(videoEvent.preparevideo);
-        if (lowBandwidth) {
-            console.log('Ignoring preparation request, we do not show videos');
-        } else {
+        preparedVideos[videoEvent.preparevideo.videotype] = videoEvent.preparevideo.url;
+        if (!lowBandwidth) {
             prepareVideo(videoEvent.preparevideo.url, videoEvent.preparevideo.videotype);
         }
     }
@@ -480,6 +470,23 @@ function stopVideos() {
     });
 }
 
+function changeLowBandwidthMode(){
+    if(lowBandwidth){
+        // Hide all the videos
+        stopVideos();
+    }else{
+        // Hide all the posters
+        $('.poster').hide();
+        $('.logoposter').show();
+        // Preload everything we ignored
+        for(var videotype in preparedVideos) {
+            var url = preparedVideos[videotype];
+            prepareVideo(url, videotype);
+          }
+
+    }
+}
+
 function registerStateButtonCallbacks() {
     $('.switchteamabutton').click(function () {
         switchTeam(EnumTeams.TEAM_A_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').text());
@@ -516,7 +523,8 @@ function registerStateButtonCallbacks() {
 function generatePlayerHTML(player, throwingPlayer) {
     disabled = '';
     classes = ' btn-default';
-    name = player.name;
+    // Make the browser escape any special characters for us
+    name = $('<div/>').text(player.name).html();
     spacing = 'vspace-small';
     if (player.abgegeben) {
         disabled = ' disabled="disabled"';
