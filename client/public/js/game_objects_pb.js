@@ -12,7 +12,6 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
-goog.exportSymbol('proto.endpoints.flunky.simulator.EnumLoginErrorReason', null, global);
 goog.exportSymbol('proto.endpoints.flunky.simulator.EnumTeams', null, global);
 goog.exportSymbol('proto.endpoints.flunky.simulator.EnumThrowStrength', null, global);
 goog.exportSymbol('proto.endpoints.flunky.simulator.GameState', null, global);
@@ -593,16 +592,6 @@ proto.endpoints.flunky.simulator.EnumTeams = {
   SPECTATOR_TEAMS: 1,
   TEAM_A_TEAMS: 2,
   TEAM_B_TEAMS: 3
-};
-
-/**
- * @enum {number}
- */
-proto.endpoints.flunky.simulator.EnumLoginErrorReason = {
-  LOGIN_ERROR_REASON_UNKNOWN: 0,
-  LOGIN_ERROR_REASON_NOT_STRIPED: 1,
-  LOGIN_ERROR_REASON_NAME_TAKEN: 2,
-  LOGIN_ERROR_REASON_SECRET_MISMATCH: 3
 };
 
 goog.object.extend(exports, proto.endpoints.flunky.simulator);
