@@ -117,27 +117,20 @@ function changePlayername(desiredPlayername) {
     }
 
     /*
-    https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
-
-    & --> &amp;
-    < --> &lt;
-    > --> &gt;
-    " --> &quot;
-    ' --> &#x27;     
-    / --> &#x2F;   
-
-    Better also escape stuff like {{  }} and ` `
-    */
-
-   desiredPlayername =  desiredPlayername.replace(/[<>/"'${}&`]+/g,"");
-
+     https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+     & --> &amp;
+     < --> &lt;
+     > --> &gt;
+     " --> &quot;
+     ' --> &#x27;     
+     / --> &#x2F;   
+     Better also escape stuff like {{  }} and ` `
+     */
+    desiredPlayername = desiredPlayername.replace(/[<>/"'${}&`]+/g, "");
     if (playerName) {
-        // Discourage false flag attacks
+        // Discourage false flag attacks, the player was already registered
         sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
-    }    
-
-
-
+    }
     var request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
