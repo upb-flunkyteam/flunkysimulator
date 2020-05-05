@@ -12,12 +12,15 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
+var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
+goog.object.extend(proto, google_protobuf_empty_pb);
 var game_objects_pb = require('./game_objects_pb.js');
 goog.object.extend(proto, game_objects_pb);
 var video_objects_pb = require('./video_objects_pb.js');
 goog.object.extend(proto, video_objects_pb);
 goog.exportSymbol('proto.endpoints.flunky.simulator.AbgegebenReq', null, global);
 goog.exportSymbol('proto.endpoints.flunky.simulator.AbgegebenResp', null, global);
+goog.exportSymbol('proto.endpoints.flunky.simulator.EnumLoginStatus', null, global);
 goog.exportSymbol('proto.endpoints.flunky.simulator.KickPlayerReq', null, global);
 goog.exportSymbol('proto.endpoints.flunky.simulator.KickPlayerResp', null, global);
 goog.exportSymbol('proto.endpoints.flunky.simulator.LogReq', null, global);
@@ -2937,7 +2940,8 @@ proto.endpoints.flunky.simulator.RegisterPlayerResp.prototype.toObject = functio
  */
 proto.endpoints.flunky.simulator.RegisterPlayerResp.toObject = function(includeInstance, msg) {
   var f, obj = {
-
+    status: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    registeredname: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -2974,6 +2978,14 @@ proto.endpoints.flunky.simulator.RegisterPlayerResp.deserializeBinaryFromReader 
     }
     var field = reader.getFieldNumber();
     switch (field) {
+    case 1:
+      var value = /** @type {!proto.endpoints.flunky.simulator.EnumLoginStatus} */ (reader.readEnum());
+      msg.setStatus(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setRegisteredname(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -3003,6 +3015,56 @@ proto.endpoints.flunky.simulator.RegisterPlayerResp.prototype.serializeBinary = 
  */
 proto.endpoints.flunky.simulator.RegisterPlayerResp.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getStatus();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      1,
+      f
+    );
+  }
+  f = message.getRegisteredname();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional EnumLoginStatus status = 1;
+ * @return {!proto.endpoints.flunky.simulator.EnumLoginStatus}
+ */
+proto.endpoints.flunky.simulator.RegisterPlayerResp.prototype.getStatus = function() {
+  return /** @type {!proto.endpoints.flunky.simulator.EnumLoginStatus} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/**
+ * @param {!proto.endpoints.flunky.simulator.EnumLoginStatus} value
+ * @return {!proto.endpoints.flunky.simulator.RegisterPlayerResp} returns this
+ */
+proto.endpoints.flunky.simulator.RegisterPlayerResp.prototype.setStatus = function(value) {
+  return jspb.Message.setProto3EnumField(this, 1, value);
+};
+
+
+/**
+ * optional string registeredName = 2;
+ * @return {string}
+ */
+proto.endpoints.flunky.simulator.RegisterPlayerResp.prototype.getRegisteredname = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.endpoints.flunky.simulator.RegisterPlayerResp} returns this
+ */
+proto.endpoints.flunky.simulator.RegisterPlayerResp.prototype.setRegisteredname = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
@@ -3716,5 +3778,16 @@ proto.endpoints.flunky.simulator.ThrowResp.prototype.setSuccess = function(value
   return jspb.Message.setProto3BooleanField(this, 1, value);
 };
 
+
+/**
+ * @enum {number}
+ */
+proto.endpoints.flunky.simulator.EnumLoginStatus = {
+  LOGIN_STATUS_UNKNOWN: 0,
+  LOGIN_STATUS_SUCCESS: 1,
+  LOGIN_STATUS_NAME_TAKEN: 2,
+  LOGIN_STATUS_SECRET_MISMATCH: 3,
+  LOGIN_STATUS_EMPTY: 4
+};
 
 goog.object.extend(exports, proto.endpoints.flunky.simulator);
