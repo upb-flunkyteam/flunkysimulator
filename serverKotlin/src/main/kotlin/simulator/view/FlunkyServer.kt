@@ -127,7 +127,7 @@ class FlunkyServer(
         else
             messageController.sendMessage(
                 request.playerName,
-                "konnte ${request.targetName} nicht als Werfer festlegen. Spielt nicht mit oder nicht existent?"
+                "konnte ${request.targetName} nicht als Werfer/in festlegen. Spielt nicht mit oder nicht existent?"
             )
 
         responseObserver?.onNext(SelectThrowingPlayerResp.getDefaultInstance())
