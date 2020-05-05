@@ -218,8 +218,7 @@ class GameController(
 
         gameStateLock.withLock {
             if (gameState.nameTaken(escapedAndTrimmedName))
-                return LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS)
-            //    return LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN)
+                return LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN)
 
             val player = Player(escapedAndTrimmedName)
 
