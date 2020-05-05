@@ -115,10 +115,29 @@ function changePlayername(desiredPlayername) {
         console.log("Warning: Cannot register empty player name");
         return;
     }
+
+    /*
+    https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+
+    & --> &amp;
+    < --> &lt;
+    > --> &gt;
+    " --> &quot;
+    ' --> &#x27;     
+    / --> &#x2F;   
+
+    Better also escape stuff like {{  }} and ` `
+    */
+
+   desiredPlayername =  desiredPlayername.replace(/[<>/"'${}&`]+/g,"");
+
     if (playerName) {
         // Discourage false flag attacks
         sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
-    }
+    }    
+
+
+
     var request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
@@ -534,8 +553,8 @@ function generatePlayerHTML(player, throwingPlayer) {
             <div class="btn btn-default kickbutton"><span class="glyphicon glyphicon-ban-circle"></span></div>\n\
         </div>';
     return html;
-}
-
+}<script>
+<script>
 function generateStrafbierHTML(number, team) {
     teamclass = '';
     if (team === EnumTeams.TEAM_A_TEAMS) {

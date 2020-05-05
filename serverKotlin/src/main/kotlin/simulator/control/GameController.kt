@@ -117,7 +117,9 @@ class GameController(
                     messageController.sendMessage(player.name, "hat nicht für Team ${throwingTeam.positionalName()} getroffen.")
                 }
                 updateThrowingPlayer(nextThrowingPlayer)
-                messageController.sendMessage(player.name, "ist der/die nächste Wefer.")
+
+                messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist der/die nächste Wefer.")
+
             }
 
             return true
