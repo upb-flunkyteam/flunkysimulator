@@ -115,10 +115,31 @@ function changePlayername(desiredPlayername){
         console.log("Warning: Cannot register empty player name");
         return;
     }
+
+    
+    /*
+
+    https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+
+    & --> &amp;
+    < --> &lt;
+    > --> &gt;
+    " --> &quot;
+    ' --> &#x27;     
+    / --> &#x2F;   
+
+    I don't know how the html template looks like but better escape stuff like {{  }} and ` `
+    */
+
+   desiredPlayername =  desiredPlayername.replace(/[<>/"'${}&`]+/g,"");
+
     if(playerName){
         // Discourage false flag attacks
         sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
-    }
+    }    
+
+
+
     var request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
