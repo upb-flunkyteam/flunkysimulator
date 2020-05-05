@@ -128,9 +128,10 @@ function changePlayername(desiredPlayername) {
             console.log(err.message);
         } else {
             response = response.toObject();
-            switch (response.getStatus()) {
+            console.log(response);
+            switch (response.status) {
                 case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
-                    playerName = response.getRegisteredname();
+                    playerName = response.registeredname;
                     $('#playername').text(playerName);
                     $('#registerform').hide();
                     // Force re-evaluation of game state, e.g. do I need to throw
