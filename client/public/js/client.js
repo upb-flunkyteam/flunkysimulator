@@ -553,8 +553,8 @@ function generatePlayerHTML(player, throwingPlayer) {
             <div class="btn btn-default kickbutton"><span class="glyphicon glyphicon-ban-circle"></span></div>\n\
         </div>';
     return html;
-}<script>
-<script>
+}
+
 function generateStrafbierHTML(number, team) {
     teamclass = '';
     if (team === EnumTeams.TEAM_A_TEAMS) {
