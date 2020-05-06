@@ -141,12 +141,11 @@ class GameController(
             return when (team) {
                 EnumTeams.TEAM_A_TEAMS -> {
                     val newCount = gameState.strafbiereA + diff
-                    if (newCount < 0)
-                        false
-                    else {
+                    if (newCount in 0..10) {
                         gameState = gameState.copy(strafbiereA = newCount)
                         true
-                    }
+                    } else
+                        false
                 }
                 EnumTeams.TEAM_B_TEAMS -> {
                     val newCount = gameState.strafbiereB + diff
