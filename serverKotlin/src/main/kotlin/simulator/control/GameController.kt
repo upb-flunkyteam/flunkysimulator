@@ -1,5 +1,6 @@
 package simulator.control
 
+import de.flunkyteam.endpoints.projects.simulator.EnumAbgegebenRespStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
@@ -247,11 +248,17 @@ class GameController(
         }
     }
 
-    fun setAbgegeben(name: String, abgegeben: Boolean): Boolean {
+    fun setAbgegeben(judgeName: String, targetName: String, abgegeben: Boolean): EnumAbgegebenRespStatus {
         gameStateLock.withLock {
-            val player = gameState.getPlayer(name) ?: return false
+            val player = gameState.getPlayer(targetName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_TARGET
+            val judge = gameState.getPlayer(judgeName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_JUDGE
+
+            if (abgegeben && player.team == judge.team)
+                return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_OWN_TEAM
+
             gameState = gameState.updatePlayer(player.copy(abgegeben = abgegeben))
-            return true
+
+            return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS
         }
     }
 
