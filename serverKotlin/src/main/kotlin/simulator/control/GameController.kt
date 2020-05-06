@@ -118,7 +118,7 @@ class GameController(
                 }
                 updateThrowingPlayer(nextThrowingPlayer)
 
-                messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist der/die nächste Wefer.")
+                messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist mit werfen dran.")
 
             }
 
