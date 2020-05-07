@@ -3,6 +3,7 @@ import flunkyprotocol_pb2 as proto
 import flunkyprotocol_pb2_grpc
 import sys
 import random
+from google.protobuf import empty_pb2 as emptyMessage
 
 #channel = grpc.insecure_channel('flunky.viings.de:11049')
 channel = grpc.insecure_channel('localhost:11049')
@@ -64,6 +65,17 @@ def modifyStrafbier(increment = True,team = 2):
   req.targetTeam = team
   req.increment = increment
   stub.ModifyStrafbierCount(req)
+
+
+# debug rpcs
+def setRestingPeriod(milliseconds, active):
+  req = proto.RestingPeriodReq()
+  req.active = active
+  req.milliseconds = milliseconds
+  stub.SetRestingPeriod(req)
+
+def hardReset():
+  stub.HardReset(emptyMessage.Empty())
 
 def playGame():
   registerPlayersAndStartGame()

@@ -82,6 +82,11 @@ class SimulatorStub(object):
         request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
         response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
         )
+    self.SetRestingPeriod = channel.unary_unary(
+        '/endpoints.flunky.simulator.Simulator/SetRestingPeriod',
+        request_serializer=flunkyprotocol__pb2.RestingPeriodReq.SerializeToString,
+        response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+        )
 
 
 class SimulatorServicer(object):
@@ -177,8 +182,14 @@ class SimulatorServicer(object):
 
   def HardReset(self, request, context):
     """Debug rpcs
-
     """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def SetRestingPeriod(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -249,6 +260,11 @@ def add_SimulatorServicer_to_server(servicer, server):
       'HardReset': grpc.unary_unary_rpc_method_handler(
           servicer.HardReset,
           request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+          response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+      ),
+      'SetRestingPeriod': grpc.unary_unary_rpc_method_handler(
+          servicer.SetRestingPeriod,
+          request_deserializer=flunkyprotocol__pb2.RestingPeriodReq.FromString,
           response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
       ),
   }
