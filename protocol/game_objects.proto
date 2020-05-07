@@ -10,6 +10,7 @@ message GameState{
   repeated Player playerTeamA = 1;
   repeated Player playerTeamB = 2;
   repeated Player spectators = 3;
+  bool restingPeriod = 9;
   string throwingPlayer = 10;
   int64 strafbierTeamA = 11;
   int64 strafbierTeamB = 12;

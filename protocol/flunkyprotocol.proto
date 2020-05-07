@@ -149,9 +149,9 @@ enum EnumAbgegebenRespStatus{
   // Players cant accept a Abgabe of their own team;
   ABGEGEBEN_STATUS_OWN_TEAM = 2;
   // The calling player is not known
-    ABGEGEBEN_STATUS_UNKNOWN_JUDGE = 3;
-    // The target player is not known
-    ABGEGEBEN_STATUS_UNKNOWN_TARGET = 4;
+  ABGEGEBEN_STATUS_UNKNOWN_JUDGE = 3;
+  // The target player is not known
+  ABGEGEBEN_STATUS_UNKNOWN_TARGET = 4;
 }
 
 message ThrowReq{
@@ -160,5 +160,14 @@ message ThrowReq{
 }
 
 message ThrowResp{
-  bool success = 1;
+  EnumThrowRespStatus status = 1;
+}
+
+enum EnumThrowRespStatus{
+    THROW_STATUS_UNKNOWN = 0;
+    THROW_STATUS_SUCCESS = 1;
+    // Did not throw, because calling player is not the throwing player.
+    THROW_STATUS_NOT_THROWING_PLAYER = 2;
+    // Did not throw, because currently the resting period is active.
+    THROW_STATUS_RESTING_PERIOD = 3;
 }
