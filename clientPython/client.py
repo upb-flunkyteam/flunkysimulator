@@ -34,16 +34,6 @@ def registerPlayersAndStartGame():
     stub.RegisterPlayer(req)
     print("Added "+pname)
 
-  # go into teams
-
-  for pname in players:
-    req = proto.SwitchTeamReq()
-    req.playerName = pname
-    req.targetName = pname
-    req.targetTeam = 2
-    print pname +"goes in a team"
-    stub.SwitchTeam(req)
-
   #start game
   req = proto.ResetGameReq()
   req.playerName = "hans"
@@ -53,20 +43,20 @@ def throw(name, strength = 1):
   req = proto.ThrowReq()
   req.playerName = name
   req.strength = strength
-  stub.Throw(req)
+  return stub.Throw(req)
 
 def throwNext( strength = 1):
   state = next(stub.StreamState(proto.StreamStateReq()))
   name = state.state.throwingPlayer
   print( name + " is throwing")
-  throw(name,strength)
+  return throw(name,strength)
 
-def setAbgegeben(player, abgegeben = True):
+def setAbgegeben(judge, player, abgegeben = True):
   req = proto.AbgegebenReq()
-  req.playerName = "jemand"
+  req.playerName = judge
   req.targetName = player
   req.setTo = abgegeben
-  stub.Abgegeben(req)
+  return stub.Abgegeben(req)
 
 def modifyStrafbier(increment = True,team = 2):
   req = proto.ModifyStrafbierCountReq()

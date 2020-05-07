@@ -126,7 +126,7 @@ class SimulatorServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def ResetGame(self, request, context):
-    """resets Strafbier counter, Abgaben, shuffles teams 
+    """resets Strafbier counter, Abgaben, shuffles teams
     and plays prepare game clip afterwards
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
