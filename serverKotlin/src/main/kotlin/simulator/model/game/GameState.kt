@@ -6,7 +6,8 @@ data class GameState(
     val roundState: RoundState = RoundState(),
     val strafbiereA: Int = 0,
     val strafbiereB: Int = 0,
-    val restingPeriod: Boolean = false
+    val restingPeriod: Boolean = false,
+    val ruleConfig: RuleConfig = RuleConfig()
 ) {
 
     val activePlayers: List<Player>
@@ -46,6 +47,7 @@ data class GameState(
         .setStrafbierTeamB(strafbiereB.toLong())
         .addAllSpectators(Spectators.toGRPC())
         .setRestingPeriod(restingPeriod)
+        .setRuleConfig(ruleConfig.toGrpc())
         .build()
 
     private fun Iterable<Player>.toGRPC() = this.map { player -> player.toGRPC() }

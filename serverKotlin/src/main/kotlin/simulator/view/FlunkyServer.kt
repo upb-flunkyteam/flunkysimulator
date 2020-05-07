@@ -267,8 +267,18 @@ class FlunkyServer(
 
     }
 
-    override fun hardReset(request: Empty?, responseObserver: StreamObserver<Empty>?) {
+    // -- Debug rpcs --
+
+    override fun hardReset(request: Empty?, responseObserver: StreamObserver<Empty>) {
         gameController.hardReset()
+        responseObserver.onNext(Empty.getDefaultInstance())
+        responseObserver.onCompleted()
+    }
+
+    override fun setRestingPeriod(request: RestingPeriodReq, responseObserver: StreamObserver<Empty>) {
+        gameController.setRestingPeriod(request.milliseconds,request.active)
+        responseObserver.onNext(Empty.getDefaultInstance())
+        responseObserver.onCompleted()
     }
 
     /***

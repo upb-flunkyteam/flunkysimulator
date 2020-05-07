@@ -90,7 +90,7 @@ class GameController(
             val runningTime = (throwingTime + minimumDrinkingTime +
                     Math.random() * (maximumDrinkingTime - minimumDrinkingTime)) * 1000
 
-            val restingTime = if (hit) 4 * 1000 + runningTime.toInt() else 4 * 1000
+            val restingTime = state.ruleConfig.restingPeriodMilliseconds + if (hit) runningTime.toInt() else 0
 
 
             // -- make the result known to the world --
@@ -137,8 +137,8 @@ class GameController(
                         "hat nicht für Team ${throwingTeam.positionalName()} getroffen."
                     )
 
-                gameState = gameState.setRestingPhase(false)
                 updateThrowingPlayer(nextThrowingPlayer)
+                gameState = gameState.setRestingPhase(false)
 
                 messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist mit werfen dran.")
             }
@@ -315,9 +315,19 @@ class GameController(
             .first
     }
 
+    // -- Debug functions
     fun hardReset() {
         gameStateLock.withLock {
             gameState = GameState()
+        }
+    }
+
+    fun setRestingPeriod(milliseconds: Long, active: Boolean) {
+        gameStateLock.withLock {
+            gameState = gameState.copy(
+                ruleConfig = gameState.ruleConfig.copy(restingPeriodMilliseconds = milliseconds.toInt()),
+                restingPeriod = active
+            )
         }
     }
 }
