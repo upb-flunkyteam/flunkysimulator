@@ -1,9 +1,6 @@
 package simulator.control
 
-import de.flunkyteam.endpoints.projects.simulator.EnumAbgegebenRespStatus
-import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
-import de.flunkyteam.endpoints.projects.simulator.EnumTeams
-import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
+import de.flunkyteam.endpoints.projects.simulator.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import simulator.shuffleSplitList
@@ -14,8 +11,8 @@ import kotlin.concurrent.withLock
 import kotlin.random.Random
 import kotlinx.coroutines.launch
 import org.apache.commons.text.StringEscapeUtils.escapeHtml4
-
-
+import simulator.model.game.GameState
+import simulator.model.game.Player
 
 
 class GameController(
@@ -38,13 +35,24 @@ class GameController(
 
     private val lastThrowingPlayer: MutableMap<Team, Player> = mutableMapOf()
 
-    fun throwBall(name: String, strength: EnumThrowStrength): Boolean {
+    fun throwBall(name: String, strength: EnumThrowStrength): EnumThrowRespStatus {
         gameStateLock.withLock {
             val state = gameState
-            if (state.roundState.throwingPlayer == null || name != state.roundState.throwingPlayer)
-                return false
 
-            val player = gameState.getPlayer(state.roundState.throwingPlayer) ?: return false
+            // -- determining whether we are allowed to throw --
+
+            if (state.roundState.throwingPlayer == null || name != state.roundState.throwingPlayer)
+                return EnumThrowRespStatus.THROW_STATUS_NOT_THROWING_PLAYER
+
+            val player = gameState.getPlayer(state.roundState.throwingPlayer)
+                ?: return EnumThrowRespStatus.THROW_STATUS_NOT_THROWING_PLAYER
+
+            if (state.restingPeriod) {
+                return EnumThrowRespStatus.THROW_STATUS_RESTING_PERIOD
+            }
+
+
+            // -- calculating the throw --
 
             val throwingTeam = player.team
             val teamAThrows = throwingTeam == Team.A
@@ -74,17 +82,25 @@ class GameController(
                     minimumDrinkingTime = 5.0
                     maximumDrinkingTime = 8.333
                 }
-                else -> return false
+                else -> return EnumThrowRespStatus.THROW_STATUS_UNKNOWN
             }
-            val hit = if (Math.random() < probability) {
+
+            val hit = Math.random() < probability
+
+            val runningTime = (throwingTime + minimumDrinkingTime +
+                    Math.random() * (maximumDrinkingTime - minimumDrinkingTime)) * 1000
+
+            val restingTime = if (hit) 4 * 1000 + runningTime.toInt() else 4 * 1000
+
+
+            // -- make the result known to the world --
+
+            if (hit) {
                 videosToPlay += VideoInstructions(
                     VideoType.Hit,
                     mirrored = teamAThrows
                 )
-                val runningTime = (throwingTime + minimumDrinkingTime +
-                        Math.random() * (maximumDrinkingTime - minimumDrinkingTime)) * 1000
                 videosToPlay += VideoInstructions(VideoType.Stop, runningTime.toLong())
-                true
             } else {
                 videosToPlay += if (Math.random() < closeMissProbability) {
                     VideoInstructions(
@@ -94,36 +110,41 @@ class GameController(
                 } else {
                     VideoInstructions(VideoType.Miss, mirrored = teamAThrows)
                 }
-                false
             }
             videoController.playVideos(videosToPlay)
+
+
+            // -- next player and resting period handling
 
             lastThrowingPlayer[throwingTeam] = player
 
             val otherTeam = throwingTeam.otherTeam()
             val nextThrowingPlayer = gameState.getNextThrowingPlayer(otherTeam)
 
-
-
+            // launch coroutine which disables the resting period, writes the result in the log and sets the next player
             GlobalScope.launch {
+
+                delay(restingTime.toLong())
+
                 if (hit)
-                    delay(5 * 1000)
+                    messageController.sendMessage(
+                        player.name,
+                        "hat für Team ${throwingTeam.positionalName()} getroffen."
+                    )
                 else
-                    delay(3 * 1000)
+                    messageController.sendMessage(
+                        player.name,
+                        "hat nicht für Team ${throwingTeam.positionalName()} getroffen."
+                    )
 
-
-                if (hit) {
-                    messageController.sendMessage(player.name, "hat für Team ${throwingTeam.positionalName()} getroffen.")
-                } else {
-                    messageController.sendMessage(player.name, "hat nicht für Team ${throwingTeam.positionalName()} getroffen.")
-                }
+                gameState = gameState.setRestingPhase(false)
                 updateThrowingPlayer(nextThrowingPlayer)
 
                 messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist mit werfen dran.")
-
             }
 
-            return true
+            gameState = gameState.setRestingPhase(true)
+            return EnumThrowRespStatus.THROW_STATUS_SUCCESS
         }
     }
 
@@ -250,7 +271,8 @@ class GameController(
 
     fun setAbgegeben(judgeName: String, targetName: String, abgegeben: Boolean): EnumAbgegebenRespStatus {
         gameStateLock.withLock {
-            val player = gameState.getPlayer(targetName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_TARGET
+            val player =
+                gameState.getPlayer(targetName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_TARGET
             val judge = gameState.getPlayer(judgeName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_JUDGE
 
             if (abgegeben && player.team == judge.team)
@@ -262,6 +284,9 @@ class GameController(
         }
     }
 
+    /***
+     * Does not get the Lock!
+     */
     private fun updateThrowingPlayer(player: Player?) {
         gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player?.name ?: ""))
     }

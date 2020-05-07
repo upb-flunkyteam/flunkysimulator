@@ -5,7 +5,8 @@ data class GameState(
     val players: List<Player> = emptyList(),
     val roundState: RoundState = RoundState(),
     val strafbiereA: Int = 0,
-    val strafbiereB: Int = 0
+    val strafbiereB: Int = 0,
+    val restingPeriod: Boolean = false
 ) {
 
     val activePlayers: List<Player>
@@ -35,6 +36,8 @@ data class GameState(
 
     fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name }
 
+    fun setRestingPhase(value: Boolean): GameState = this.copy(restingPeriod = value)
+
     fun toGRPC() = de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
         .setThrowingPlayer(roundState.throwingPlayer?: "")
         .addAllPlayerTeamA(TeamA.toGRPC())
@@ -42,6 +45,7 @@ data class GameState(
         .addAllPlayerTeamB(TeamB.toGRPC())
         .setStrafbierTeamB(strafbiereB.toLong())
         .addAllSpectators(Spectators.toGRPC())
+        .setRestingPeriod(restingPeriod)
         .build()
 
     private fun Iterable<Player>.toGRPC() = this.map { player -> player.toGRPC() }

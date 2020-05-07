@@ -21,13 +21,34 @@ class FlunkyServer(
 
     override fun throw_(request: ThrowReq?, responseObserver: StreamObserver<ThrowResp>?) {
 
-        GlobalScope.launch {
-            if (gameController.throwBall(request!!.playerName, request.strength))
-                messageController.sendMessage(request.playerName, "hat ${request.strength.toPrettyString()} geworfen")
-            else
-                messageController.sendMessage(request.playerName, "darf nicht werfen")
+        val result = gameController.throwBall(request!!.playerName, request.strength)
+        when (result) {
+            EnumThrowRespStatus.THROW_STATUS_SUCCESS ->
+                messageController.sendMessage(
+                    request.playerName,
+                    "hat ${request.strength.toPrettyString()} geworfen"
+                )
+            EnumThrowRespStatus.THROW_STATUS_RESTING_PERIOD ->
+                messageController.sendMessage(
+                    request.playerName,
+                    "darf noch nicht werfen, da wir uns noch vom letzten Wurf erholen."
+                )
+            EnumThrowRespStatus.THROW_STATUS_NOT_THROWING_PLAYER ->
+                messageController.sendMessage(
+                    request.playerName,
+                    "ist nicht dran und darf daher nicht werfen."
+                )
+            else -> messageController.sendMessage(
+                request.playerName,
+                "darf nicht werfen"
+            )
         }
-        responseObserver?.onNext(ThrowResp.getDefaultInstance())
+
+        responseObserver?.onNext(
+            ThrowResp.newBuilder()
+                .setStatus(result)
+                .build()
+        )
         responseObserver?.onCompleted()
     }
 
