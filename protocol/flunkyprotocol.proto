@@ -44,8 +44,8 @@ service Simulator {
   rpc StreamLog(LogReq) returns (stream LogResp);
 
   // Debug rpcs
-
   rpc HardReset(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc SetRestingPeriod(RestingPeriodReq) returns (google.protobuf.Empty);
 
 }
 
@@ -170,4 +170,10 @@ enum EnumThrowRespStatus{
     THROW_STATUS_NOT_THROWING_PLAYER = 2;
     // Did not throw, because currently the resting period is active.
     THROW_STATUS_RESTING_PERIOD = 3;
+}
+
+// Debug messages
+message RestingPeriodReq{
+  int64 milliseconds = 1;
+  bool active = 2;
 }
