@@ -134,7 +134,11 @@ function changePlayername(desiredPlayername) {
             console.log(response);
             switch (response.status) {
                 case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
+                case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
                     playerName = response.registeredname;
+                    if(!playerName){
+                        playerName = desiredPlayername;
+                    }
                     $('#playername').text(playerName);
                     $('#registerform').hide();
                     // Force re-evaluation of game state, e.g. do I need to throw
@@ -142,9 +146,6 @@ function changePlayername(desiredPlayername) {
                     break;
                 case EnumLoginStatus.LOGIN_STATUS_EMPTY:
                     window.alert('Registrierung fehlgeschlagen! Dein Benutzername ist leer.');
-                    break;
-                case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
-                    window.alert('Registrierung fehlgeschlagen! Der Benutzername ist bereits vergeben.');
                     break;
                 case EnumLoginStatus.LOGIN_STATUS_SECRET_MISMATCH:
                     window.alert('Registrierung fehlgeschlagen! Passwort falsch.');
@@ -532,8 +533,7 @@ function generatePlayerHTML(player, throwingPlayer) {
         classes = ' btn-primary';
     }
     if (name === playerName) {
-        spacing = 'vspace';
-        name = '<b>' + name + '</b>';
+        classes = classes + ' egoplayer';
     }
 
     html =
@@ -541,7 +541,7 @@ function generatePlayerHTML(player, throwingPlayer) {
             <div class="btn namebutton' + classes + '"' + disabled + '>' + name + '</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n\
-                    <span class="glyphicon glyphicon-transfer"></span>\n\
+                    <span class="glyphicon glyphicon-transfer" data-toggle="tooltip" title="Spieler verschieben"></span>\n\
                 </button>\n\
                 <ul class="dropdown-menu">\n\
                     <li><a href="#" class="switchteamabutton">Linkes Team</a></li>\n\
@@ -549,8 +549,10 @@ function generatePlayerHTML(player, throwingPlayer) {
                     <li><a href="#" class="switchspectatorbutton">Zuschauer</a></li>\n\
                 </ul>\n\
             </div>\n\
-            \n\<div class="btn btn-default abgebenbutton"><span class="glyphicon glyphicon-ok-circle"></span></div>\n\
-            <div class="btn btn-default kickbutton"><span class="glyphicon glyphicon-ban-circle"></span></div>\n\
+            \n\<div class="btn btn-default abgebenbutton">\
+               <span class="glyphicon glyphicon-ok-circle" data-toggle="tooltip" title="Abgabe abnehmen"></span></div>\n\
+            <div class="btn btn-default kickbutton" data-toggle="tooltip" title="Spieler kicken">\
+            <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" title="Spieler kicken"></span></div>\n\
         </div>';
     return html;
 }
