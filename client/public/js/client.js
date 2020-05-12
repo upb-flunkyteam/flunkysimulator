@@ -136,6 +136,9 @@ function changePlayername(desiredPlayername) {
                 case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
                 case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
                     playerName = response.registeredname;
+                    if(!playerName){
+                        playerName = desiredPlayername;
+                    }
                     $('#playername').text(playerName);
                     $('#registerform').hide();
                     // Force re-evaluation of game state, e.g. do I need to throw
