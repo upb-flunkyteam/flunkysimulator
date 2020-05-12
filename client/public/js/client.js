@@ -532,8 +532,7 @@ function generatePlayerHTML(player, throwingPlayer) {
         classes = ' btn-primary';
     }
     if (name === playerName) {
-        spacing = 'vspace';
-        name = '<b>' + name + '</b>';
+        classes = classes + ' egoplayer';
     }
 
     html =
