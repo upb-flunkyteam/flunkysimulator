@@ -134,6 +134,7 @@ function changePlayername(desiredPlayername) {
             console.log(response);
             switch (response.status) {
                 case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
+                case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
                     playerName = response.registeredname;
                     $('#playername').text(playerName);
                     $('#registerform').hide();
@@ -142,9 +143,6 @@ function changePlayername(desiredPlayername) {
                     break;
                 case EnumLoginStatus.LOGIN_STATUS_EMPTY:
                     window.alert('Registrierung fehlgeschlagen! Dein Benutzername ist leer.');
-                    break;
-                case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
-                    window.alert('Registrierung fehlgeschlagen! Der Benutzername ist bereits vergeben.');
                     break;
                 case EnumLoginStatus.LOGIN_STATUS_SECRET_MISMATCH:
                     window.alert('Registrierung fehlgeschlagen! Passwort falsch.');
