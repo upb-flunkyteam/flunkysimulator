@@ -1,5 +1,6 @@
 package simulator.control
 
+import de.flunkyteam.endpoints.projects.simulator.EnumAbgegebenRespStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import de.flunkyteam.endpoints.projects.simulator.EnumThrowStrength
@@ -118,7 +119,7 @@ class GameController(
                 }
                 updateThrowingPlayer(nextThrowingPlayer)
 
-                messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist der/die nächste Wefer.")
+                messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist mit werfen dran.")
 
             }
 
@@ -141,12 +142,11 @@ class GameController(
             return when (team) {
                 EnumTeams.TEAM_A_TEAMS -> {
                     val newCount = gameState.strafbiereA + diff
-                    if (newCount < 0)
-                        false
-                    else {
+                    if (newCount in 0..10) {
                         gameState = gameState.copy(strafbiereA = newCount)
                         true
-                    }
+                    } else
+                        false
                 }
                 EnumTeams.TEAM_B_TEAMS -> {
                     val newCount = gameState.strafbiereB + diff
@@ -248,11 +248,17 @@ class GameController(
         }
     }
 
-    fun setAbgegeben(name: String, abgegeben: Boolean): Boolean {
+    fun setAbgegeben(judgeName: String, targetName: String, abgegeben: Boolean): EnumAbgegebenRespStatus {
         gameStateLock.withLock {
-            val player = gameState.getPlayer(name) ?: return false
+            val player = gameState.getPlayer(targetName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_TARGET
+            val judge = gameState.getPlayer(judgeName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_JUDGE
+
+            if (abgegeben && player.team == judge.team)
+                return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_OWN_TEAM
+
             gameState = gameState.updatePlayer(player.copy(abgegeben = abgegeben))
-            return true
+
+            return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS
         }
     }
 

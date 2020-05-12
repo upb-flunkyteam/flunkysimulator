@@ -127,7 +127,7 @@ class FlunkyServer(
         else
             messageController.sendMessage(
                 request.playerName,
-                "konnte ${request.targetName} nicht als Werfer festlegen. Spielt nicht mit oder nicht existent?"
+                "konnte ${request.targetName} nicht als Werfer/in festlegen. Spielt nicht mit oder nicht existent?"
             )
 
         responseObserver?.onNext(SelectThrowingPlayerResp.getDefaultInstance())
@@ -135,23 +135,43 @@ class FlunkyServer(
     }
 
     override fun abgegeben(request: AbgegebenReq, responseObserver: StreamObserver<AbgegebenResp>?) {
-        if (request.playerName.isNotBlank() && gameController.setAbgegeben(request.targetName, request.setTo)) {
-            var text =
-                "hat ${request.targetName}"
-            if (request.setTo) {
+        val result = gameController.setAbgegeben(
+            request.playerName,
+            request.targetName,
+            request.setTo
+        )
+
+        when (result) {
+            EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS -> {
+                var text =
+                    "hat ${request.targetName}"
+                if (request.setTo) {
+                    if (!request.targetName.endsWith("s"))
+                        text += "s"
+                    text += " Abgabe abgenommen."
+                } else
+                    text += " ein Bier geöffnet."
+                messageController.sendMessage(request.playerName, text)
+            }
+            EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_OWN_TEAM -> {
+                var text = "kann ${request.targetName}"
                 if (!request.targetName.endsWith("s"))
                     text += "s"
-                text += " Abgabe abgenommen."
-            } else
-                text += " ein Bier geöffnet."
-            messageController.sendMessage(request.playerName, text)
-        } else
-            messageController.sendMessage(
-                request.playerName,
-                "konnte ${request.targetName} Abgabestatus nicht ändern."
-            )
+                text += " Abgabe nicht abnehmen, da sie im selben Team sind."
+                messageController.sendMessage(request.playerName, text)
+            }
+            else ->
+                messageController.sendMessage(
+                    request.playerName,
+                    "konnte ${request.targetName} Abgabestatus nicht ändern."
+                )
+        }
 
-        responseObserver?.onNext(AbgegebenResp.getDefaultInstance())
+        responseObserver?.onNext(
+            AbgegebenResp.newBuilder()
+                .setStatus(result)
+                .build()
+        )
         responseObserver?.onCompleted()
     }
 
