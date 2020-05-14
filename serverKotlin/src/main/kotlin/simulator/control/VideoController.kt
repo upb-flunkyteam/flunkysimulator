@@ -112,7 +112,7 @@ class VideoController(private val videoListUrl: String) :
 
     internal fun parseJson(jsonString: String): Map<VideoType, List<String>> {
         val withoutBraces = jsonString.removeFirstAndLast()
-        val elements = withoutBraces.split(",").map { it.removeFirstAndLast() }
+        val elements = withoutBraces.split(",").map { it.trim().removeFirstAndLast() }
 
         return elements.map { path ->
             val typeString = path.substringAfter("path=%2F").substringBefore("&files")
