@@ -11,7 +11,7 @@ import java.net.URL
 import kotlin.concurrent.withLock
 
 
-class VideoController(private val videoListUrl: String = "https://upbflunkyteamsimulator.herokuapp.com/videolist") :
+class VideoController(private val videoListUrl: String) :
     EventControllerBase<VideoEvent>() {
 
     private var lastVideoListRefresh: Long = 0
@@ -115,9 +115,9 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
         val elements = withoutBraces.split(",").map { it.removeFirstAndLast() }
 
         return elements.map { path ->
-            val split = path.split("/")
+            val typeString = path.substringAfter("path=%2F").substringBefore("&files")
 
-            val type = when (split[0]) {
+            val type = when (typeString) {
                 "hit" -> VideoType.Hit
                 "closenohit" -> VideoType.CloseMiss
                 "nohit" -> VideoType.Miss
@@ -135,7 +135,8 @@ class VideoController(private val videoListUrl: String = "https://upbflunkyteams
 }
 
 fun main() {
-    val vc = VideoController()
+    val envVar = System.getenv("VIDEO_LIST_URL") ?: throw error("VideoListUrl parameter is missing")
+    val vc = VideoController(envVar)
     val a = vc.parseJson(vc.sendGetRequest())
     a.forEach { println("${it.key}: ${it.value}") }
 }
