@@ -566,9 +566,9 @@ function generateStrafbierHTML(number, team) {
     }
     html = '<div class="btn-group vspace" role="group">';
     for (var i = 0; i < number; i++) {
-        html += '<div class="btn btn-default reducebutton' + teamclass + '"><span class="glyphicon glyphicon-glass"></span></div>';
+        html += '<div class="btn btn-default reducebutton' + teamclass + '"><span class="glyphicon glyphicon-steinie"></span></div>';
     }
-    html += '<div class="btn btn-default increasebutton' + teamclass + '"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-glass"></span></div>';
+    html += '<div class="btn btn-default increasebutton' + teamclass + '"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-steinie"></span></div>';
     html += '</div>';
     return html;
 }
