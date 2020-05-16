@@ -556,7 +556,7 @@ function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
                     <li><a href="#" class="switchspectatorbutton">Zuschauer</a></li>\n\
                 </ul>\n\
             </div>\n\
-            <div class="btn btn-default abgebenbutton"' + isSelectPlayerDisabled + ' data-toggle="tooltip" title="Abgabe abnehmen"">\
+            <div class="btn btn-default abgebenbutton"' + isAbgabeDisabled + ' data-toggle="tooltip" title="Abgabe abnehmen"">\
                <span class="glyphicon glyphicon-ok-circle"></span></div>\n\
             <div class="btn btn-default kickbutton" data-toggle="tooltip" title="Spieler kicken">\
                 <span class="glyphicon glyphicon-ban-circle"></span></div>\n\
