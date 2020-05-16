@@ -383,7 +383,7 @@ function processNewVideoEvent(videoEvent) {
 
 function prepareVideo(url, videotype) {
     video = getVideoByType(videotype);
-    video.attr('src', 'video/' + url);
+    video.attr('src', url);
     video[0].load();
     // Force loading of the video by starting to play it muted and hidden
     video.prop('muted', true).trigger('play');
