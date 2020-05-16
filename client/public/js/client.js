@@ -5,7 +5,8 @@
  */
 
 console.log("Starte Flunkyball-Simulator");
-const {EnumThrowStrength, EnumTeams, EnumVideoType, EnumLoginStatus, GameState,
+const {
+    EnumThrowStrength, EnumTeams, EnumVideoType, EnumLoginStatus, GameState,
     ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp,
     StreamStateReq, StreamStateResp, LogReq, LogResp,
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
@@ -62,6 +63,8 @@ jQuery(window).load(function () {
             resetGame();
         }
     });
+    // secondary data-toogle to enable tooltips and dropdown at the same time
+    $('[data-toggle-second="tooltip"]').tooltip();
     desktop = window.matchMedia("(min-width: 992px)").matches;
     if (desktop) {
         $('#lowbandwidthbutton').bootstrapToggle('on');
@@ -136,7 +139,7 @@ function changePlayername(desiredPlayername) {
                 case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
                 case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
                     playerName = response.registeredname;
-                    if(!playerName){
+                    if (!playerName) {
                         playerName = desiredPlayername;
                     }
                     $('#playername').text(playerName);
@@ -471,19 +474,19 @@ function stopVideos() {
     });
 }
 
-function changeLowBandwidthMode(){
-    if(lowBandwidth){
+function changeLowBandwidthMode() {
+    if (lowBandwidth) {
         // Hide all the videos
         stopVideos();
-    }else{
+    } else {
         // Hide all the posters
         $('.poster').hide();
         $('.logoposter').show();
         // Preload everything we ignored
-        for(var videotype in preparedVideos) {
+        for (var videotype in preparedVideos) {
             var url = preparedVideos[videotype];
             prepareVideo(url, videotype);
-          }
+        }
 
     }
 }
@@ -537,11 +540,12 @@ function generatePlayerHTML(player, throwingPlayer) {
     }
 
     html =
-            '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
+        '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
             <div class="btn namebutton' + classes + '"' + disabled + '>' + name + '</div>\n\
             <div class="btn-group" role="group">\n\
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n\
-                    <span class="glyphicon glyphicon-transfer" data-toggle="tooltip" title="Spieler verschieben"></span>\n\
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" \
+                 data-toggle-second="tooltip" aria-haspopup="true" aria-expanded="false"  title="Spieler verschieben">\n\
+                    <span class="glyphicon glyphicon-transfer"></span>\n\
                 </button>\n\
                 <ul class="dropdown-menu">\n\
                     <li><a href="#" class="switchteamabutton">Linkes Team</a></li>\n\
@@ -549,10 +553,10 @@ function generatePlayerHTML(player, throwingPlayer) {
                     <li><a href="#" class="switchspectatorbutton">Zuschauer</a></li>\n\
                 </ul>\n\
             </div>\n\
-            \n\<div class="btn btn-default abgebenbutton">\
-               <span class="glyphicon glyphicon-ok-circle" data-toggle="tooltip" title="Abgabe abnehmen"></span></div>\n\
+            <div class="btn btn-default abgebenbutton" data-toggle="tooltip" title="Abgabe abnehmen"">\
+               <span class="glyphicon glyphicon-ok-circle"></span></div>\n\
             <div class="btn btn-default kickbutton" data-toggle="tooltip" title="Spieler kicken">\
-            <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" title="Spieler kicken"></span></div>\n\
+                <span class="glyphicon glyphicon-ban-circle"></span></div>\n\
         </div>';
     return html;
 }
