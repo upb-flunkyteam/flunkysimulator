@@ -383,7 +383,7 @@ function processNewVideoEvent(videoEvent) {
 
 function prepareVideo(url, videotype) {
     video = getVideoByType(videotype);
-    video.attr('src', 'video/' + url);
+    video.attr('src', url);
     video[0].load();
     // Force loading of the video by starting to play it muted and hidden
     video.prop('muted', true).trigger('play');
@@ -566,9 +566,9 @@ function generateStrafbierHTML(number, team) {
     }
     html = '<div class="btn-group vspace" role="group">';
     for (var i = 0; i < number; i++) {
-        html += '<div class="btn btn-default reducebutton' + teamclass + '"><span class="glyphicon glyphicon-glass"></span></div>';
+        html += '<div class="btn btn-default reducebutton' + teamclass + '"><span class="glyphicon glyphicon-steinie"></span></div>';
     }
-    html += '<div class="btn btn-default increasebutton' + teamclass + '"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-glass"></span></div>';
+    html += '<div class="btn btn-default increasebutton' + teamclass + '"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-steinie"></span></div>';
     html += '</div>';
     return html;
 }
