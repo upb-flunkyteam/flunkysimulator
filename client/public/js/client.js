@@ -126,7 +126,7 @@ function changePlayername(desiredPlayername) {
         // Discourage false flag attacks, the player was already registered
         sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
     }
-    var request = new RegisterPlayerReq();
+    const request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
     simulatorClient.registerPlayer(request, {}, function (err, response) {
@@ -167,7 +167,7 @@ function throwing(strength) {
     $('.throwbutton').prop('disabled', true);
     // Remove annoying flashing
     $('.actionbox').removeClass('flashingbackground');
-    var request = new ThrowReq();
+    const request = new ThrowReq();
     request.setPlayername(playerName);
     request.setStrength(strength);
     console.log(request.toObject());
@@ -180,7 +180,7 @@ function throwing(strength) {
 }
 
 function sendMessage(content) {
-    var request = new SendMessageReq();
+    const request = new SendMessageReq();
     request.setPlayername(playerName);
     request.setContent(content);
     console.log(request.toObject());
@@ -193,7 +193,7 @@ function sendMessage(content) {
 }
 
 function switchTeam(targetTeam, targetName) {
-    var request = new SwitchTeamReq();
+    const request = new SwitchTeamReq();
     request.setPlayername(playerName);
     request.setTargetteam(targetTeam);
     request.setTargetname(targetName);
@@ -282,8 +282,8 @@ function processNewState(state) {
     console.log(currentGameState);
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
     playerTeam =
-        currentGameState.playerteamaList.includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
-            currentGameState.playerteambList.includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
+        currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
+            currentGameState.playerteambList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
                 EnumTeams.SPECTATOR_TEAMS;
 
     $('#teamaarea, #teambarea, #spectatorarea').empty();
