@@ -533,23 +533,18 @@ function registerStateButtonCallbacks() {
 }
 
 function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
-    isDisabled = '';
-    classes = ' btn-default';
     name = player.name;
     spacing = 'vspace-small';
-    if (player.abgegeben || isOwnTeam) {
-        isDisabled = ' disabled="disabled"';
-    }
-    if (name === throwingPlayer) {
-        classes = ' btn-primary';
-    }
+    isSelectPlayerDisabled = player.abgegeben ? ' disabled="disabled"' : '';
+    isAbgabeDisabled = isOwnTeam ? ' disabled="disabled"' : '';
+    classes = name === throwingPlayer ? ' btn-primary' : ' btn-default';
     if (name === playerName) {
         classes = classes + ' egoplayer';
     }
 
     html =
         '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
-            <div class="btn namebutton' + classes + '"' + isDisabled + '>' + name + '</div>\n\
+            <div class="btn namebutton' + classes + '"' + isSelectPlayerDisabled + '>' + name + '</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" \
                  data-toggle-second="tooltip" aria-haspopup="true" aria-expanded="false"  title="Spieler verschieben">\n\
@@ -561,7 +556,7 @@ function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
                     <li><a href="#" class="switchspectatorbutton">Zuschauer</a></li>\n\
                 </ul>\n\
             </div>\n\
-            <div class="btn btn-default abgebenbutton" data-toggle="tooltip" title="Abgabe abnehmen"">\
+            <div class="btn btn-default abgebenbutton"' + isSelectPlayerDisabled + ' data-toggle="tooltip" title="Abgabe abnehmen"">\
                <span class="glyphicon glyphicon-ok-circle"></span></div>\n\
             <div class="btn btn-default kickbutton" data-toggle="tooltip" title="Spieler kicken">\
                 <span class="glyphicon glyphicon-ban-circle"></span></div>\n\
