@@ -18,6 +18,7 @@ const {
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
 var playerName = null;
+var playerTeam = null
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
@@ -280,22 +281,29 @@ function processNewState(state) {
     currentGameState = state;
     console.log(currentGameState);
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
+    playerTeam =
+        currentGameState.playerteamaList.includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
+            currentGameState.playerteambList.includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
+                EnumTeams.SPECTATOR_TEAMS;
 
     $('#teamaarea, #teambarea, #spectatorarea').empty();
     currentGameState.playerteamaList.forEach(function (player, index) {
-        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+        player.team = EnumTeams.TEAM_A_TEAMS
+        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam));
         if (player.name === currentGameState.throwingplayer) {
             currentTeam = EnumTeams.TEAM_A_TEAMS;
         }
     });
     currentGameState.playerteambList.forEach(function (player, index) {
-        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+        player.team = EnumTeams.TEAM_B_TEAMS
+        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam));
         if (player.name === currentGameState.throwingplayer) {
             currentTeam = EnumTeams.TEAM_B_TEAMS;
         }
     });
     currentGameState.spectatorsList.forEach(function (player, index) {
-        $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+        player.team = EnumTeams.SPECTATOR_TEAMS
+        $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, false));
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
@@ -524,13 +532,13 @@ function registerStateButtonCallbacks() {
     });
 }
 
-function generatePlayerHTML(player, throwingPlayer) {
-    disabled = '';
+function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
+    isDisabled = '';
     classes = ' btn-default';
     name = player.name;
     spacing = 'vspace-small';
-    if (player.abgegeben) {
-        disabled = ' disabled="disabled"';
+    if (player.abgegeben || isOwnTeam) {
+        isDisabled = ' disabled="disabled"';
     }
     if (name === throwingPlayer) {
         classes = ' btn-primary';
@@ -541,7 +549,7 @@ function generatePlayerHTML(player, throwingPlayer) {
 
     html =
         '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
-            <div class="btn namebutton' + classes + '"' + disabled + '>' + name + '</div>\n\
+            <div class="btn namebutton' + classes + '"' + isDisabled + '>' + name + '</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" \
                  data-toggle-second="tooltip" aria-haspopup="true" aria-expanded="false"  title="Spieler verschieben">\n\
