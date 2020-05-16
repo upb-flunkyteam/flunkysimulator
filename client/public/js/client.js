@@ -75,6 +75,7 @@ jQuery(window).load(function () {
         $(this).hide();
         $('.logoposter').show();
     });
+    $('[data-toggle-second="tooltip"]').tooltip();
     $('.video').hide();
     $('.poster').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
@@ -537,11 +538,12 @@ function generatePlayerHTML(player, throwingPlayer) {
     }
 
     html =
-            '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
+        '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
             <div class="btn namebutton' + classes + '"' + disabled + '>' + name + '</div>\n\
             <div class="btn-group" role="group">\n\
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n\
-                    <span class="glyphicon glyphicon-transfer" data-toggle="tooltip" title="Spieler verschieben"></span>\n\
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" \
+                 data-toggle-second="tooltip" aria-haspopup="true" aria-expanded="false"  title="Spieler verschieben">\n\
+                    <span class="glyphicon glyphicon-transfer"></span>\n\
                 </button>\n\
                 <ul class="dropdown-menu">\n\
                     <li><a href="#" class="switchteamabutton">Linkes Team</a></li>\n\
