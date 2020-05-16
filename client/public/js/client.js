@@ -18,6 +18,7 @@ const {
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
 var playerName = null;
+var playerTeam = null
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
@@ -125,7 +126,7 @@ function changePlayername(desiredPlayername) {
         // Discourage false flag attacks, the player was already registered
         sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
     }
-    var request = new RegisterPlayerReq();
+    const request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
     simulatorClient.registerPlayer(request, {}, function (err, response) {
@@ -166,7 +167,7 @@ function throwing(strength) {
     $('.throwbutton').prop('disabled', true);
     // Remove annoying flashing
     $('.actionbox').removeClass('flashingbackground');
-    var request = new ThrowReq();
+    const request = new ThrowReq();
     request.setPlayername(playerName);
     request.setStrength(strength);
     console.log(request.toObject());
@@ -179,7 +180,7 @@ function throwing(strength) {
 }
 
 function sendMessage(content) {
-    var request = new SendMessageReq();
+    const request = new SendMessageReq();
     request.setPlayername(playerName);
     request.setContent(content);
     console.log(request.toObject());
@@ -192,7 +193,7 @@ function sendMessage(content) {
 }
 
 function switchTeam(targetTeam, targetName) {
-    var request = new SwitchTeamReq();
+    const request = new SwitchTeamReq();
     request.setPlayername(playerName);
     request.setTargetteam(targetTeam);
     request.setTargetname(targetName);
@@ -280,22 +281,29 @@ function processNewState(state) {
     currentGameState = state;
     console.log(currentGameState);
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
+    playerTeam =
+        currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
+            currentGameState.playerteambList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
+                EnumTeams.SPECTATOR_TEAMS;
 
     $('#teamaarea, #teambarea, #spectatorarea').empty();
     currentGameState.playerteamaList.forEach(function (player, index) {
-        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+        player.team = EnumTeams.TEAM_A_TEAMS
+        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam));
         if (player.name === currentGameState.throwingplayer) {
             currentTeam = EnumTeams.TEAM_A_TEAMS;
         }
     });
     currentGameState.playerteambList.forEach(function (player, index) {
-        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+        player.team = EnumTeams.TEAM_B_TEAMS
+        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam));
         if (player.name === currentGameState.throwingplayer) {
             currentTeam = EnumTeams.TEAM_B_TEAMS;
         }
     });
     currentGameState.spectatorsList.forEach(function (player, index) {
-        $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer));
+        player.team = EnumTeams.SPECTATOR_TEAMS
+        $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, false));
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
@@ -524,24 +532,19 @@ function registerStateButtonCallbacks() {
     });
 }
 
-function generatePlayerHTML(player, throwingPlayer) {
-    disabled = '';
-    classes = ' btn-default';
+function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
     name = player.name;
     spacing = 'vspace-small';
-    if (player.abgegeben) {
-        disabled = ' disabled="disabled"';
-    }
-    if (name === throwingPlayer) {
-        classes = ' btn-primary';
-    }
+    isSelectPlayerDisabled = player.abgegeben ? ' disabled="disabled"' : '';
+    isAbgabeDisabled = isOwnTeam ? ' disabled="disabled"' : '';
+    classes = name === throwingPlayer ? ' btn-primary' : ' btn-default';
     if (name === playerName) {
         classes = classes + ' egoplayer';
     }
 
     html =
         '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
-            <div class="btn namebutton' + classes + '"' + disabled + '>' + name + '</div>\n\
+            <div class="btn namebutton' + classes + '"' + isSelectPlayerDisabled + '>' + name + '</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" \
                  data-toggle-second="tooltip" aria-haspopup="true" aria-expanded="false"  title="Spieler verschieben">\n\
@@ -553,7 +556,7 @@ function generatePlayerHTML(player, throwingPlayer) {
                     <li><a href="#" class="switchspectatorbutton">Zuschauer</a></li>\n\
                 </ul>\n\
             </div>\n\
-            <div class="btn btn-default abgebenbutton" data-toggle="tooltip" title="Abgabe abnehmen"">\
+            <div class="btn btn-default abgebenbutton"' + isAbgabeDisabled + ' data-toggle="tooltip" title="Abgabe abnehmen"">\
                <span class="glyphicon glyphicon-ok-circle"></span></div>\n\
             <div class="btn btn-default kickbutton" data-toggle="tooltip" title="Spieler kicken">\
                 <span class="glyphicon glyphicon-ban-circle"></span></div>\n\
