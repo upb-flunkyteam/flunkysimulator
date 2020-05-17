@@ -7,8 +7,8 @@ enum class Team {
 }
 
 fun Team.positionalName() = when(this){
-    Team.A -> "Links"
-    Team.B -> "Rechts"
+    Team.A -> "Team Links"
+    Team.B -> "Team Rechts"
     Team.Spectator -> "Zuschauer"
 }
 
@@ -25,7 +25,7 @@ fun EnumTeams.toKotlin() = when(this){
 }
 
 fun EnumTeams.positionalName() = when(this){
-    EnumTeams.TEAM_A_TEAMS -> "Links"
-    EnumTeams.TEAM_B_TEAMS -> "Rechts"
+    EnumTeams.TEAM_A_TEAMS -> "Team Links"
+    EnumTeams.TEAM_B_TEAMS -> "Team Rechts"
     else -> "Zuschauer"
 }

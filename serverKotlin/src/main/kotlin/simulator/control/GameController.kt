@@ -129,12 +129,12 @@ class GameController(
                 if (hit)
                     messageController.sendMessage(
                         player.name,
-                        "hat für Team ${throwingTeam.positionalName()} getroffen."
+                        "hat für ${throwingTeam.positionalName()} getroffen."
                     )
                 else
                     messageController.sendMessage(
                         player.name,
-                        "hat nicht für Team ${throwingTeam.positionalName()} getroffen."
+                        "hat nicht für ${throwingTeam.positionalName()} getroffen."
                     )
 
                 updateThrowingPlayer(nextThrowingPlayer)
