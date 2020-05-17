@@ -281,6 +281,10 @@ function resetGame() {
 function processNewState(state) {
     currentGameState = state;
     console.log(currentGameState);
+     //TODO: Rename variable restingperiod to isresting
+    if(currentGameState.restingperiod){
+        return;
+    }
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
     playerTeam =
         currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
