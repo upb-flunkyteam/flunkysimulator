@@ -124,7 +124,7 @@ function changePlayername(desiredPlayername) {
     }
 
     // Discourage false flag attacks, the player was already registered
-    playerName ? sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt') : '';
+    playerName !== null ? sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt') : '';
 
     const request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
@@ -287,7 +287,7 @@ function processNewState(state) {
                 currentGameState.spectatorsList.map(a => a.name).includes(playerName) ? EnumTeams.SPECTATOR_TEAMS :
                     EnumTeams.UNKNOWN_TEAMS;
 
-    if (playerTeam === EnumTeams.UNKNOWN_TEAMS) {
+    if (playerName !== null && playerTeam === EnumTeams.UNKNOWN_TEAMS) {
         // player must have been kicked since he is not part of any team or lobby
         playerName = null;
         console.log('player appears to be kicked -> Playername reset to null')
