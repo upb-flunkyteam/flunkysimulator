@@ -70,7 +70,6 @@ body {
     font-weight: bold;
 }
 
-
 .glyphicon-steinie {
     background-image: url("/picture/steinie.svg");
     background-size: contain;
@@ -81,4 +80,8 @@ body {
     margin-top: 1px;
     margin-left: 2px;
     margin-bottom: 6px;
+}
+
+.smaller-font {
+    font-size: smaller;
 }

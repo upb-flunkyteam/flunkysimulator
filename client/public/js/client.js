@@ -18,7 +18,7 @@ const {
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
 var playerName = null;
-var playerTeam = null
+var playerTeam = null;
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
@@ -139,11 +139,15 @@ function changePlayername(desiredPlayername) {
             switch (response.status) {
                 case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
                 case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
-                    playerName = response.registeredname;
-                    if (!playerName) {
-                        playerName = desiredPlayername;
+                    if (playerName) {
+                        playerName = response.registeredname;
+                    } else if (!playerName) {
+                        // TODO: This is a bug in the server
+                        console.log('Got empty registered name in response.');
+                        playerName = $('<div/>').text(desiredPlayername).html();
+                        console.log('Player name: ' + playerName);
                     }
-                    $('#playername').html(playerName);
+                    $('#playername').text(playerName);
                     $('#registerform').hide();
                     // Force re-evaluation of game state, e.g. do I need to throw
                     processNewState(currentGameState);
@@ -282,15 +286,15 @@ function processNewState(state) {
     console.log(currentGameState);
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
     playerTeam =
-        currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
+            currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
             currentGameState.playerteambList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
-                currentGameState.spectatorsList.map(a => a.name).includes(playerName) ? EnumTeams.SPECTATOR_TEAMS :
-                    EnumTeams.UNKNOWN_TEAMS;
+            currentGameState.spectatorsList.map(a => a.name).includes(playerName) ? EnumTeams.SPECTATOR_TEAMS :
+            EnumTeams.UNKNOWN_TEAMS;
 
     if (playerName !== null && playerTeam === EnumTeams.UNKNOWN_TEAMS) {
         // player must have been kicked since he is not part of any team or lobby
         playerName = null;
-        console.log('player appears to be kicked -> Playername reset to null')
+        console.log('player appears to be kicked -> Playername reset to null');
     }
 
     // Create players
@@ -303,14 +307,14 @@ function processNewState(state) {
         }
     });
     currentGameState.playerteambList.forEach(function (player, index) {
-        player.team = EnumTeams.TEAM_B_TEAMS
+        player.team = EnumTeams.TEAM_B_TEAMS;
         $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam));
         if (player.name === currentGameState.throwingplayer) {
             currentTeam = EnumTeams.TEAM_B_TEAMS;
         }
     });
     currentGameState.spectatorsList.forEach(function (player, index) {
-        player.team = EnumTeams.SPECTATOR_TEAMS
+        player.team = EnumTeams.SPECTATOR_TEAMS;
         $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, false));
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
@@ -318,8 +322,8 @@ function processNewState(state) {
 
     // Throwing Team related highlighting
     playerTeam === currentTeam
-        ? $('.video').addClass('highlight')
-        : $('.video').removeClass('highlight');
+            ? $('.video').addClass('highlight')
+            : $('.video').removeClass('highlight');
 
 
     // Throwing player related highlighting
@@ -329,10 +333,10 @@ function processNewState(state) {
         $('.throwbutton').prop('disabled', false);
         $('#throwerdisplayarea').hide();
         // Make sure user notices
-        $('.actionbox').addClass('flashingbackground')
+        $('.actionbox').addClass('flashingbackground');
         document.title = `Wirf ${playerName}!`;
     } else {
-        document.title = title
+        document.title = title;
         // Remove annoying flashing
         $('.actionbox').removeClass('flashingbackground');
         // Update the box displaying who is currently throwing
@@ -557,13 +561,13 @@ function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
     isAbgabeDisabled = isOwnTeam ? ' disabled="disabled"' : '';
     currPlayerClass = name === throwingPlayer ? ' btn-primary' : ' btn-default';
     pName = name === playerName
-        ? `<span class="glyphicon glyphicon-chevron-right" style="font-size: smaller"></span>\
-           <span class="name egoplayer">${name}</span>\
-           <span class="glyphicon glyphicon-chevron-left" style="font-size: smaller"></span>`
-        : `<span class="name">${name}</span>`;
+            ? `<span class="glyphicon glyphicon-chevron-right smaller-font"></span>
+        <span class="name egoplayer">${name}</span>
+        <span class="glyphicon glyphicon-chevron-left smaller-font"></span>`
+            : `<span class="name">${name}</span>`;
 
     html =
-        '<div class="btn-group btn-group-justified playerbuttongroup' + spacing + '" role="group">\n\
+            '<div class="btn-group btn-group-justified playerbuttongroup' + spacing + '" role="group">\n\
             <div class="btn btn-default namebutton' + currPlayerClass + '"' + isSelectPlayerDisabled + '>' + pName + '</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" \
