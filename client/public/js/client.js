@@ -518,22 +518,23 @@ function changeLowBandwidthMode() {
 
 function registerStateButtonCallbacks() {
     $('.switchteamabutton').click(function () {
-        switchTeam(EnumTeams.TEAM_A_TEAMS, $(this).parents('.playerbuttongroup').find('.name').text());
+        // html is important for encoded usernames
+        switchTeam(EnumTeams.TEAM_A_TEAMS, $(this).parents('.playerbuttongroup').find('.name').html());
     });
     $('.switchteambbutton').click(function () {
-        switchTeam(EnumTeams.TEAM_B_TEAMS, $(this).parents('.playerbuttongroup').find('.name').text());
+        switchTeam(EnumTeams.TEAM_B_TEAMS, $(this).parents('.playerbuttongroup').find('.name').html());
     });
     $('.switchspectatorbutton').click(function () {
-        switchTeam(EnumTeams.SPECTATOR_TEAMS, $(this).parents('.playerbuttongroup').find('.name').text());
+        switchTeam(EnumTeams.SPECTATOR_TEAMS, $(this).parents('.playerbuttongroup').find('.name').html());
     });
     $('.kickbutton').click(function () {
-        kickPlayer($(this).parents('.playerbuttongroup').find('.name').text());
+        kickPlayer($(this).parents('.playerbuttongroup').find('.name').html());
     });
     $('.abgebenbutton').click(function () {
-        abgeben($(this).parents('.playerbuttongroup').find('.name').text());
+        abgeben($(this).parents('.playerbuttongroup').find('.name').html());
     });
     $('.namebutton').click(function () {
-        selectThrowingPlayer($(this).find('.name').text());
+        selectThrowingPlayer($(this).find('.name').html());
     });
     $('.strafbierteamabutton.reducebutton').click(function () {
         modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);
