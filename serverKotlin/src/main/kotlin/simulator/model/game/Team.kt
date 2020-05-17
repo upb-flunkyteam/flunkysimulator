@@ -23,3 +23,9 @@ fun EnumTeams.toKotlin() = when(this){
     EnumTeams.TEAM_B_TEAMS -> Team.B
     else -> Team.Spectator
 }
+
+fun EnumTeams.positionalName() = when(this){
+    EnumTeams.TEAM_A_TEAMS -> "Links"
+    EnumTeams.TEAM_B_TEAMS -> "Rechts"
+    else -> "Zuschauer"
+}

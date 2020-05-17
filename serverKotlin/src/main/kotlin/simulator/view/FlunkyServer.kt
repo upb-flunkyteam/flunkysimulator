@@ -12,6 +12,7 @@ import simulator.control.GameController
 import simulator.control.MessageController
 import simulator.control.VideoController
 import simulator.control.VideoEvent
+import simulator.model.game.positionalName
 
 class FlunkyServer(
     private val gameController: GameController,
@@ -88,7 +89,7 @@ class FlunkyServer(
 
 
         if (request.playerName.isNotBlank() && gameController.switchTeam(name, team))
-            messageController.sendMessage(request.playerName, "hat $name nach ${team.toString()} verschoben.")
+            messageController.sendMessage(request.playerName, "hat $name nach ${team.positionalName()} verschoben.")
         else
             messageController.sendMessage(request.playerName, "konnte ${name} nicht verschieben.")
 
@@ -105,7 +106,7 @@ class FlunkyServer(
                 request.increment
             )
         ) {
-            val text = "hat ein Strafbier für ${request.targetTeam} " +
+            val text = "hat ein Strafbier für ${request.targetTeam.positionalName()} " +
                     if (request.increment)
                         "hinzugefügt"
                     else
@@ -114,7 +115,7 @@ class FlunkyServer(
         } else {
             messageController.sendMessage(
                 request.playerName,
-                " hat die Strafbiere für ${request.targetTeam} nicht verändert."
+                " hat die Strafbiere für ${request.targetTeam.positionalName()} nicht verändert."
             )
         }
 
