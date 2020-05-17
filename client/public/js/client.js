@@ -326,7 +326,7 @@ function processNewState(state) {
         $('#throwerdisplayarea').hide();
         // Make sure user notices
         $('.actionbox').addClass('flashingbackground')
-        document.title = `!! ${playerName} !!`;
+        document.title = `Wirf ${playerName}!`;
     } else {
         document.title = title
         // Remove annoying flashing
