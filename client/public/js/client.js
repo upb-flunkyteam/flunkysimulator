@@ -24,6 +24,7 @@ var actionButtonsEnabled = true;
 var currentGameState = null;
 var lowBandwidth = false;
 var preparedVideos = {};
+const title = document.title;
 
 jQuery(window).load(function () {
     $('#softthrowbutton').click(function () {
@@ -314,8 +315,10 @@ function processNewState(state) {
         $('.throwbutton').prop('disabled', false);
         $('#throwerdisplayarea').hide();
         // Make sure user notices
-        $('.actionbox').addClass('flashingbackground');
+        $('.actionbox').addClass('flashingbackground')
+        document.title = `!! ${playerName} !!`;
     } else {
+        document.title = title
         // Remove annoying flashing
         $('.actionbox').removeClass('flashingbackground');
         // Update the box displaying who is currently throwing
