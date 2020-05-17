@@ -11,7 +11,7 @@ message GameState{
   repeated Player playerTeamB = 2;
   repeated Player spectators = 3;
   RuleConfig ruleConfig = 8;
-  bool restingPeriod = 9;
+  bool isResting = 9;
   string throwingPlayer = 10;
   int64 strafbierTeamA = 11;
   int64 strafbierTeamB = 12;
