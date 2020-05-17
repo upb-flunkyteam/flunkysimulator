@@ -1,5 +1,5 @@
 module.exports = {
-    mode: 'production',
+    mode: 'development',
     entry: [
         './client/public/js/client.js'
     ],
@@ -8,4 +8,4 @@ module.exports = {
         publicPath: '/js',
         filename: 'main.js'
     }
-} 
+}
