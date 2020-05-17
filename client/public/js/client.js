@@ -143,7 +143,7 @@ function changePlayername(desiredPlayername) {
                     if (!playerName) {
                         playerName = desiredPlayername;
                     }
-                    $('#playername').text(playerName);
+                    $('#playername').html(playerName);
                     $('#registerform').hide();
                     // Force re-evaluation of game state, e.g. do I need to throw
                     processNewState(currentGameState);
@@ -284,7 +284,14 @@ function processNewState(state) {
     playerTeam =
         currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
             currentGameState.playerteambList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
-                EnumTeams.SPECTATOR_TEAMS;
+                currentGameState.spectatorsList.map(a => a.name).includes(playerName) ? EnumTeams.SPECTATOR_TEAMS :
+                    EnumTeams.UNKNOWN_TEAMS;
+
+    if (playerTeam === EnumTeams.UNKNOWN_TEAMS) {
+        // player must have been kicked since he is not part of any team or lobby
+        playerName = null;
+        console.log('player appears to be kicked -> Playername reset to null')
+    }
 
     // Create players
     $('#teamaarea, #teambarea, #spectatorarea').empty();
@@ -310,9 +317,6 @@ function processNewState(state) {
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
 
     // Throwing Team related highlighting
-    console.log(playerTeam)
-    console.log(currentTeam)
-
     playerTeam === currentTeam
         ? $('.video').addClass('highlight')
         : $('.video').removeClass('highlight');
@@ -514,22 +518,22 @@ function changeLowBandwidthMode() {
 
 function registerStateButtonCallbacks() {
     $('.switchteamabutton').click(function () {
-        switchTeam(EnumTeams.TEAM_A_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').html());
+        switchTeam(EnumTeams.TEAM_A_TEAMS, $(this).parents('.playerbuttongroup').find('.name').text());
     });
     $('.switchteambbutton').click(function () {
-        switchTeam(EnumTeams.TEAM_B_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').html());
+        switchTeam(EnumTeams.TEAM_B_TEAMS, $(this).parents('.playerbuttongroup').find('.name').text());
     });
     $('.switchspectatorbutton').click(function () {
-        switchTeam(EnumTeams.SPECTATOR_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').html());
+        switchTeam(EnumTeams.SPECTATOR_TEAMS, $(this).parents('.playerbuttongroup').find('.name').text());
     });
     $('.kickbutton').click(function () {
-        kickPlayer($(this).parents('.playerbuttongroup').children('.namebutton').html());
+        kickPlayer($(this).parents('.playerbuttongroup').find('.name').text());
     });
     $('.abgebenbutton').click(function () {
-        abgeben($(this).parents('.playerbuttongroup').children('.namebutton').html());
+        abgeben($(this).parents('.playerbuttongroup').find('.name').text());
     });
     $('.namebutton').click(function () {
-        selectThrowingPlayer($(this).text());
+        selectThrowingPlayer($(this).find('.name').text());
     });
     $('.strafbierteamabutton.reducebutton').click(function () {
         modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);
@@ -551,8 +555,11 @@ function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
     isSelectPlayerDisabled = player.abgegeben ? ' disabled="disabled"' : '';
     isAbgabeDisabled = isOwnTeam ? ' disabled="disabled"' : '';
     currPlayerClass = name === throwingPlayer ? ' btn-primary' : ' btn-default';
-    pName = name === playerName ? `<span class="glyphicon glyphicon-chevron-right" style="font-size: smaller"></span><span class="egoplayer">${name}</span><span class="glyphicon glyphicon-chevron-left" style="font-size: smaller"></span>` : name;
-
+    pName = name === playerName
+        ? `<span class="glyphicon glyphicon-chevron-right" style="font-size: smaller"></span>\
+           <span class="name egoplayer">${name}</span>\
+           <span class="glyphicon glyphicon-chevron-left" style="font-size: smaller"></span>`
+        : `<span class="name">${name}</span>`;
 
     html =
         '<div class="btn-group btn-group-justified playerbuttongroup' + spacing + '" role="group">\n\
