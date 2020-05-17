@@ -547,17 +547,16 @@ function registerStateButtonCallbacks() {
 
 function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
     name = player.name;
-    spacing = 'vspace-small';
+    spacing = ' vspace-small';
     isSelectPlayerDisabled = player.abgegeben ? ' disabled="disabled"' : '';
     isAbgabeDisabled = isOwnTeam ? ' disabled="disabled"' : '';
-    classes = name === throwingPlayer ? ' btn-primary' : ' btn-default';
-    if (name === playerName) {
-        classes = classes + ' egoplayer';
-    }
+    currPlayerClass = name === throwingPlayer ? ' btn-primary' : ' btn-default';
+    pName = name === playerName ? `<span class="glyphicon glyphicon-chevron-right" style="font-size: smaller"></span><span class="egoplayer">${name}</span><span class="glyphicon glyphicon-chevron-left" style="font-size: smaller"></span>` : name;
+
 
     html =
-        '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
-            <div class="btn namebutton' + classes + '"' + isSelectPlayerDisabled + '>' + name + '</div>\n\
+        '<div class="btn-group btn-group-justified playerbuttongroup' + spacing + '" role="group">\n\
+            <div class="btn btn-default namebutton' + currPlayerClass + '"' + isSelectPlayerDisabled + '>' + pName + '</div>\n\
             <div class="btn-group" role="group">\n\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" \
                  data-toggle-second="tooltip" aria-haspopup="true" aria-expanded="false"  title="Spieler verschieben">\n\

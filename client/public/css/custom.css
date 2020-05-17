@@ -67,10 +67,9 @@ body {
 }
 
 .egoplayer {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    font-weight: 700;
+    font-weight: bold;
 }
+
 
 .glyphicon-steinie {
     background-image: url("/picture/steinie.svg");
