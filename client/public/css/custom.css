@@ -61,3 +61,15 @@ body {
     margin-bottom: 10px;
     font-weight: 700;
 }
+
+.glyphicon-steinie {
+    background-image: url("/picture/steinie.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 1em;
+    width: 0.5em;
+    float: right;
+    margin-top: 1px;
+    margin-left: 2px;
+    margin-bottom: 6px;
+}

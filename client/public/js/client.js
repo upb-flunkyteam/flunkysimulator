@@ -383,7 +383,7 @@ function processNewVideoEvent(videoEvent) {
 
 function prepareVideo(url, videotype) {
     video = getVideoByType(videotype);
-    video.attr('src', 'video/' + url);
+    video.attr('src', url);
     video[0].load();
     // Force loading of the video by starting to play it muted and hidden
     video.prop('muted', true).trigger('play');
@@ -566,49 +566,9 @@ function generateStrafbierHTML(number, team) {
     }
     html = '<div class="btn-group vspace" role="group">';
     for (var i = 0; i < number; i++) {
-        html += '<div class="btn btn-default reducebutton' + teamclass + '">
-        <svg class="glyphicon" viewbox="0 0 225 520" height=1em>
-    <path fill=currentColor stroke=currentColor stroke-width=25
-          stroke-linejoin=round
-          d="M 119.00723,506.64674 
-             c -67.163999,0 -96.038999,-0.145 -98.780999,-23.153
-             -0.574,-68.215 -0.73,-136.441 -1.145,-204.66 
-             -1.656,-24.359 2.891,-50.75 22.235,-67.617
-             20.316,-18.137 8.598,-47.992 21.141,-70.012
-             8.945,-17.699 21.789,-35.004 20.324,-55.999998 
-             1.34,-23.316 2.082,-40.914 2.426,-66.453
-             h 33.8
-             m -0.038,487.894998
-             c 67.164,0 96.039,-0.145 98.781,-23.153
-             0.574,-68.215 0.73,-136.441 1.145,-204.66
-             1.656,-24.359 -2.891,-50.75 -22.235,-67.617 
-             -20.316,-18.137 -8.598,-47.992 -21.141,-70.012
-             -8.945,-17.699 -21.789,-35.004 -20.324,-56
-             -1.34,-23.316 -2.082,-40.914 -2.426,-66.453
-             h -33.8"/>
- </svg></div>';
+        html += '<div class="btn btn-default reducebutton' + teamclass + '"><span class="glyphicon glyphicon-steinie"></span></div>';
     }
-    html += '<div class="btn btn-default increasebutton' + teamclass + '">
-    <svg class="glyphicon" viewbox="0 0 225 520" height=1em>
-    <path fill=currentColor stroke=currentColor stroke-width=25
-          stroke-linejoin=round
-          d="M 119.00723,506.64674 
-             c -67.163999,0 -96.038999,-0.145 -98.780999,-23.153
-             -0.574,-68.215 -0.73,-136.441 -1.145,-204.66 
-             -1.656,-24.359 2.891,-50.75 22.235,-67.617
-             20.316,-18.137 8.598,-47.992 21.141,-70.012
-             8.945,-17.699 21.789,-35.004 20.324,-55.999998 
-             1.34,-23.316 2.082,-40.914 2.426,-66.453
-             h 33.8
-             m -0.038,487.894998
-             c 67.164,0 96.039,-0.145 98.781,-23.153
-             0.574,-68.215 0.73,-136.441 1.145,-204.66
-             1.656,-24.359 -2.891,-50.75 -22.235,-67.617 
-             -20.316,-18.137 -8.598,-47.992 -21.141,-70.012
-             -8.945,-17.699 -21.789,-35.004 -20.324,-56
-             -1.34,-23.316 -2.082,-40.914 -2.426,-66.453
-             h -33.8"/>
- </svg></div>';
+    html += '<div class="btn btn-default increasebutton' + teamclass + '"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-steinie"></span></div>';
     html += '</div>';
     return html;
 }
