@@ -123,10 +123,9 @@ function changePlayername(desiredPlayername) {
         return;
     }
 
-    if (playerName) {
-        // Discourage false flag attacks, the player was already registered
-        sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt');
-    }
+    // Discourage false flag attacks, the player was already registered
+    playerName ? sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt') : '';
+
     const request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
@@ -287,6 +286,7 @@ function processNewState(state) {
             currentGameState.playerteambList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
                 EnumTeams.SPECTATOR_TEAMS;
 
+    // Create players
     $('#teamaarea, #teambarea, #spectatorarea').empty();
     currentGameState.playerteamaList.forEach(function (player, index) {
         player.team = EnumTeams.TEAM_A_TEAMS
@@ -309,6 +309,16 @@ function processNewState(state) {
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
 
+    // Throwing Team related highlighting
+    console.log(playerTeam)
+    console.log(currentTeam)
+
+    playerTeam === currentTeam
+        ? $('.video').addClass('highlight')
+        : $('.video').removeClass('highlight');
+
+
+    // Throwing player related highlighting
     if (currentGameState.throwingplayer === playerName) {
         // It's my turn, display the throwing buttons!
         $('#throwactionbuttons').show();

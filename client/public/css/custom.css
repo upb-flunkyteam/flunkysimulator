@@ -6,21 +6,26 @@ body {
     background: #CFD8DC;
 }
 
-.video, .poster, .logoposter{
-  /* override other styles to make responsive */
-  width: 100%    !important;
-  height: auto   !important;
+.video, .poster, .logoposter {
+    /* override other styles to make responsive */
+    width: 100% !important;
+    height: auto !important;
 }
+
+.highlight {
+    box-shadow: 0 0 10px red;
+}
+
+
 .mirroredvideo {
     transform: rotateY(180deg);
-    -webkit-transform:rotateY(180deg); /* Safari and Chrome */
-    -moz-transform:rotateY(180deg); /* Firefox */
+    -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+    -moz-transform: rotateY(180deg); /* Firefox */
 }
 
 #mainvideobox {
     padding-left: 0px;
     padding-right: 0px;
-
 }
 
 .box {
@@ -46,14 +51,19 @@ body {
 }
 
 .flashingbackground {
-  animation: colorchange 2s infinite;
+    animation: colorchange 2s infinite;
 }
 
-@keyframes colorchange
-{
-  0%   {background: #f5f5f5;}
-  50%  {background: #EF5350;}
-  100% {background: #f5f5f5;}
+@keyframes colorchange {
+    0% {
+        background: #f5f5f5;
+    }
+    50% {
+        background: #EF5350;
+    }
+    100% {
+        background: #f5f5f5;
+    }
 }
 
 .egoplayer {
