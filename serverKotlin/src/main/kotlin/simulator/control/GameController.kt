@@ -47,7 +47,7 @@ class GameController(
             val player = gameState.getPlayer(state.roundState.throwingPlayer)
                 ?: return EnumThrowRespStatus.THROW_STATUS_NOT_THROWING_PLAYER
 
-            if (state.restingPeriod) {
+            if (state.isResting) {
                 return EnumThrowRespStatus.THROW_STATUS_RESTING_PERIOD
             }
 
@@ -129,21 +129,21 @@ class GameController(
                 if (hit)
                     messageController.sendMessage(
                         player.name,
-                        "hat für Team ${throwingTeam.positionalName()} getroffen."
+                        "hat für ${throwingTeam.positionalName()} getroffen."
                     )
                 else
                     messageController.sendMessage(
                         player.name,
-                        "hat nicht für Team ${throwingTeam.positionalName()} getroffen."
+                        "hat nicht für ${throwingTeam.positionalName()} getroffen."
                     )
 
                 updateThrowingPlayer(nextThrowingPlayer)
-                gameState = gameState.setRestingPhase(false)
+                gameState = gameState.setResting(false)
 
                 messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist mit werfen dran.")
             }
 
-            gameState = gameState.setRestingPhase(true)
+            gameState = gameState.setResting(true)
             return EnumThrowRespStatus.THROW_STATUS_SUCCESS
         }
     }
@@ -326,7 +326,7 @@ class GameController(
         gameStateLock.withLock {
             gameState = gameState.copy(
                 ruleConfig = gameState.ruleConfig.copy(restingPeriodMilliseconds = milliseconds.toInt()),
-                restingPeriod = active
+                isResting = active
             )
         }
     }
