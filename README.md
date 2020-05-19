@@ -29,6 +29,6 @@ Server bauen und starten im *./kotlinServer* Verzeichnis
 
 Befehlt um den [Go-Proxy](https://github.com/improbable-eng/grpc-web/tree/master/go/grpcwebproxy) zu starten
 
-`./startProxy.sh
+`./startProxy.sh`
 
 [tmux cheat sheet](https://tmuxcheatsheet.com)
