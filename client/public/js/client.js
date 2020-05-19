@@ -281,8 +281,8 @@ function resetGame() {
 function processNewState(state) {
     currentGameState = state;
     console.log(currentGameState);
-     //TODO: Rename variable restingperiod to isresting
-    if(currentGameState.restingperiod){
+    //TODO: Rename variable restingperiod to isresting
+    if (currentGameState.restingperiod) {
         return;
     }
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
@@ -541,7 +541,6 @@ function registerStateButtonCallbacks() {
 
 function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
     name = player.name;
-    spacing = 'vspace-small';
     isSelectPlayerDisabled = player.abgegeben ? ' disabled="disabled"' : '';
     isAbgabeDisabled = isOwnTeam ? ' disabled="disabled"' : '';
     classes = name === throwingPlayer ? ' btn-primary' : ' btn-default';
@@ -549,25 +548,35 @@ function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
         classes = classes + ' egoplayer';
     }
 
-    html =
-        '<div class="btn-group btn-group-justified ' + spacing + ' playerbuttongroup" role="group">\n\
-            <div class="btn namebutton' + classes + '"' + isSelectPlayerDisabled + '>' + name + '</div>\n\
-            <div class="btn-group" role="group">\n\
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" \
-                 data-toggle-second="tooltip" aria-haspopup="true" aria-expanded="false"  title="Spieler verschieben">\n\
-                    <span class="glyphicon glyphicon-transfer"></span>\n\
-                </button>\n\
-                <ul class="dropdown-menu">\n\
-                    <li><a href="#" class="switchteamabutton">Linkes Team</a></li>\n\
-                    <li><a href="#" class="switchteambbutton">Rechtes Team</a></li>\n\
-                    <li><a href="#" class="switchspectatorbutton">Zuschauer</a></li>\n\
-                </ul>\n\
-            </div>\n\
-            <div class="btn btn-default abgebenbutton"' + isAbgabeDisabled + ' data-toggle="tooltip" title="Abgabe abnehmen"">\
-               <span class="glyphicon glyphicon-ok-circle"></span></div>\n\
-            <div class="btn btn-default kickbutton" data-toggle="tooltip" title="Spieler kicken">\
-                <span class="glyphicon glyphicon-ban-circle"></span></div>\n\
-        </div>';
+    html = $("<div>").addClass("btn-group btn-group-justified vspace-small playerbuttongroup").attr("role", "group")
+        .append($("<a>").addClass("btn namebutton" + classes).attr({"href": "#"}).prop("disabled", player.abgeben).html(name))
+        .append($("<div>").addClass("btn-group").attr("role", "group")
+            .append($("<a>").addClass("btn btn-default dropdown-toggle").attr({
+                "type": "button",
+                "data-toggle": "dropdown",
+                "data-toggle-second": "tooltip",
+                "aria-haspopup": "true",
+                "aria-expanded": "false",
+                "title": "Spieler verschieben",
+                "href": "#"
+            }).append($("<span>").addClass("glyphicon glyphicon-transfer")))
+            .append($("<ul>").addClass("dropdown-menu")
+                .append($("<li>").append($("<a>").addClass("switchteamabutton").attr("href", "#").text("Linkes Team")))
+                .append($("<li>").append($("<a>").addClass("switchteambbutton").attr("href", "#").text("Rechtes Team")))
+                .append($("<li>").append($("<a>").addClass("switchspectatorbutton").attr("href", "#").text("Zuschauer")))
+            )
+        )
+        .append($("<a>").addClass("btn btn-default abgebenbutton").attr({
+            "href": "#",
+            "data-toggle": "tooltip",
+            "title": "Abgabe abnehmen"
+        }).prop("disabled", isOwnTeam).append($("<span>").addClass("glyphicon glyphicon-ok-circle")))
+        .append($("<a>").addClass("btn btn-default kickbutton").attr({
+            "href": "#",
+            "data-toggle": "tooltip",
+            "title": "Spieler kicken"
+        }).prop("disabled", isOwnTeam).append($("<span>").addClass("glyphicon glyphicon-ban-circle")));
+
     return html;
 }
 
