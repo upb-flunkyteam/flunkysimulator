@@ -294,21 +294,22 @@ function processNewState(state) {
     $('#teamaarea, #teambarea, #spectatorarea').empty();
     currentGameState.playerteamaList.forEach(function (player, index) {
         player.team = EnumTeams.TEAM_A_TEAMS
-        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam));
+        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteama));
         if (player.name === currentGameState.throwingplayer) {
             currentTeam = EnumTeams.TEAM_A_TEAMS;
         }
     });
     currentGameState.playerteambList.forEach(function (player, index) {
         player.team = EnumTeams.TEAM_B_TEAMS
-        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam));
+        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteamb));
         if (player.name === currentGameState.throwingplayer) {
             currentTeam = EnumTeams.TEAM_B_TEAMS;
         }
     });
     currentGameState.spectatorsList.forEach(function (player, index) {
         player.team = EnumTeams.SPECTATOR_TEAMS
-        $('#spectatorarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, false));
+        // This is ugly, but js does not support named parameters, therefore we have to fill the other parameters with undefineds
+        $('#spectatorarea').append(generatePlayerHTML(player, undefined, undefined, undefined, isSpectator = true));
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
@@ -507,24 +508,6 @@ function changeLowBandwidthMode() {
 }
 
 function registerStateButtonCallbacks() {
-    $('.switchteamabutton').click(function () {
-        switchTeam(EnumTeams.TEAM_A_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').html());
-    });
-    $('.switchteambbutton').click(function () {
-        switchTeam(EnumTeams.TEAM_B_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').html());
-    });
-    $('.switchspectatorbutton').click(function () {
-        switchTeam(EnumTeams.SPECTATOR_TEAMS, $(this).parents('.playerbuttongroup').children('.namebutton').html());
-    });
-    $('.kickbutton').click(function () {
-        kickPlayer($(this).parents('.playerbuttongroup').children('.namebutton').html());
-    });
-    $('.abgebenbutton').click(function () {
-        abgeben($(this).parents('.playerbuttongroup').children('.namebutton').html());
-    });
-    $('.namebutton').click(function () {
-        selectThrowingPlayer($(this).text());
-    });
     $('.strafbierteamabutton.reducebutton').click(function () {
         modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);
     });
@@ -539,43 +522,66 @@ function registerStateButtonCallbacks() {
     });
 }
 
-function generatePlayerHTML(player, throwingPlayer, isOwnTeam) {
+function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = false) {
     name = player.name;
-    isSelectPlayerDisabled = player.abgegeben ? ' disabled="disabled"' : '';
-    isAbgabeDisabled = isOwnTeam ? ' disabled="disabled"' : '';
-    classes = name === throwingPlayer ? ' btn-primary' : ' btn-default';
-    if (name === playerName) {
-        classes = classes + ' egoplayer';
+    turnClass = name === throwingPlayer ? ' btn-primary' : ' btn-default';
+    egoClass = name === playerName ? ' egoplayer' : '';
+    hasAbgegebenClass = player.abgegeben ? ' disabled' : '';
+
+    // disabled for own team unless player has abgegeben and strafbier
+    disableAbgabeButtonClass = (isOwnTeam && !(player.abgegeben && hasStrafbier) || (player.abgegeben && !hasStrafbier)) ? " disabled" : ""
+
+    playerbutton = $("<a href='#'>").addClass("btn namebutton" + turnClass + egoClass + hasAbgegebenClass).html(name)
+    if (!isSpectator) {
+        playerbutton.click(((n) => function () {
+            selectThrowingPlayer(n);
+        })(name)).attr({
+            "data-toggle": "tooltip",
+            "title": "Werfer machen"
+        })
     }
 
     html = $("<div>").addClass("btn-group btn-group-justified vspace-small playerbuttongroup").attr("role", "group")
-        .append($("<a>").addClass("btn namebutton" + classes).attr({"href": "#"}).prop("disabled", player.abgeben).html(name))
+        .append(playerbutton)
         .append($("<div>").addClass("btn-group").attr("role", "group")
-            .append($("<a>").addClass("btn btn-default dropdown-toggle").attr({
+            .append($("<a href='#'>").addClass("btn btn-default dropdown-toggle").attr({
                 "type": "button",
                 "data-toggle": "dropdown",
                 "data-toggle-second": "tooltip",
                 "aria-haspopup": "true",
                 "aria-expanded": "false",
                 "title": "Spieler verschieben",
-                "href": "#"
             }).append($("<span>").addClass("glyphicon glyphicon-transfer")))
             .append($("<ul>").addClass("dropdown-menu")
-                .append($("<li>").append($("<a>").addClass("switchteamabutton").attr("href", "#").text("Linkes Team")))
-                .append($("<li>").append($("<a>").addClass("switchteambbutton").attr("href", "#").text("Rechtes Team")))
-                .append($("<li>").append($("<a>").addClass("switchspectatorbutton").attr("href", "#").text("Zuschauer")))
-            )
-        )
-        .append($("<a>").addClass("btn btn-default abgebenbutton").attr({
-            "href": "#",
+                .append($("<li>").append($("<a href='#'>").addClass("switchteamabutton").text("Linkes Team"))
+                    .click(((n) => function () {
+                        switchTeam(EnumTeams.TEAM_A_TEAMS, n);
+                    })(name)))
+                .append($("<li>").append($("<a href='#'>").addClass("switchteambbutton").text("Rechtes Team"))
+                    .click(((n) => function () {
+                        switchTeam(EnumTeams.TEAM_B_TEAMS, n);
+                    })(name)))
+                .append($("<li>").append($("<a href='#'>").addClass("switchspectatorbutton").text("Zuschauer"))
+                    .click(((n) => function () {
+                        switchTeam(EnumTeams.SPECTATOR_TEAMS, n);
+                    })(name)))))
+    if (!isSpectator) {
+        html.append($("<a href='#'>").addClass("btn btn-default abgebenbutton" + disableAbgabeButtonClass).attr({
             "data-toggle": "tooltip",
-            "title": "Abgabe abnehmen"
-        }).prop("disabled", isOwnTeam).append($("<span>").addClass("glyphicon glyphicon-ok-circle")))
-        .append($("<a>").addClass("btn btn-default kickbutton").attr({
-            "href": "#",
-            "data-toggle": "tooltip",
-            "title": "Spieler kicken"
-        }).prop("disabled", isOwnTeam).append($("<span>").addClass("glyphicon glyphicon-ban-circle")));
+            "title": player.abgegeben ? "Strafbier übernehmen" : "Abgabe abnehmen"
+        }).append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
+            .click(((n, hasAbgegeben) => function () {
+                !hasAbgegeben ? abgeben(n) : modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);
+            })(name, player.abgegeben)))
+    }
+
+    html.append($("<a href='#'>").addClass("btn btn-default kickbutton").attr({
+        "data-toggle": "tooltip",
+        "title": "Spieler kicken"
+    }).prop("disabled", isOwnTeam).append($("<span>").addClass("glyphicon glyphicon-ban-circle"))
+        .click(((n) => function () {
+            kickPlayer(n);
+        })(name)));
 
     return html;
 }
