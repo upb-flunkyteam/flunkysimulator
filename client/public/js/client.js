@@ -220,7 +220,7 @@ function kickPlayer(targetName) {
     });
 }
 
-function modifyStrafbierCount(team, increment) {
+function increaseStrafbierCount(team, increment) {
     var request = new ModifyStrafbierCountReq();
     request.setPlayername(playerName);
     request.setTargetteam(team);
@@ -247,7 +247,7 @@ function selectThrowingPlayer(targetName) {
     });
 }
 
-function abgeben(targetName) {
+function toggleAbgabe(targetName) {
     var request = new AbgegebenReq();
     request.setPlayername(playerName);
     request.setTargetname(targetName);
@@ -339,8 +339,6 @@ function processNewState(state) {
         $('#throwactionbuttons').hide();
         $('#throwerdisplayarea').show();
     }
-
-    registerStateButtonCallbacks();
 }
 
 function processNewLog(sender, content) {
@@ -507,43 +505,34 @@ function changeLowBandwidthMode() {
     }
 }
 
-function registerStateButtonCallbacks() {
-    $('.strafbierteamabutton.reducebutton').click(function () {
-        modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);
-    });
-    $('.strafbierteamabutton.increasebutton').click(function () {
-        modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, true);
-    });
-    $('.strafbierteambbutton.reducebutton').click(function () {
-        modifyStrafbierCount(EnumTeams.TEAM_B_TEAMS, false);
-    });
-    $('.strafbierteambbutton.increasebutton').click(function () {
-        modifyStrafbierCount(EnumTeams.TEAM_B_TEAMS, true);
-    });
-}
-
 function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = false) {
     name = player.name;
+    isHimself = name === playerName;
     turnClass = name === throwingPlayer ? ' btn-primary' : ' btn-default';
-    egoClass = name === playerName ? ' egoplayer' : '';
+    egoClass = isHimself ? ' egoplayer' : '';
     hasAbgegebenClass = player.abgegeben ? ' disabled' : '';
 
-    // disabled for own team unless player has abgegeben and strafbier
-    disableAbgabeButtonClass = (isOwnTeam && !(player.abgegeben && hasStrafbier) || (player.abgegeben && !hasStrafbier)) ? " disabled" : ""
+    // disabled for own team and not abgegeben
+    // disabled if abgegeben but has no strafbier or is not himself
+    disableAbgabeButtonClass = ''
+    if (isOwnTeam && !player.abgegeben
+        || player.abgegeben && (!hasStrafbier || !isHimself)) {
+        disableAbgabeButtonClass = " disabled"
+    }
 
     playerbutton = $("<a href='#'>").addClass("btn namebutton" + turnClass + egoClass + hasAbgegebenClass).html(name)
     if (!isSpectator) {
-        playerbutton.click(((n) => function () {
-            selectThrowingPlayer(n);
-        })(name)).attr({
-            "data-toggle": "tooltip",
-            "title": "Werfer machen"
-        })
+        playerbutton
+            .click(((n) => () => selectThrowingPlayer(n))(name))
+            .attr({
+                "data-toggle": "tooltip",
+                "title": "Werfer machen"
+            })
     }
 
-    html = $("<div>").addClass("btn-group btn-group-justified vspace-small playerbuttongroup").attr("role", "group")
+    html = $('<div role="group">').addClass("btn-group btn-group-justified vspace-small playerbuttongroup")
         .append(playerbutton)
-        .append($("<div>").addClass("btn-group").attr("role", "group")
+        .append($('<div role="group">').addClass("btn-group")
             .append($("<a href='#'>").addClass("btn btn-default dropdown-toggle").attr({
                 "type": "button",
                 "data-toggle": "dropdown",
@@ -553,25 +542,23 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
                 "title": "Spieler verschieben",
             }).append($("<span>").addClass("glyphicon glyphicon-transfer")))
             .append($("<ul>").addClass("dropdown-menu")
-                .append($("<li>").append($("<a href='#'>").addClass("switchteamabutton").text("Linkes Team"))
-                    .click(((n) => function () {
-                        switchTeam(EnumTeams.TEAM_A_TEAMS, n);
-                    })(name)))
-                .append($("<li>").append($("<a href='#'>").addClass("switchteambbutton").text("Rechtes Team"))
-                    .click(((n) => function () {
-                        switchTeam(EnumTeams.TEAM_B_TEAMS, n);
-                    })(name)))
-                .append($("<li>").append($("<a href='#'>").addClass("switchspectatorbutton").text("Zuschauer"))
-                    .click(((n) => function () {
-                        switchTeam(EnumTeams.SPECTATOR_TEAMS, n);
-                    })(name)))))
+                .append($("<li>")
+                    .append($("<a href='#'>").addClass("switchteamabutton").text("Linkes Team"))
+                    .click(((n) => () => switchTeam(EnumTeams.TEAM_A_TEAMS, n))(name)))
+                .append($("<li>")
+                    .append($("<a href='#'>").addClass("switchteambbutton").text("Rechtes Team"))
+                    .click(((n) => () => switchTeam(EnumTeams.TEAM_B_TEAMS, n))(name)))
+                .append($("<li>")
+                    .append($("<a href='#'>").addClass("switchspectatorbutton").text("Zuschauer"))
+                    .click(((n) => () => switchTeam(EnumTeams.SPECTATOR_TEAMS, n))(name)))))
     if (!isSpectator) {
         html.append($("<a href='#'>").addClass("btn btn-default abgebenbutton" + disableAbgabeButtonClass).attr({
             "data-toggle": "tooltip",
             "title": player.abgegeben ? "Strafbier übernehmen" : "Abgabe abnehmen"
         }).append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
             .click(((n, hasAbgegeben) => function () {
-                !hasAbgegeben ? abgeben(n) : modifyStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);
+                toggleAbgabe(n);
+                hasAbgegeben && increaseStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);
             })(name, player.abgegeben)))
     }
 
@@ -579,25 +566,34 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
         "data-toggle": "tooltip",
         "title": "Spieler kicken"
     }).prop("disabled", isOwnTeam).append($("<span>").addClass("glyphicon glyphicon-ban-circle"))
-        .click(((n) => function () {
-            kickPlayer(n);
-        })(name)));
+        .click(((n) => () => kickPlayer(n))(name)));
 
     return html;
 }
 
 function generateStrafbierHTML(number, team) {
-    teamclass = '';
-    if (team === EnumTeams.TEAM_A_TEAMS) {
-        teamclass = ' strafbierteamabutton';
-    } else if (team === EnumTeams.TEAM_B_TEAMS) {
-        teamclass = ' strafbierteambbutton';
-    }
-    html = '<div class="btn-group vspace" role="group">';
+    teamclass = team === EnumTeams.TEAM_A_TEAMS ? ' strafbierteamabutton' :
+        team === EnumTeams.TEAM_B_TEAMS ? ' strafbierteambbutton' : '';
+
+    html = $('<div role="group">').addClass("btn-group vspace");
     for (var i = 0; i < number; i++) {
-        html += '<div class="btn btn-default reducebutton' + teamclass + '"><span class="glyphicon glyphicon-steinie"></span></div>';
+        html.append($('<div>').addClass("btn btn-default reducebutton" + teamclass)
+            .append($("<span>").addClass("glyphicon glyphicon-steinie"))
+            .click(((team) => () => increaseStrafbierCount(team, false))(team))
+            .attr({
+                "data-toggle": "tooltip",
+                "title": "Strafbier entfernen"
+            })
+        );
     }
-    html += '<div class="btn btn-default increasebutton' + teamclass + '"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-steinie"></span></div>';
-    html += '</div>';
+    html.append($("<div>").addClass("btn btn-default increasebutton" + teamclass)
+        .append($("<span>").addClass("glyphicon glyphicon-plus"))
+        .append($("<span>").addClass("glyphicon glyphicon-steinie"))
+        .click(((team) => () => increaseStrafbierCount(team, true))(team))
+        .attr({
+            "data-toggle": "tooltip",
+            "title": "Strafbier hinzufügen"
+        })
+    );
     return html;
 }
