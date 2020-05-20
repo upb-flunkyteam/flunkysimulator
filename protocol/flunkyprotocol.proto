@@ -46,6 +46,7 @@ service Simulator {
   // Debug rpcs
   rpc HardReset(google.protobuf.Empty) returns (google.protobuf.Empty);
   rpc SetRestingPeriod(RestingPeriodReq) returns (google.protobuf.Empty);
+  rpc SetRoundPhase(RoundPhaseReq) returns (google.protobuf.Empty);
 
 }
 
@@ -175,5 +176,8 @@ enum EnumThrowRespStatus{
 // Debug messages
 message RestingPeriodReq{
   int64 milliseconds = 1;
-  bool active = 2;
+}
+
+message RoundPhaseReq{
+    EnumRoundPhase roundPhase = 1;
 }
