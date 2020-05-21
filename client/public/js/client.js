@@ -76,7 +76,7 @@ jQuery(window).load(function () {
         lowBandwidth = !$(this).prop('checked');
         changeLowBandwidthMode();
     });
-    $('.video').on('ended', function () {
+    $('.video:not(.hit)').on('ended', function () {
         $(this).hide();
         $('.logoposter').show();
     });
