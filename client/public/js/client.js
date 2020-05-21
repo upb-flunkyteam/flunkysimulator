@@ -317,7 +317,7 @@ function processNewState(state) {
     });
     currentGameState.spectatorsList.forEach(function (player, index) {
         player.team = EnumTeams.SPECTATOR_TEAMS
-        $('#spectatorarea').append(generateSpectatorHTML(player);
+        $('#spectatorarea').append(generateSpectatorHTML(player));
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
@@ -514,7 +514,7 @@ function changeLowBandwidthMode() {
 }
 
 function generateSpectatorHTML(player) {
-    generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = true);
+    return generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = true);
 }
 
 function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = false) {
