@@ -290,7 +290,7 @@ function resetGame() {
 function processNewState(state) {
     currentGameState = state;
     console.log(currentGameState);
-    //TODO: Rename variable restingperiod to isresting
+    // TODO: Rename variable restingperiod to isresting
     if (currentGameState.restingperiod) {
         return;
     }
@@ -567,7 +567,8 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
                 .addClass("btn btn-default abgebenbutton" + mayRejoinClass)
                 .click(((n) => function () {
                     toggleAbgabe(n);
-                    reduceStrafbierCount(EnumTeams.TEAM_A_TEAMS);
+                    // TODO needs intelligent button hiding!
+                    // reduceStrafbierCount(EnumTeams.TEAM_A_TEAMS);
                 })(name, player.abgegeben))
                 .append($("<span>").addClass("glyphicon glyphicon-refresh"))
             );
