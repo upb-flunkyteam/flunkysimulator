@@ -323,23 +323,51 @@ function processNewState(state, stale = false) {
     }*/
 
     // Create players
-    $('#teamaarea, #teambarea, #spectatorarea').empty();
+    $('#teamaarea, #teambarea, #spectatorarea').addClass("teamcontainer").empty();
+
+    team = EnumTeams.TEAM_A_TEAMS
+    $('#teamaarea').addClass('ui-widget-header')
+        .droppable({
+            classes: {
+                "ui-droppable-active": "ui-state-active",
+                "ui-droppable-hover": "ui-state-hover"
+            },
+            drop: (event, ui) => switchTeam(EnumTeams.TEAM_A_TEAMS, ui.draggable.data('name'))
+        })
     currentGameState.playerteamaList.forEach(function (player, index) {
-        player.team = EnumTeams.TEAM_A_TEAMS
-        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteama));
+        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, team === playerTeam, currentGameState.strafbierteama));
         if (player.name === currentGameState.throwingplayer) {
-            currentTeam = EnumTeams.TEAM_A_TEAMS;
+            currentTeam = team;
         }
     });
+
+    team = EnumTeams.TEAM_B_TEAMS
+    $('#teambarea')
+        .addClass('ui-widget-header')
+        .droppable({
+            classes: {
+                "ui-droppable-active": "ui-state-active",
+                "ui-droppable-hover": "ui-state-hover"
+            },
+            drop: (event, ui) => switchTeam(EnumTeams.TEAM_B_TEAMS, ui.draggable.data('name'))
+        })
     currentGameState.playerteambList.forEach(function (player, index) {
-        player.team = EnumTeams.TEAM_B_TEAMS
-        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteamb));
+        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, team === playerTeam, currentGameState.strafbierteamb));
         if (player.name === currentGameState.throwingplayer) {
-            currentTeam = EnumTeams.TEAM_B_TEAMS;
+            currentTeam = team;
         }
     });
+
+    team = EnumTeams.SPECTATOR_TEAMS
+    $('#spectatorarea').addClass('ui-widget-header')
+        .droppable({
+            classes: {
+                "ui-droppable-active": "ui-state-active",
+                "ui-droppable-hover": "ui-state-hover"
+            },
+            drop: (event, ui) => switchTeam(EnumTeams.SPECTATOR_TEAMS, ui.draggable.data('name'))
+        })
     currentGameState.spectatorsList.forEach(function (player, index) {
-        player.team = EnumTeams.SPECTATOR_TEAMS
         $('#spectatorarea').append(generateSpectatorHTML(player));
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
@@ -582,7 +610,10 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
             });
     }
 
-    html = $('<div role="group">').addClass("btn-group btn-group-justified vspace-small playerbuttongroup")
+    html = $('<div role="group">')
+        .data("name", name)
+        .addClass("btn-group btn-group-justified vspace-small playerbuttongroup ui-widget-content")
+        .draggable({revert: "invalid"})
         .append(playerbutton)
         .append($('<div role="group">').addClass("btn-group")
             .append($("<a href='#'>").addClass("btn btn-default dropdown-toggle").attr({
