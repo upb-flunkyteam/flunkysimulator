@@ -6,21 +6,26 @@ body {
     background: #CFD8DC;
 }
 
-.video, .poster, .logoposter{
-  /* override other styles to make responsive */
-  width: 100%    !important;
-  height: auto   !important;
+.video, .poster, .logoposter {
+    /* override other styles to make responsive */
+    width: 100% !important;
+    height: auto !important;
 }
+
+.highlight {
+    box-shadow: 0 0 10px red;
+}
+
+
 .mirroredvideo {
     transform: rotateY(180deg);
-    -webkit-transform:rotateY(180deg); /* Safari and Chrome */
-    -moz-transform:rotateY(180deg); /* Firefox */
+    -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+    -moz-transform: rotateY(180deg); /* Firefox */
 }
 
 #mainvideobox {
     padding-left: 0px;
     padding-right: 0px;
-
 }
 
 .box {
@@ -57,9 +62,7 @@ body {
 }
 
 .egoplayer {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    font-weight: 700;
+    font-weight: bold;
 }
 
 .glyphicon-steinie {
@@ -72,4 +75,8 @@ body {
     margin-top: 1px;
     margin-left: 2px;
     margin-bottom: 6px;
+}
+
+.smaller-font {
+    font-size: smaller;
 }
