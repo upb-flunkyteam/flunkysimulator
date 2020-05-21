@@ -139,18 +139,18 @@ function changePlayername(desiredPlayername) {
             switch (response.status) {
                 case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
                 case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
-                    if (playerName) {
+                    if (response.registeredname) {
                         playerName = response.registeredname;
-                    } else if (!playerName) {
+                    } else {
                         // TODO: This is a bug in the server
                         console.log('Got empty registered name in response.');
-                        playerName = $('<div/>').text(desiredPlayername).html();
+                        playerName = $('<div>').text(desiredPlayername).html();
                         console.log('Player name: ' + playerName);
                     }
                     $('#playername').text(playerName);
                     $('#registerform').hide();
                     // Force re-evaluation of game state, e.g. do I need to throw
-                    processNewState(currentGameState);
+                    processNewState(currentGameState, true);
                     break;
                 case EnumLoginStatus.LOGIN_STATUS_EMPTY:
                     window.alert('Registrierung fehlgeschlagen! Dein Benutzername ist leer.');
@@ -290,7 +290,7 @@ function resetGame() {
     });
 }
 
-function processNewState(state) {
+function processNewState(state, stale = false) {
     currentGameState = state;
     console.log(currentGameState);
     // TODO: Rename variable restingperiod to isresting
@@ -299,16 +299,18 @@ function processNewState(state) {
     }
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
     playerTeam =
-            currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
+        currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
             currentGameState.playerteambList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
-            currentGameState.spectatorsList.map(a => a.name).includes(playerName) ? EnumTeams.SPECTATOR_TEAMS :
-            EnumTeams.UNKNOWN_TEAMS;
+                currentGameState.spectatorsList.map(a => a.name).includes(playerName) ? EnumTeams.SPECTATOR_TEAMS :
+                    EnumTeams.UNKNOWN_TEAMS;
 
-    if (playerName && playerTeam === EnumTeams.UNKNOWN_TEAMS) {
+    // TODO wont work because of  #82
+    //  umlaut playernames are never correctly assigned to their team and will be removed nevertheless
+    /*if (!stale && playerName && playerTeam === EnumTeams.UNKNOWN_TEAMS) {
         // player must have been kicked since he is not part of any team or lobby
         playerName = null;
         console.log('player appears to be kicked -> Playername reset to null');
-    }
+    }*/
 
     // Create players
     $('#teamaarea, #teambarea, #spectatorarea').empty();
@@ -335,8 +337,8 @@ function processNewState(state) {
 
     // Throwing Team related highlighting
     playerTeam === currentTeam
-            ? $('.video').addClass('highlight')
-            : $('.video').removeClass('highlight');
+        ? $('.video').addClass('highlight')
+        : $('.video').removeClass('highlight');
 
 
     // Throwing player related highlighting
@@ -346,7 +348,14 @@ function processNewState(state) {
         $('.throwbutton').prop('disabled', false);
         $('#throwerdisplayarea').hide();
         // Make sure user notices
-        $('.actionbox').addClass('flashingbackground');
+        // TODO rename after namechange isResting
+        console.log(state.restingperiod)
+        if (!state.restingperiod) {
+            console.log('not resting')
+            $('.actionbox').addClass('flashingbackground');
+        } else {
+            console.log('resting')
+        }
         document.title = `Wirf ${playerName}!`;
     } else {
         document.title = title;
@@ -548,9 +557,10 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
     mayRejoinClass = ""
 
     playerSpan = name === playerName
-        ? $('<span class="glyphicon glyphicon-chevron-right smaller-font">')
+        ? $('<span>')
+            .append($('<span class="glyphicon glyphicon-chevron-right smaller-font">'))
             .append(name)
-            .apppend($('<span class="glyphicon glyphicon-chevron-left smaller-font">'))
+            .append($('<span class="glyphicon glyphicon-chevron-left smaller-font">'))
         : name;
     playerbutton = $("<a href='#'>").addClass("btn namebutton" + turnClass + egoClass + hasAbgegebenClass).html(playerSpan)
     if (!isSpectator) {
