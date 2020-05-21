@@ -220,7 +220,16 @@ function kickPlayer(targetName) {
     });
 }
 
-function increaseStrafbierCount(team, increment) {
+function increaseStrafbierCount(team) {
+    modifyStrafbierCount(team, true);
+}
+
+function reduceStrafbierCount(team) {
+    modifyStrafbierCount(team, false);
+}
+
+
+function modifyStrafbierCount(team, increment) {
     var request = new ModifyStrafbierCountReq();
     request.setPlayername(playerName);
     request.setTargetteam(team);
@@ -308,8 +317,7 @@ function processNewState(state) {
     });
     currentGameState.spectatorsList.forEach(function (player, index) {
         player.team = EnumTeams.SPECTATOR_TEAMS
-        // This is ugly, but js does not support named parameters, therefore we have to fill the other parameters with undefineds
-        $('#spectatorarea').append(generatePlayerHTML(player, undefined, undefined, undefined, isSpectator = true));
+        $('#spectatorarea').append(generateSpectatorHTML(player);
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
@@ -505,6 +513,10 @@ function changeLowBandwidthMode() {
     }
 }
 
+function generateSpectatorHTML(player) {
+    generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = true);
+}
+
 function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = false) {
     name = player.name;
     isHimself = name === playerName;
@@ -513,12 +525,9 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
     hasAbgegebenClass = player.abgegeben ? ' disabled' : '';
 
     // disabled for own team and not abgegeben
-    // disabled if abgegeben but has no strafbier or is not himself
-    disableAbgabeButtonClass = ''
-    if (isOwnTeam && !player.abgegeben
-        || player.abgegeben && (!hasStrafbier || !isHimself)) {
-        disableAbgabeButtonClass = " disabled"
-    }
+    mayValidateAbgabeClass = !isOwnTeam ? "" : " disabled";
+    // TODO discussion: hasStrafbier && isHimself ? "" : "disabled";
+    mayRejoinClass = ""
 
     playerbutton = $("<a href='#'>").addClass("btn namebutton" + turnClass + egoClass + hasAbgegebenClass).html(name)
     if (!isSpectator) {
@@ -527,7 +536,7 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
             .attr({
                 "data-toggle": "tooltip",
                 "title": "Werfer machen"
-            })
+            });
     }
 
     html = $('<div role="group">').addClass("btn-group btn-group-justified vspace-small playerbuttongroup")
@@ -550,23 +559,32 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
                     .click(((n) => () => switchTeam(EnumTeams.TEAM_B_TEAMS, n))(name)))
                 .append($("<li>")
                     .append($("<a href='#'>").addClass("switchspectatorbutton").text("Zuschauer"))
-                    .click(((n) => () => switchTeam(EnumTeams.SPECTATOR_TEAMS, n))(name)))))
+                    .click(((n) => () => switchTeam(EnumTeams.SPECTATOR_TEAMS, n))(name)))));
+    // Abgabe / TakeStrafbier button
     if (!isSpectator) {
-        html.append($("<a href='#'>").addClass("btn btn-default abgebenbutton" + disableAbgabeButtonClass).attr({
-            "data-toggle": "tooltip",
-            "title": player.abgegeben ? "Strafbier übernehmen" : "Abgabe abnehmen"
-        }).append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
-            .click(((n, hasAbgegeben) => function () {
-                toggleAbgabe(n);
-                hasAbgegeben && increaseStrafbierCount(EnumTeams.TEAM_A_TEAMS, false);
-            })(name, player.abgegeben)))
+        if (player.abgegeben) {
+            html.append($("<a href='#' data-toggle='tooltip' title='Strafbier übernehmen'>")
+                .addClass("btn btn-default abgebenbutton" + mayRejoinClass)
+                .click(((n) => function () {
+                    toggleAbgabe(n);
+                    reduceStrafbierCount(EnumTeams.TEAM_A_TEAMS);
+                })(name, player.abgegeben))
+                .append($("<span>").addClass("glyphicon glyphicon-refresh"))
+            );
+        } else {
+            html.append($("<a href='#' data-toggle='tooltip' title='Abgabe abnehmen'>")
+                .addClass("btn btn-default abgebenbutton" + mayValidateAbgabeClass)
+                .click(((n) => () => toggleAbgabe(n))(name))
+                .append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
+            );
+        }
     }
 
-    html.append($("<a href='#'>").addClass("btn btn-default kickbutton").attr({
-        "data-toggle": "tooltip",
-        "title": "Spieler kicken"
-    }).prop("disabled", isOwnTeam).append($("<span>").addClass("glyphicon glyphicon-ban-circle"))
-        .click(((n) => () => kickPlayer(n))(name)));
+    html.append($("<a href='#' data-toggle='tooltip' title='Spieler kicken'>")
+        .addClass("btn btn-default kickbutton")
+        .click(((n) => () => kickPlayer(n))(name))
+        .append($("<span>").addClass("glyphicon glyphicon-ban-circle"))
+    );
 
     return html;
 }
@@ -579,7 +597,7 @@ function generateStrafbierHTML(number, team) {
     for (var i = 0; i < number; i++) {
         html.append($('<div>').addClass("btn btn-default reducebutton" + teamclass)
             .append($("<span>").addClass("glyphicon glyphicon-steinie"))
-            .click(((team) => () => increaseStrafbierCount(team, false))(team))
+            .click(((team) => () => reduceStrafbierCount(team))(team))
             .attr({
                 "data-toggle": "tooltip",
                 "title": "Strafbier entfernen"
@@ -589,7 +607,7 @@ function generateStrafbierHTML(number, team) {
     html.append($("<div>").addClass("btn btn-default increasebutton" + teamclass)
         .append($("<span>").addClass("glyphicon glyphicon-plus"))
         .append($("<span>").addClass("glyphicon glyphicon-steinie"))
-        .click(((team) => () => increaseStrafbierCount(team, true))(team))
+        .click(((team) => () => increaseStrafbierCount(team))(team))
         .attr({
             "data-toggle": "tooltip",
             "title": "Strafbier hinzufügen"
