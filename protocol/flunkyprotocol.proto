@@ -153,6 +153,7 @@ enum EnumAbgegebenRespStatus{
   ABGEGEBEN_STATUS_UNKNOWN_JUDGE = 3;
   // The target player is not known
   ABGEGEBEN_STATUS_UNKNOWN_TARGET = 4;
+  ABGEGEBEN_STATUS_ERROR = 5;
 }
 
 message ThrowReq{

@@ -17,7 +17,8 @@ import simulator.model.game.Player
 
 class GameController(
     private val videoController: VideoController,
-    private val messageController: MessageController
+    private val messageController: MessageController,
+    initGamestate: GameState = GameState()
 ) :
     EventControllerBase<GameController.GameStateEvent>() {
 
@@ -25,7 +26,7 @@ class GameController(
 
     private val gameStateLock = handlerLock
 
-    var gameState = GameState()
+    var gameState = initGamestate
         private set(value) {
             handlerLock.withLock {
                 onEvent(GameStateEvent(value))
@@ -281,8 +282,17 @@ class GameController(
             if (abgegeben && player.team == judge.team)
                 return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_OWN_TEAM
 
-            gameState = gameState.updatePlayer(player.copy(abgegeben = abgegeben))
+            // check if team has won
+            var newState = gameState.updatePlayer(player.copy(abgegeben = abgegeben))
+            if (newState.getTeam(player.team).all{it.abgegeben} && newState.getStrafbier(player.team) == 0) {
+               newState = newState.setRoundPhase(when (player.team){
+                   Team.A -> EnumRoundPhase.TEAM_A_WON_PHASE
+                   Team.B -> EnumRoundPhase.TEAM_B_WON_PHASE
+                   else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR
+               })
+            }
 
+            gameState = newState
             return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS
         }
     }

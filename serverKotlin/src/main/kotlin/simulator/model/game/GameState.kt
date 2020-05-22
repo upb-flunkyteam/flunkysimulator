@@ -28,6 +28,12 @@ data class GameState(
         else -> Spectators
     }
 
+    fun getStrafbier(team:Team) = when (team){
+        Team.A -> strafbiereA
+        Team.B -> strafbiereB
+        else -> -1
+    }
+
     fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name }
 
     fun getTeamOfPlayer(player: Player) = when{
