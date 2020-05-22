@@ -617,7 +617,11 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
 
     html.append($("<a href='#' data-toggle='tooltip' title='Spieler kicken'>")
         .addClass("btn btn-default kickbutton")
-        .click(((n) => () => kickPlayer(n))(name))
+        .click(((n) => function () {
+            if (confirm(`Möchtest du "${n}" wirklich kicken?`)) {
+                kickPlayer(n);
+            }
+        })(name))
         .append($("<span>").addClass("glyphicon glyphicon-ban-circle"))
     );
 
