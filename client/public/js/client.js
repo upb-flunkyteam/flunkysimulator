@@ -76,7 +76,8 @@ jQuery(window).load(function () {
         lowBandwidth = !$(this).prop('checked');
         changeLowBandwidthMode();
     });
-    $('.video').on('ended', function () {
+    // do not autohide hit-videos, in order to hold the last frame of the video until the stop video is played (#4)
+    $('.video:not(.hit)').on('ended', function () {
         $(this).hide();
         $('.logoposter').show();
     });
