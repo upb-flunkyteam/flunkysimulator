@@ -174,9 +174,8 @@ class GameController(
                     if (newCount in 0..10) {
                         gameState = gameState.copy(strafbiereB = newCount)
                         true
-                    else {
+                    } else
                         false
-                    }
                 }
                 else -> false
             }
