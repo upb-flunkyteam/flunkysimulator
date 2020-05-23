@@ -4,6 +4,12 @@ Dieses Projekt ist eine Kombination aus klassischem Javascript und Node.js.
 Gehostet wird die resultierende Seite auf Heroku.
 Die Video-Dateien sind zum Schutz der Privatsphäre nicht in diesem Repository gespeichert. Es können aber eigene Videos im public_html/videos Ordner abgelegt werden.
 
+# Geplante Versionen
+
+- Version 1: anything to play (Done by Jan)
+- Version 2: Distributed Client-Server Game with solid technical base and very loose Rule enforcement to allow easy recovering from faulty game states.
+- Version 3: Enforcing Rules and extra features.
+
 ## Nützliche Kommandozeilen-Befehle
 MP4-Videos in kleinere Webms mit VP9 rekodieren (Siehe [FFMPEG-Wiki](https://trac.ffmpeg.org/wiki/Encode/VP9#twopass))
 
