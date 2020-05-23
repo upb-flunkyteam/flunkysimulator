@@ -154,7 +154,7 @@ class GameController(
     fun forceThrowingPlayer(name: String): Boolean {
         gameStateLock.withLock {
             val player = gameState.getPlayer(name) ?: return false
-            val playerTeam = gameState.getTeamOfPlayer(player)?: return false
+            val playerTeam = gameState.getTeamOfPlayer(player) ?: return false
             val throwingPhase = playerTeam.toThrowingPhase()
             if (throwingPhase == EnumRoundPhase.UNKNOWN_PHASE) return false
             gameState = gameState.copy(throwingPlayer = player.name, roundPhase = throwingPhase)
@@ -284,12 +284,15 @@ class GameController(
 
             // check if team has won
             var newState = gameState.updatePlayer(player.copy(abgegeben = abgegeben))
-            if (newState.getTeam(player.team).all{it.abgegeben} && newState.getStrafbier(player.team) == 0) {
-               newState = newState.setRoundPhase(when (player.team){
-                   Team.A -> EnumRoundPhase.TEAM_A_WON_PHASE
-                   Team.B -> EnumRoundPhase.TEAM_B_WON_PHASE
-                   else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR
-               })
+            if (newState.getTeam(player.team).all { it.abgegeben } && newState.getStrafbier(player.team) == 0) {
+                newState = newState
+                    .setRoundPhase(
+                        when (player.team) {
+                            Team.A -> EnumRoundPhase.TEAM_A_WON_PHASE
+                            Team.B -> EnumRoundPhase.TEAM_B_WON_PHASE
+                            else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR
+                        }
+                    ).registerTeamWin(player.team)
             }
 
             gameState = newState

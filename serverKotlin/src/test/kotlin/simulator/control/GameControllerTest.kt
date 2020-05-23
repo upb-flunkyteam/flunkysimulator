@@ -40,11 +40,9 @@ internal class GameControllerTest {
 
         val gameController = GameController(videoController, messageController, state)
 
-        assertEquals(
-            EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS,
-            gameController.setAbgegeben("peter0", hans.name, true)
-        )
+        val abgegebenResult = gameController.setAbgegeben("peter0", hans.name, true)
 
+        assertEquals(EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS, abgegebenResult)
         assertEquals(EnumRoundPhase.TEAM_B_WON_PHASE, gameController.gameState.roundPhase)
     }
 

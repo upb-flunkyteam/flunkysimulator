@@ -26,6 +26,7 @@ message RuleConfig{
 message Player{
   string name = 1;
   bool abgegeben = 2;
+  int64 wonGames = 10;
 }
 
 enum EnumRoundPhase{

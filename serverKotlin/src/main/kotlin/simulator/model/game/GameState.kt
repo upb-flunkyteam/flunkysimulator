@@ -28,7 +28,7 @@ data class GameState(
         else -> Spectators
     }
 
-    fun getStrafbier(team:Team) = when (team){
+    fun getStrafbier(team: Team) = when (team) {
         Team.A -> strafbiereA
         Team.B -> strafbiereB
         else -> -1
@@ -36,7 +36,7 @@ data class GameState(
 
     fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name }
 
-    fun getTeamOfPlayer(player: Player) = when{
+    fun getTeamOfPlayer(player: Player) = when {
         TeamA.contains(player) -> Team.A
         TeamB.contains(player) -> Team.B
         Spectators.contains(player) -> Team.Spectator
@@ -55,10 +55,18 @@ data class GameState(
 
     fun setRoundPhase(value: EnumRoundPhase): GameState = this.copy(roundPhase = value)
 
-    fun setThrowingPlayer(name: String?): GameState = this .copy(throwingPlayer = name)
+    fun setThrowingPlayer(name: String?): GameState = this.copy(throwingPlayer = name)
+
+    fun registerTeamWin(team: Team): GameState =
+        this.copy(players = players.map {
+            if (it.team == team)
+                it.copy(wonGames = it.wonGames + 1)
+            else
+                it
+        })
 
     fun toGRPC() = de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
-        .setThrowingPlayer(throwingPlayer?: "")
+        .setThrowingPlayer(throwingPlayer ?: "")
         .addAllPlayerTeamA(TeamA.toGRPC())
         .setStrafbierTeamA(strafbiereA.toLong())
         .addAllPlayerTeamB(TeamB.toGRPC())
