@@ -21,7 +21,6 @@ internal class GameControllerTest {
     @Test
     fun `detect winning team on abgabe`() {
 
-
         val hans = Player("hans", team = Team.B, abgegeben = false)
         val state = GameState(
             players = listOf(
@@ -39,11 +38,52 @@ internal class GameControllerTest {
         val messageController = mockk<MessageController>()
         val videoController = mockk<VideoController>()
 
-        val gameController = GameController(videoController,messageController,state)
+        val gameController = GameController(videoController, messageController, state)
 
-        assertEquals(EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS, gameController.setAbgegeben("peter0",hans.name,true))
+        assertEquals(
+            EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS,
+            gameController.setAbgegeben("peter0", hans.name, true)
+        )
 
         assertEquals(EnumRoundPhase.TEAM_B_WON_PHASE, gameController.gameState.roundPhase)
+    }
 
+    @Test
+    fun `regular abgabe`() {
+
+        val hans = Player("hans", team = Team.B, abgegeben = false)
+        val state = GameState(
+            players = listOf(
+                Player("peter0", team = Team.A, abgegeben = true),
+                Player("peter1", team = Team.A, abgegeben = false),
+                Player("peter2", team = Team.B, abgegeben = false),
+                Player("peter3", team = Team.B, abgegeben = true),
+                hans
+            ),
+            throwingPlayer = hans.name,
+            roundPhase = EnumRoundPhase.TEAM_A_THROWING_PHASE
+        )
+
+
+        val messageController = mockk<MessageController>()
+        val videoController = mockk<VideoController>()
+
+        val gameController = GameController(videoController, messageController, state)
+
+        assertEquals(
+            EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS,
+            gameController.setAbgegeben("peter0", hans.name, true)
+        )
+
+        assertEquals(
+            state.copy(players = state.players.map {
+                if (it == hans) {
+                    hans.copy(abgegeben = true)
+                } else {
+                    it
+                }
+            }),
+            gameController.gameState
+        )
     }
 }
