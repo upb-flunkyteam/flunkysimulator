@@ -32,3 +32,23 @@ Befehlt um den [Go-Proxy](https://github.com/improbable-eng/grpc-web/tree/master
 `./startProxy.sh
 
 [tmux cheat sheet](https://tmuxcheatsheet.com)
+
+## Versionsgeschichte
+
+### 2.1
+
+- Kleinere Fehlerbehebungen; richtige Teamnamen im Chat
+- Abgaben können nur vom Gegnerteam abgenommen werden
+- Sophies & Daniels Videos gespiegelt
+- Erholungsphase nach Würfen eingeführt
+- Spielername in Tabtitel, wenn richtig eingeloggt
+- Sicherheitsfrage beim Kicken und neuem Spiel
+- Strafbierlimit, Strafbiericon
+
+### 2.0
+
+- Client/Server Applikation mit Basisfunktionalität
+
+### 1.0
+
+- Client only Webpage mit Basisfunktionalität

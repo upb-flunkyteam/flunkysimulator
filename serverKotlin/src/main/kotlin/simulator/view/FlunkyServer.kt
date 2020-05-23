@@ -319,7 +319,7 @@ class FlunkyServer(
 
     private val patchNotes = """Version 2.1:
     - Kleinere Fehlerbehebungen; richtige Teamnamen im Chat
-    - Abgaben können nur vom Gegenerteam abgenommen werden
+    - Abgaben können nur vom Gegnerteam abgenommen werden
     - Sophies & Daniels Videos gespiegelt
     - Erholungsphase nach Würfen eingeführt
     - Spielername in Tabtitel, wenn richtig eingeloggt
