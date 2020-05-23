@@ -5,8 +5,6 @@ import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import simulator.DeactiveableHandler
 import simulator.control.GameController
 import simulator.control.MessageController
@@ -251,17 +249,22 @@ class FlunkyServer(
         videoController.addEventHandler(handler::doAction)
     }
 
-    override fun streamLog(request: LogReq?, responseObserver: StreamObserver<LogResp>?) {
+    override fun streamLog(request: LogReq, responseObserver: StreamObserver<LogResp>) {
 
         val handler =
             buildRegisterHandler { event: MessageController.MessageEvent ->
-                responseObserver?.onNext(
+                responseObserver.onNext(
                     LogResp.newBuilder()
                         .setContent(event.content)
                         .setSender(event.sender)
                         .build()
                 )
             }
+
+        responseObserver.onNext(LogResp.newBuilder()
+            .setSender("Server")
+            .setContent(patchNotes)
+            .build())
 
         messageController.addEventHandler(handler::doAction)
 
@@ -313,4 +316,13 @@ class FlunkyServer(
         EnumThrowStrength.HARD_THROW_STRENGTH -> "stark"
         EnumThrowStrength.UNRECOGNIZED -> "unbekannt"
     }
+
+    private val patchNotes = """Version 2.1:
+    - Kleinere Fehlerbehebungen; richtige Teamnamen im Chat
+    - Abgaben können nur vom Gegenerteam abgenommen werden
+    - Sophies & Daniels Videos gespiegelt
+    - Erholungsphase nach Würfen eingeführt
+    - Spielername in Tabtitel, wenn richtig eingeloggt
+    - Sicherheitsfrage beim Kicken und neuem Spiel
+    - Strafbierlimit, Strafbiericon"""
 }
