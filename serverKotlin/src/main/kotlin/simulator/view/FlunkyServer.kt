@@ -262,7 +262,7 @@ class FlunkyServer(
             }
 
         responseObserver.onNext(LogResp.newBuilder()
-            .setSender("Server")
+            .setSender("Server:")
             .setContent(patchNotes)
             .build())
 
