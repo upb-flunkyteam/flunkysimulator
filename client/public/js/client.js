@@ -86,6 +86,15 @@ jQuery(window).load(function () {
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
     simulatorClient = new SimulatorClient('https://flunky.viings.de:8443');
     subscribeStreams();
+    // Try to re-register if the username field is not empty
+    // This happens when the page is reloaded
+    // Browsers will preserve the form input, thus the username remains set
+    playerNameFormValue = $('#playername').val();
+    if(playerNameFormValue){
+        if (confirm('Möchtest du mit dem Namen ' + playerNameFormValue + ' beitreten?')) {
+            changePlayername(playerNameFormValue);
+        }
+    }
 });
 
 function subscribeStreams() {
