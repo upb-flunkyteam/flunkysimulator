@@ -6,7 +6,9 @@ import random
 from google.protobuf import empty_pb2 as emptyMessage
 
 #channel = grpc.insecure_channel('flunky.viings.de:11049')
-channel = grpc.insecure_channel('localhost:11049')
+#channel = grpc.insecure_channel('localhost:11049')
+channel = grpc.insecure_channel('infinite-beach-92310.herokuapp.com:11049')
+
 stub = flunkyprotocol_pb2_grpc.SimulatorStub(channel)
 
 players = 'hans jurgen marie lola jana'.split()

@@ -79,3 +79,6 @@ startScripts.enabled = true
 application {
     mainClassName = 'simulator.ServerStarterKt'
 }
+
+task stage(dependsOn: ['shadowJar', 'clean'])
+shadowJar.mustRunAfter clean
