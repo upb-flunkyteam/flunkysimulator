@@ -11,6 +11,8 @@ plugins {
 
     // Provide convenience executables for trying out the examples.
     id 'application'
+
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
 repositories {
@@ -75,13 +77,5 @@ sourceSets {
 
 startScripts.enabled = true
 application {
-    mainClassName = 'simulator.ServerStarter'
+    mainClassName = 'simulator.ServerStarterKt'
 }
-
-/*
-task startServer(type: CreateStartScripts) {
-    mainClassName = 'io.grpc.examples.helloworld.HelloWorldServer'
-    applicationName = 'hello-world-server'
-    outputDir = new File(project.buildDir, 'tmp')
-    classpath = startScripts.classpath
-}*/

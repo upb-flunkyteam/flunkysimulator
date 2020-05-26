@@ -20,7 +20,7 @@ class ServerStarter {
     private var server: Server? = null
 
     @Throws(IOException::class)
-    private fun start() {
+    internal fun start() {
 
         val videoListUrl = System.getenv("VIDEO_LIST_URL")
 
@@ -62,24 +62,20 @@ class ServerStarter {
      * Await termination on the main thread since the grpc library uses daemon threads.
      */
     @Throws(InterruptedException::class)
-    private fun blockUntilShutdown() {
+    internal fun blockUntilShutdown() {
         server?.awaitTermination()
     }
 
 
-    companion object {
-        private val logger = Logger.getLogger(ServerStarter::class.java.name)
-
-        /**
-         * Main launches the server from the command line.
-         */
-        @Throws(IOException::class, InterruptedException::class)
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val server = ServerStarter()
-            server.start()
-            server.blockUntilShutdown()
-        }
-    }
 }
 
+private val logger = Logger.getLogger(ServerStarter::class.java.name)
+
+/**
+ * Main launches the server from the command line.
+ */
+fun main(args: Array<String>) {
+    val server = ServerStarter()
+    server.start()
+    server.blockUntilShutdown()
+}
