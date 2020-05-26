@@ -11,7 +11,7 @@ import java.net.URL
 import kotlin.concurrent.withLock
 
 
-class VideoController(private val videoListUrl: String) :
+class VideoController(private val videoListUrl: String?) :
     EventControllerBase<VideoEvent>() {
 
     private var lastVideoListRefresh: Long = 0
@@ -84,6 +84,8 @@ class VideoController(private val videoListUrl: String) :
     }
 
     internal fun sendGetRequest(): String {
+        if (videoListUrl == null)
+            error("Video list url missing.")
 
         val mURL = URL(videoListUrl)
 

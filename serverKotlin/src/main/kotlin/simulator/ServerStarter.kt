@@ -22,7 +22,11 @@ class ServerStarter {
     @Throws(IOException::class)
     private fun start() {
 
-        val videoListUrl = System.getenv("VIDEO_LIST_URL") ?: throw error("VideoListUrl environment variable is missing.")
+        val videoListUrl = System.getenv("VIDEO_LIST_URL")
+
+        if (videoListUrl == null)
+            logger.log(Level.WARNING,"VideoListUrl environment variable is missing." )
+
 
         val messageController = MessageController()
         val videoController = VideoController(videoListUrl)
