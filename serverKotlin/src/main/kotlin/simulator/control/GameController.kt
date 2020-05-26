@@ -171,12 +171,11 @@ class GameController(
                 }
                 EnumTeams.TEAM_B_TEAMS -> {
                     val newCount = gameState.strafbiereB + diff
-                    if (newCount < 0)
-                        false
-                    else {
+                    if (newCount in 0..10) {
                         gameState = gameState.copy(strafbiereB = newCount)
                         true
-                    }
+                    } else
+                        false
                 }
                 else -> false
             }
@@ -237,13 +236,14 @@ class GameController(
 
         val escapedAndTrimmedName = escapeHtml4(name.trim())
 
+        val player = Player(escapedAndTrimmedName)
+
         gameStateLock.withLock {
+
             if (gameState.nameTaken(escapedAndTrimmedName))
-                return LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN)
-
-            val player = Player(escapedAndTrimmedName)
-
-            gameState = gameState.addPlayer(player)
+                return LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN, escapedAndTrimmedName)
+            else
+                gameState = gameState.addPlayer(player)
 
             return LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, escapedAndTrimmedName)
         }

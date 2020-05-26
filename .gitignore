@@ -129,3 +129,4 @@ temp/
 client/public/video
 # Webpack-generate JavaScript
 client/public/js/main.js
+/.idea/
