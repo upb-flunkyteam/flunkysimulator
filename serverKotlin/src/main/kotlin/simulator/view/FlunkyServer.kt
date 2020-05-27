@@ -322,7 +322,7 @@ class FlunkyServer(
     - Abgaben können nur vom Gegnerteam abgenommen werden
     - Sophies & Daniels Videos gespiegelt
     - Erholungsphase nach Würfen eingeführt
-    - Spielername in Tabtitel, wenn richtig eingeloggt
+    - Spielername in Tabtitel, wenn dran mit Werfen.
     - Sicherheitsfrage beim Kicken und neuem Spiel
     - Strafbierlimit, Strafbiericon"""
 }
