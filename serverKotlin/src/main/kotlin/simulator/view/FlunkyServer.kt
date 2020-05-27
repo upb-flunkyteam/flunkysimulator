@@ -311,7 +311,7 @@ class FlunkyServer(
 
     private fun EnumThrowStrength.toPrettyString() = when (this) {
         EnumThrowStrength.UNKNOWN_THROW_STRENGTH -> "unbekannt"
-        EnumThrowStrength.SOFT_THROW_STRENGTH -> "normal"
+        EnumThrowStrength.SOFT_THROW_STRENGTH -> "leicht"
         EnumThrowStrength.MEDIUM_THROW_STRENGTH -> "mittel"
         EnumThrowStrength.HARD_THROW_STRENGTH -> "stark"
         EnumThrowStrength.UNRECOGNIZED -> "unbekannt"
