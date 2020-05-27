@@ -195,8 +195,8 @@ class GameController(
 
             // determine starting team
             val startingTeam = when {
-                teamA.count() > newPlayers2.count() -> teamB
-                teamB.count() < newPlayers2.count() -> teamA
+                teamA.count() > teamB.count() -> teamB
+                teamB.count() < teamA.count() -> teamA
                 Random.nextBoolean() -> teamA
                 else -> teamB
             }
