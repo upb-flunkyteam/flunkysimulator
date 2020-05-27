@@ -20,25 +20,23 @@ class ServerStarter {
     private var server: Server? = null
 
     @Throws(IOException::class)
-    internal fun start() {
+    internal fun start(port: Int) {
 
         val videoListUrl = System.getenv("VIDEO_LIST_URL")
 
         if (videoListUrl == null)
-            logger.log(Level.WARNING,"VideoListUrl environment variable is missing." )
+            logger.log(Level.WARNING, "VIDEO_LIST_URL environment variable is missing.")
 
 
         val messageController = MessageController()
         val videoController = VideoController(videoListUrl)
-        val gameController = GameController(videoController,messageController)
-        val flunkyServer = FlunkyServer(gameController, messageController,videoController)
+        val gameController = GameController(videoController, messageController)
+        val flunkyServer = FlunkyServer(gameController, messageController, videoController)
 
         // debug print
         gameController.addEventHandler { println(it) }
         messageController.addEventHandler { println(it) }
 
-        /* The port on which the server should run */
-        val port = 11049
         server = ServerBuilder.forPort(port)
             .addService(flunkyServer)
             .build()
@@ -75,7 +73,9 @@ private val logger = Logger.getLogger(ServerStarter::class.java.name)
  * Main launches the server from the command line.
  */
 fun main(args: Array<String>) {
+    val port = if (args.size == 1) args[0].toInt() else 11049
+
     val server = ServerStarter()
-    server.start()
+    server.start(port)
     server.blockUntilShutdown()
 }
