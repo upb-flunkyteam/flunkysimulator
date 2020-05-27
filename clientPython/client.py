@@ -5,9 +5,9 @@ import sys
 import random
 from google.protobuf import empty_pb2 as emptyMessage
 
-#channel = grpc.insecure_channel('flunky.viings.de:11049')
+#channel = grpc.insecure_channel('flunky.viings.de:11049') # master
+channel = grpc.insecure_channel('flunky.viings.de:64809') # develop
 #channel = grpc.insecure_channel('localhost:11049')
-channel = grpc.insecure_channel('localhost:11110')
 
 stub = flunkyprotocol_pb2_grpc.SimulatorStub(channel)
 
