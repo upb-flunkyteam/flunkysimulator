@@ -86,7 +86,7 @@ class FlunkyServer(
 
 
 
-        if (request.playerName.isNotBlank() && gameController.switchTeam(name, team))
+        if (request.playerName.isNotBlank() && gameController.setPlayerTeam(name, team))
             messageController.sendMessage(request.playerName, "hat $name nach ${team.positionalName()} verschoben.")
         else
             messageController.sendMessage(request.playerName, "konnte ${name} nicht verschieben.")

@@ -266,10 +266,22 @@ class GameController(
         }
     }
 
-    fun switchTeam(name: String, team: EnumTeams): Boolean {
+    fun setPlayerTeam(name: String, team: EnumTeams): Boolean {
         gameStateLock.withLock {
             val player = gameState.getPlayer(name) ?: return false
-            gameState = gameState.updatePlayer(player.copy(team = team.toKotlin()))
+            var newGamestate = gameState.updatePlayer(
+                player.copy(
+                    team = team.toKotlin(),
+                    abgegeben = if (team == EnumTeams.SPECTATOR_TEAMS) false else player.abgegeben
+                )
+            )
+
+            if (team == EnumTeams.SPECTATOR_TEAMS && gameState.throwingPlayer == player.name){
+                newGamestate = newGamestate.setThrowingPlayer(null)
+            }
+
+            gameState = newGamestate
+
             return true
         }
     }

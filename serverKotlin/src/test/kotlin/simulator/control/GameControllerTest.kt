@@ -2,6 +2,7 @@ package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumAbgegebenRespStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumRoundPhase
+import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -83,5 +84,38 @@ internal class GameControllerTest {
             }),
             gameController.gameState
         )
+    }
+
+    @Test
+    fun `move player to spectator`() {
+
+        val state = GameState(
+            players = listOf(
+                Player("hans", team = Team.B, abgegeben = false)
+            ),
+            throwingPlayer = "hans",
+            roundPhase = EnumRoundPhase.TEAM_B_THROWING_PHASE
+        )
+
+        val expectedState = GameState(
+            players = listOf(
+                Player("hans", team = Team.Spectator, abgegeben = false)
+            ),
+            throwingPlayer = null,
+            roundPhase = EnumRoundPhase.TEAM_B_THROWING_PHASE
+        )
+
+
+        val messageController = mockk<MessageController>()
+        val videoController = mockk<VideoController>()
+
+        val gameController = GameController(videoController, messageController, state)
+
+        assertEquals(
+            true,
+            gameController.setPlayerTeam("hans", EnumTeams.SPECTATOR_TEAMS)
+        )
+
+        assertEquals(expectedState, gameController.gameState)
     }
 }
