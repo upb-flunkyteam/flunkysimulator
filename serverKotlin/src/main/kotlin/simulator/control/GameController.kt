@@ -166,7 +166,7 @@ class GameController(
         gameStateLock.withLock {
             val diff = if (increment) 1 else -1
 
-            return when (team) {
+            val success = when (team) {
                 EnumTeams.TEAM_A_TEAMS -> {
                     val newCount = gameState.strafbiereA + diff
                     if (newCount in 0..10) {
@@ -185,6 +185,19 @@ class GameController(
                 }
                 else -> false
             }
+
+            if (success && increment) {
+                videoController.playVideos(
+                    listOf(
+                        VideoInstructions(
+                            VideoType.Strafbier,
+                            mirrored = EnumTeams.TEAM_A_TEAMS == team
+                        )
+                    )
+                )
+            }
+
+            return success
         }
     }
 
@@ -276,7 +289,7 @@ class GameController(
                 )
             )
 
-            if (team == EnumTeams.SPECTATOR_TEAMS && gameState.throwingPlayer == player.name){
+            if (team == EnumTeams.SPECTATOR_TEAMS && gameState.throwingPlayer == player.name) {
                 newGamestate = newGamestate.setThrowingPlayer(null)
             }
 

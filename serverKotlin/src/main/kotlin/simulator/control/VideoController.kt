@@ -1,5 +1,6 @@
 package simulator.control
 
+import simulator.ServerStarter
 import simulator.getRandomElement
 import simulator.model.video.VideoInstructions
 import simulator.model.video.VideoType
@@ -8,6 +9,8 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.logging.Level
+import java.util.logging.Logger
 import kotlin.concurrent.withLock
 
 
@@ -93,8 +96,8 @@ class VideoController(private val videoListUrl: String?) :
             // optional default is GET
             requestMethod = "GET"
 
-            println("Update VideoList by URL : $url")
-            println("Update VideoList Response Code : $responseCode")
+            logger.log(Level.INFO, "Update VideoList by URL : {0}",url)
+            logger.log(Level.INFO, "Update VideoList Response Code : $responseCode")
 
             BufferedReader(InputStreamReader(inputStream)).use {
                 val response = StringBuffer()
@@ -116,7 +119,7 @@ class VideoController(private val videoListUrl: String?) :
         val withoutBraces = jsonString.removeFirstAndLast()
         val elements = withoutBraces.split(",").map { it.trim().removeFirstAndLast() }
 
-        return elements.map { path ->
+        return elements.mapNotNull { path ->
             val typeString = path.substringAfter("path=%2F").substringBefore("&files")
 
             val type = when (typeString) {
@@ -127,7 +130,11 @@ class VideoController(private val videoListUrl: String?) :
                 "miss" -> VideoType.Miss
                 "preparation" -> VideoType.Setup
                 "stop" -> VideoType.Stop
-                else -> error("Unknown Video path type $path")
+                "strafbier" -> VideoType.Strafbier
+                else -> {
+                    logger.log(Level.WARNING, "Unknown Video path type $path")
+                    return@mapNotNull  null
+                }
             }
             type to path
         }.groupBy { it.first }
@@ -143,3 +150,5 @@ fun main() {
     a.forEach { println("${it.key}: ${it.value}") }
 }
 
+
+private val logger = Logger.getLogger(ServerStarter::class.java.name)
