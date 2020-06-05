@@ -280,7 +280,7 @@ class FlunkyServer(
     }
 
     override fun setRestingPeriod(request: RestingPeriodReq, responseObserver: StreamObserver<Empty>) {
-        gameController.setRestingPeriod(request.milliseconds,request.active)
+        gameController.setRestingPeriod(request.milliseconds)
         responseObserver.onNext(Empty.getDefaultInstance())
         responseObserver.onCompleted()
     }

@@ -17,7 +17,8 @@ import simulator.model.game.Player
 
 class GameController(
     private val videoController: VideoController,
-    private val messageController: MessageController
+    private val messageController: MessageController,
+    initGamestate: GameState = GameState()
 ) :
     EventControllerBase<GameController.GameStateEvent>() {
 
@@ -25,7 +26,7 @@ class GameController(
 
     private val gameStateLock = handlerLock
 
-    var gameState = GameState()
+    var gameState = initGamestate
         private set(value) {
             handlerLock.withLock {
                 onEvent(GameStateEvent(value))
@@ -41,13 +42,13 @@ class GameController(
 
             // -- determining whether we are allowed to throw --
 
-            if (state.roundState.throwingPlayer == null || name != state.roundState.throwingPlayer)
+            if (state.throwingPlayer == null || name != state.throwingPlayer)
                 return EnumThrowRespStatus.THROW_STATUS_NOT_THROWING_PLAYER
 
-            val player = gameState.getPlayer(state.roundState.throwingPlayer)
+            val player = gameState.getPlayer(state.throwingPlayer)
                 ?: return EnumThrowRespStatus.THROW_STATUS_NOT_THROWING_PLAYER
 
-            if (state.isResting) {
+            if (state.roundPhase == EnumRoundPhase.RESTING_PHASE) {
                 return EnumThrowRespStatus.THROW_STATUS_RESTING_PERIOD
             }
 
@@ -93,7 +94,7 @@ class GameController(
             val restingTime = state.ruleConfig.restingPeriodMilliseconds + if (hit) runningTime.toInt() else 0
 
 
-            // -- make the result known to the world --
+            // -- make the result known to the world via video--
 
             if (hit) {
                 videosToPlay += VideoInstructions(
@@ -114,12 +115,13 @@ class GameController(
             videoController.playVideos(videosToPlay)
 
 
-            // -- next player and resting period handling
+            // -- next player and round phase handling --
 
             lastThrowingPlayer[throwingTeam] = player
 
             val otherTeam = throwingTeam.otherTeam()
             val nextThrowingPlayer = gameState.getNextThrowingPlayer(otherTeam)
+            val nextThrowingPhase = otherTeam.toThrowingPhase()
 
             // launch coroutine which disables the resting period, writes the result in the log and sets the next player
             GlobalScope.launch {
@@ -137,13 +139,14 @@ class GameController(
                         "hat nicht für ${throwingTeam.positionalName()} getroffen."
                     )
 
-                updateThrowingPlayer(nextThrowingPlayer)
-                gameState = gameState.setResting(false)
+                gameState = gameState
+                    .setThrowingPlayer(nextThrowingPlayer?.name)
+                    .setRoundPhase(nextThrowingPhase)
 
                 messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist mit werfen dran.")
             }
 
-            gameState = gameState.setResting(true)
+            gameState = gameState.setRoundPhase(EnumRoundPhase.RESTING_PHASE)
             return EnumThrowRespStatus.THROW_STATUS_SUCCESS
         }
     }
@@ -151,7 +154,10 @@ class GameController(
     fun forceThrowingPlayer(name: String): Boolean {
         gameStateLock.withLock {
             val player = gameState.getPlayer(name) ?: return false
-            updateThrowingPlayer(player)
+            val playerTeam = gameState.getTeamOfPlayer(player) ?: return false
+            val throwingPhase = playerTeam.toThrowingPhase()
+            if (throwingPhase == EnumRoundPhase.UNKNOWN_PHASE) return false
+            gameState = gameState.copy(throwingPlayer = player.name, roundPhase = throwingPhase)
             return true
         }
     }
@@ -182,6 +188,7 @@ class GameController(
         }
     }
 
+
     fun resetGameAndShuffleTeams(): Boolean {
         gameStateLock.withLock {
             val (newPlayers1, newPlayers2) = gameState.players
@@ -204,9 +211,7 @@ class GameController(
             lastThrowingPlayer.clear()
 
             gameState = GameState(
-                roundState = RoundState(
-                    throwingPlayer = startingTeam.firstOrNull()?.name
-                ),
+                throwingPlayer = startingTeam.firstOrNull()?.name,
                 players = teamA.map { p -> p.copy(team = Team.A) }
                         + teamB.map { p -> p.copy(team = Team.B) }
             )
@@ -254,8 +259,8 @@ class GameController(
         gameStateLock.withLock {
             val player = gameState.getPlayer(target) ?: return false
             val newGameState = gameState.removePlayer(player)
-            if (newGameState.roundState.throwingPlayer == player.name)
-                newGameState.copy(roundState = RoundState())
+            if (newGameState.throwingPlayer == player.name)
+                newGameState.copy(throwingPlayer = null)
             gameState = newGameState
             return true
         }
@@ -278,17 +283,22 @@ class GameController(
             if (abgegeben && player.team == judge.team)
                 return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_OWN_TEAM
 
-            gameState = gameState.updatePlayer(player.copy(abgegeben = abgegeben))
+            // check if team has won
+            var newState = gameState.updatePlayer(player.copy(abgegeben = abgegeben))
+            if (newState.getTeam(player.team).all { it.abgegeben } && newState.getStrafbier(player.team) == 0) {
+                newState = newState
+                    .setRoundPhase(
+                        when (player.team) {
+                            Team.A -> EnumRoundPhase.TEAM_A_WON_PHASE
+                            Team.B -> EnumRoundPhase.TEAM_B_WON_PHASE
+                            else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR
+                        }
+                    ).registerTeamWin(player.team)
+            }
 
+            gameState = newState
             return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS
         }
-    }
-
-    /***
-     * Does not get the Lock!
-     */
-    private fun updateThrowingPlayer(player: Player?) {
-        gameState = gameState.copy(roundState = gameState.roundState.copy(throwingPlayer = player?.name ?: ""))
     }
 
     private fun GameState.getNextThrowingPlayer(team: Team): Player? {
@@ -315,6 +325,14 @@ class GameController(
             .first
     }
 
+    private fun Team.toThrowingPhase(): EnumRoundPhase {
+        return when (this) {
+            Team.A -> EnumRoundPhase.TEAM_A_THROWING_PHASE
+            Team.B -> EnumRoundPhase.TEAM_B_THROWING_PHASE
+            else -> EnumRoundPhase.UNKNOWN_PHASE
+        }
+    }
+
     // -- Debug functions
     fun hardReset() {
         gameStateLock.withLock {
@@ -322,11 +340,10 @@ class GameController(
         }
     }
 
-    fun setRestingPeriod(milliseconds: Long, active: Boolean) {
+    fun setRestingPeriod(milliseconds: Long) {
         gameStateLock.withLock {
             gameState = gameState.copy(
-                ruleConfig = gameState.ruleConfig.copy(restingPeriodMilliseconds = milliseconds.toInt()),
-                isResting = active
+                ruleConfig = gameState.ruleConfig.copy(restingPeriodMilliseconds = milliseconds.toInt())
             )
         }
     }

@@ -10,8 +10,10 @@ message GameState{
   repeated Player playerTeamA = 1;
   repeated Player playerTeamB = 2;
   repeated Player spectators = 3;
+
+  EnumRoundPhase roundPhase = 7;
   RuleConfig ruleConfig = 8;
-  bool isResting = 9;
+
   string throwingPlayer = 10;
   int64 strafbierTeamA = 11;
   int64 strafbierTeamB = 12;
@@ -24,6 +26,17 @@ message RuleConfig{
 message Player{
   string name = 1;
   bool abgegeben = 2;
+  int64 wonGames = 10;
+}
+
+enum EnumRoundPhase{
+  UNKNOWN_PHASE = 0;
+  NO_ACTIVE_GAME_PHASE = 1;
+  TEAM_A_THROWING_PHASE = 2;
+  TEAM_B_THROWING_PHASE = 3;
+  RESTING_PHASE = 4;
+  TEAM_A_WON_PHASE = 5;
+  TEAM_B_WON_PHASE = 6;
 }
 
 enum EnumThrowStrength {

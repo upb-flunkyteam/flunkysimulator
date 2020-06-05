@@ -1,12 +1,15 @@
 package simulator.model.game
 
+import de.flunkyteam.endpoints.projects.simulator.EnumRoundPhase
+import de.flunkyteam.endpoints.projects.simulator.EnumTeams
+
 
 data class GameState(
     val players: List<Player> = emptyList(),
-    val roundState: RoundState = RoundState(),
+    val throwingPlayer: String? = null,
+    val roundPhase: EnumRoundPhase = EnumRoundPhase.NO_ACTIVE_GAME_PHASE,
     val strafbiereA: Int = 0,
     val strafbiereB: Int = 0,
-    val isResting: Boolean = false,
     val ruleConfig: RuleConfig = RuleConfig()
 ) {
 
@@ -25,6 +28,21 @@ data class GameState(
         else -> Spectators
     }
 
+    fun getStrafbier(team: Team) = when (team) {
+        Team.A -> strafbiereA
+        Team.B -> strafbiereB
+        else -> -1
+    }
+
+    fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name }
+
+    fun getTeamOfPlayer(player: Player) = when {
+        TeamA.contains(player) -> Team.A
+        TeamB.contains(player) -> Team.B
+        Spectators.contains(player) -> Team.Spectator
+        else -> null
+    }
+
     fun addPlayer(player: Player) = this.copy(players = players + player)
 
     fun updatePlayer(player: Player) = this.copy(players = players.map {
@@ -35,18 +53,26 @@ data class GameState(
 
     fun nameTaken(name: String) = this.players.any { player -> player.name == name }
 
-    fun getPlayer(name: String) = this.players.firstOrNull { player -> player.name == name }
+    fun setRoundPhase(value: EnumRoundPhase): GameState = this.copy(roundPhase = value)
 
-    fun setResting(value: Boolean): GameState = this.copy(isResting = value)
+    fun setThrowingPlayer(name: String?): GameState = this.copy(throwingPlayer = name)
+
+    fun registerTeamWin(team: Team): GameState =
+        this.copy(players = players.map {
+            if (it.team == team)
+                it.copy(wonGames = it.wonGames + 1)
+            else
+                it
+        })
 
     fun toGRPC() = de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
-        .setThrowingPlayer(roundState.throwingPlayer?: "")
+        .setThrowingPlayer(throwingPlayer ?: "")
         .addAllPlayerTeamA(TeamA.toGRPC())
         .setStrafbierTeamA(strafbiereA.toLong())
         .addAllPlayerTeamB(TeamB.toGRPC())
         .setStrafbierTeamB(strafbiereB.toLong())
         .addAllSpectators(Spectators.toGRPC())
-        .setIsResting(isResting)
+        .setRoundPhase(roundPhase)
         .setRuleConfig(ruleConfig.toGrpc())
         .build()
 
