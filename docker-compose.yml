@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    ports:
+      - "11049:11049"
+  backendproxy:
+    container_name: backendproxy
+    build:
+      context: .
+      dockerfile: docker/backendproxy/Dockerfile
+    network_mode: host
+    ports:
+      - "8080:8080"
+  frontend:
+    container_name: frontend
+    build:
+      dockerfile: docker/frontend/Dockerfile
+      context: client
+    ports:
+      - "80:5000"
