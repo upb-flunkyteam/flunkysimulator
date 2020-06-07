@@ -1,8 +1,9 @@
-FROM node:lts-stretch-slim
+FROM node:lts-alpine3.11
 
-COPY client /frontend
+COPY . /frontend
 
 WORKDIR /frontend
-# RUN npm install && npm run-script build
+RUN apk update && apk add python
+RUN npm install && npm run-script build
 ENTRYPOINT npm run-script start
 EXPOSE 5000

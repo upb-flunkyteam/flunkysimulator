@@ -27,6 +27,6 @@
     },
     "scripts": {
         "start": "node webserver.js",
-        "build": "../node_modules/.bin/webpack --config webpack.config.js"
+        "build": "node_modules/.bin/webpack --config webpack.config.js"
     }
 }
