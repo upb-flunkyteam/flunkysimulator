@@ -41,9 +41,10 @@ dependencies {
     implementation "io.grpc:grpc-stub:${grpcVersion}"
     compileOnly "javax.annotation:javax.annotation-api:1.2"
 
-    //other
+    //events
     implementation 'com.github.stuhlmeier:kotlin-events:v2.0'
-    implementation 'org.apache.commons:commons-text:1.8'
+    //for html escaping of user inputs
+    compile group: 'org.springframework', name: 'spring-web', version: '5.2.6.RELEASE'
 
     //tests
     testImplementation "io.grpc:grpc-testing:${grpcVersion}" // gRCP testing utilities

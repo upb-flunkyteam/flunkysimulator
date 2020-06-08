@@ -10,7 +10,7 @@ import simulator.model.video.VideoType
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 import kotlinx.coroutines.launch
-import org.apache.commons.text.StringEscapeUtils.escapeHtml4
+import org.springframework.web.util.HtmlUtils
 import simulator.model.game.GameState
 import simulator.model.game.Player
 
@@ -252,7 +252,7 @@ class GameController(
 
         GlobalScope.launch { videoController.refreshVideos() }
 
-        val escapedAndTrimmedName = escapeHtml4(name.trim())
+        val escapedAndTrimmedName = HtmlUtils.htmlEscape(name.trim())
 
         val player = Player(escapedAndTrimmedName)
 
