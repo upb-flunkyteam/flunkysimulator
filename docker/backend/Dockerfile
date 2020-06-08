@@ -4,7 +4,7 @@ COPY serverKotlin /backend/server
 COPY protocol /backend/protocol
 
 WORKDIR /backend/server
-ENV VIDEO_LIST_URL banane
+ENV VIDEO_LIST_URL none
 ENTRYPOINT ./gradlew run
 EXPOSE 11049
 

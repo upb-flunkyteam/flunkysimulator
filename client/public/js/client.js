@@ -84,7 +84,7 @@ jQuery(window).load(function () {
     $('.video').hide();
     $('.poster').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-    simulatorClient = new SimulatorClient('http://localhost:8080');
+    simulatorClient = new SimulatorClient(BACKEND_URL);
     subscribeStreams();
     // Try to re-register if the username field is not empty
     // This happens when the page is reloaded

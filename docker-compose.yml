@@ -18,7 +18,7 @@ services:
   frontend:
     container_name: frontend
     build:
+      context: .
       dockerfile: docker/frontend/Dockerfile
-      context: client
     ports:
       - "80:5000"
