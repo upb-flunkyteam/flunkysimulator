@@ -13,7 +13,7 @@ const {
     ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
     AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
-    StreamVideoEventsReq, StreamVideoEventsResp
+    StreamVideoEventsReq, StreamVideoEventsResp, EnumRoundPhase
 } = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
@@ -303,11 +303,15 @@ function resetGame() {
 function processNewState(state, stale = false) {
     currentGameState = state;
     console.log(currentGameState);
-    // TODO: Rename variable restingperiod to isresting
-    if (currentGameState.restingperiod) {
+    if (currentGameState.roundphase === EnumRoundPhase.RESTING_PHASE) {
         return;
     }
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
+    if (currentGameState.roundphase === EnumRoundPhase.TEAM_A_THROWING_PHASE){
+        currentTeam = EnumTeams.TEAM_A_TEAMS;
+    }else if(currentGameState.roundphase === EnumRoundPhase.TEAM_B_THROWING_PHASE){
+        currentTeam = EnumTeams.TEAM_B_TEAMS;
+    }
     playerTeam =
         currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
             currentGameState.playerteambList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
@@ -327,16 +331,10 @@ function processNewState(state, stale = false) {
     currentGameState.playerteamaList.forEach(function (player, index) {
         player.team = EnumTeams.TEAM_A_TEAMS
         $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteama));
-        if (player.name === currentGameState.throwingplayer) {
-            currentTeam = EnumTeams.TEAM_A_TEAMS;
-        }
     });
     currentGameState.playerteambList.forEach(function (player, index) {
         player.team = EnumTeams.TEAM_B_TEAMS
         $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteamb));
-        if (player.name === currentGameState.throwingplayer) {
-            currentTeam = EnumTeams.TEAM_B_TEAMS;
-        }
     });
     currentGameState.spectatorsList.forEach(function (player, index) {
         player.team = EnumTeams.SPECTATOR_TEAMS
