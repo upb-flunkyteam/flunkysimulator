@@ -569,8 +569,7 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
 
     // disabled for own team and not abgegeben
     mayValidateAbgabeClass = !isOwnTeam ? "" : " disabled";
-    // TODO discussion: hasStrafbier && isHimself ? "" : "disabled";
-    mayRejoinClass = ""
+    mayRejoinClass = hasStrafbier && isHimself ? "" : "disabled";
 
     playerSpan = name === playerName
         ? $('<span>')
@@ -616,8 +615,7 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
                 .addClass("btn btn-default abgebenbutton" + mayRejoinClass)
                 .click(((n) => function () {
                     toggleAbgabe(n);
-                    // TODO needs intelligent button hiding!
-                    // reduceStrafbierCount(EnumTeams.TEAM_A_TEAMS);
+                    reduceStrafbierCount(EnumTeams.TEAM_A_TEAMS);
                 })(name, player.abgegeben))
                 .append($("<span>").addClass("glyphicon glyphicon-refresh"))
             );
