@@ -3,6 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+var env = {};
+$.get({
+    url: "env",
+    async: false,
+    success: function (data) {
+        env = data;
+    }
+});
 
 console.log("Starte Flunkyball-Simulator");
 const {
@@ -84,13 +92,13 @@ jQuery(window).load(function () {
     $('.video').hide();
     $('.poster').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-    simulatorClient = new SimulatorClient(BACKEND_URL);
+    simulatorClient = new SimulatorClient(env['BACKEND_URL']);
     subscribeStreams();
     // Try to re-register if the username field is not empty
     // This happens when the page is reloaded
     // Browsers will preserve the form input, thus the username remains set
     playerNameFormValue = $('#playername').val();
-    if(playerNameFormValue){
+    if (playerNameFormValue) {
         if (confirm('Möchtest du mit dem Namen ' + playerNameFormValue + ' beitreten?')) {
             changePlayername(playerNameFormValue);
         }
