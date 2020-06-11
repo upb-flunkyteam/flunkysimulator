@@ -1,6 +1,6 @@
 FROM openjdk:11.0.7-jdk-slim-buster
 
-COPY serverKotlin /backend/server
+COPY backend /backend/src
 COPY protocol /backend/protocol
 
 WORKDIR /backend/server

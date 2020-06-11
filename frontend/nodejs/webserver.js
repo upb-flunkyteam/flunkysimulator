@@ -8,14 +8,6 @@ app.set('view engine', 'pug');
 
 app.set('views', path.join(__dirname, 'views'));
 
-// Reroute HTTP to HTTPS
-/*app.use((req, res, next) => {
-    if (req.header('x-forwarded-proto') !== 'https')
-        res.redirect(`https://${req.header('host')}${req.url}`)
-    else
-        next()
-})*/
-
 app.get('/', (req, res) => {
     res.render('homepage');
 });

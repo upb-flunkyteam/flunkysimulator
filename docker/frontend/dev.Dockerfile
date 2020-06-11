@@ -13,7 +13,7 @@ RUN protoc -I=/proto \
   /proto/*.proto
 
 WORKDIR /frontend
-RUN npm install && npm run-script build
+RUN npm install && npm run-script build:dev
 ENV BACKEND_URL none
 ENTRYPOINT npm run-script start
 EXPOSE 5000

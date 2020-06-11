@@ -14,14 +14,14 @@ $.get({
 
 console.log("Starte Flunkyball-Simulator");
 const {
-    EnumThrowStrength, EnumTeams, EnumVideoType, EnumLoginStatus, GameState,
-    ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp,
+    EnumThrowStrength, EnumRoundPhase, EnumTeams, EnumVideoType, EnumLoginStatus,
+    GameState, ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp,
     StreamStateReq, StreamStateResp, LogReq, LogResp,
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
     ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
     AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
-    StreamVideoEventsReq, StreamVideoEventsResp, EnumRoundPhase
+    StreamVideoEventsReq, StreamVideoEventsResp
 } = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
 var simulatorClient = null;
@@ -315,9 +315,9 @@ function processNewState(state, stale = false) {
         return;
     }
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
-    if (currentGameState.roundphase === EnumRoundPhase.TEAM_A_THROWING_PHASE){
+    if (currentGameState.roundphase === EnumRoundPhase.TEAM_A_THROWING_PHASE) {
         currentTeam = EnumTeams.TEAM_A_TEAMS;
-    }else if(currentGameState.roundphase === EnumRoundPhase.TEAM_B_THROWING_PHASE){
+    } else if (currentGameState.roundphase === EnumRoundPhase.TEAM_B_THROWING_PHASE) {
         currentTeam = EnumTeams.TEAM_B_TEAMS;
     }
     playerTeam =

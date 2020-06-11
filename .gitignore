@@ -124,9 +124,6 @@ tmp/
 temp/
 
 # End of https://www.gitignore.io/api/node
-
-# Confidential videos
-client/public/video
 # Webpack-generate JavaScript
-client/public/js/main.js
+frontend/**/main.js
 /.idea/
