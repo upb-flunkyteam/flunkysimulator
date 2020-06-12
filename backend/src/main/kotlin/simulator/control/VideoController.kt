@@ -52,7 +52,7 @@ class VideoController(private val videoListUrl: String?) :
         loadVideoUrls()
 
         VideoType.values().forEach {
-            val videos = videoUrls[it] ?: error("Video Type not found!")
+            val videos = videoUrls[it] ?: error("Video Type \"${it}\" not found!")
             if (!videos.contains(preparedVideos[it])) {
                 // video has been deleted or not set => need new one
                 handlerLock.withLock {
