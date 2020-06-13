@@ -568,7 +568,7 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
     hasAbgegebenClass = player.abgegeben ? ' disabled' : '';
 
     // disabled for own team and not abgegeben
-    mayValidateAbgabeClass = !isOwnTeam ? "" : " disabled";
+    mayValidateAbgabeClass = !isOwnTeam ? "" : "disabled";
     mayRejoinClass = hasStrafbier && isHimself ? "" : "disabled";
 
     playerSpan = name === playerName
@@ -612,16 +612,16 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
     if (!isSpectator) {
         if (player.abgegeben) {
             html.append($("<a href='#' data-toggle='tooltip' title='Strafbier übernehmen'>")
-                .addClass("btn btn-default abgebenbutton" + mayRejoinClass)
+                .addClass("btn btn-default abgebenbutton " + mayRejoinClass)
                 .click(((n) => function () {
                     toggleAbgabe(n);
-                    reduceStrafbierCount(EnumTeams.TEAM_A_TEAMS);
+                    reduceStrafbierCount(player.team);
                 })(name, player.abgegeben))
                 .append($("<span>").addClass("glyphicon glyphicon-refresh"))
             );
         } else {
             html.append($("<a href='#' data-toggle='tooltip' title='Abgabe abnehmen'>")
-                .addClass("btn btn-default abgebenbutton" + mayValidateAbgabeClass)
+                .addClass("btn btn-default abgebenbutton " + mayValidateAbgabeClass)
                 .click(((n) => () => toggleAbgabe(n))(name))
                 .append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
             );
