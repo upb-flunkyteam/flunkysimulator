@@ -317,12 +317,8 @@ class FlunkyServer(
         EnumThrowStrength.UNRECOGNIZED -> "unbekannt"
     }
 
-    private val patchNotes = """Version 2.1:
-    - Kleinere Fehlerbehebungen; richtige Teamnamen im Chat
-    - Abgaben können nur vom Gegnerteam abgenommen werden
-    - Sophies & Daniels Videos gespiegelt
-    - Erholungsphase nach Würfen eingeführt
-    - Spielername in Tabtitel, wenn dran mit Werfen.
-    - Sicherheitsfrage beim Kicken und neuem Spiel
-    - Strafbierlimit, Strafbiericon"""
+    private val patchNotes = """Version 2.2:
+    - Strafbiere haben auch Videos
+    - Gesamte Infrastruktur auf Docker-Images umgestellt
+    - Infrastruktur umgezogen"""
 }
