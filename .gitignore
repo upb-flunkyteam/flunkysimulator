@@ -126,4 +126,6 @@ temp/
 # End of https://www.gitignore.io/api/node
 # Webpack-generate JavaScript
 frontend/**/main.js
+*_pb.js
 .idea/
+nbproject/
