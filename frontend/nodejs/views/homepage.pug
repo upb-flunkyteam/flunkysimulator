@@ -11,18 +11,20 @@ head
     .row
         .col-md-6.col-md-push-3
             #mainvideobox.vspace
-                image.logoposter(src='picture/logoposter.jpg')
+                video.stop.video(src='' preload='auto') Stop!
                 video.hit.video(src='' preload='auto') Getroffen!
                 video.miss.video(src='') Nicht getroffen!
                 video.nearmiss.video(src='') Nicht getroffen!
                 video.setup.video(src='') Wird aufgebaut...
-                video.stop.video(src='' preload='auto') Stop!
+                video.strafbier.video(src='') Strafbier
+                image.stop.poster(src='picture/stop.png')
                 image.hit.poster(src='picture/hit.png')
                 image.miss.poster(src='picture/miss.png')
                 image.nearmiss.poster(src='picture/nearmiss.png')
                 image.setup.poster(src='picture/setup.png')
-                image.stop.poster(src='picture/stop.png')
                 image.throw.poster(src='picture/throw.png')
+                image.strafbier.poster(src='picture/strafbier.png')
+                image.logoposter(src='picture/logoposter.jpg')
             .actionbox.well.vspace
                 #registerform.vspace
                     .input-group
