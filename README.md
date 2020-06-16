@@ -65,6 +65,11 @@ Befehlt um den [grpcWebProxy](https://github.com/improbable-eng/grpc-web/tree/ma
 
 ## Versionsgeschichte
 
+### 2.2:
+- Strafbiere haben auch Videos
+- Gesamte Infrastruktur auf Docker-Images umgestellt
+- Infrastruktur umgezogen
+    
 ### 2.1
 
 - Kleinere Fehlerbehebungen; richtige Teamnamen im Chat
