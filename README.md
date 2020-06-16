@@ -19,17 +19,41 @@ ffmpeg -i stop.mp4 -c:v libvpx-vp9 -b:v 2M -pass 1 -an -f webm /dev/null &&\
 ffmpeg -i stop.mp4 -c:v libvpx-vp9 -b:v 2M -pass 2 -c:a libopus stop.webm`
 ```
 
-Die javascript-resourcen aus commonJS zusammenbauen
+## Frontend lokal starten
 
-`npm run-script build --dev`
+### Im Docker-Container
 
-Aus protobuffer-Definitionen die commonJS-Bindings generieren
+TODO
 
-`protoc -I=./protocol flunkyprotocol.proto game_objects.proto video_objects.proto --js_out=import_style=commonjs:./client/public/js/ --grpc-web_out=mode=grpcwebtext,import_style=commonjs:./client/public/js/`
+### Node
+
+Im Ordner frontend/nodejs
+
+Aus Protobuf-Definitionen die commonJS-Bindings generieren
+
+`protoc -I=./protocol  --js_out=import_style=commonjs:./frontend/nodejs/public/js/ --grpc-web_out=mode=grpcwebtext,import_style=commonjs:./frontend/nodejs/public/js/ ./protocol/*.proto`
+
+NodeJS-Dependencies installieren
+
+`npm install`
+
+Backend-Server-URL auswählen
+
+`export BACKEND_URL="https://www.example.com:8443"`
+
+Javascript-Ressourcen bauen
+
+`npm run-script build:dev`
+
+NodeJS als lokalen Webserver unter Port 5000 starten
+
+`npm run-script start`
+
+`http://localhost:5000/` im Browser besuchen
 
 ### Server
 
-Server bauen und starten im *./kotlinServer* Verzeichnis
+Server bauen und starten im *./backend* Verzeichnis
 
 `./gradlew run`
 
@@ -41,6 +65,11 @@ Befehlt um den [grpcWebProxy](https://github.com/improbable-eng/grpc-web/tree/ma
 
 ## Versionsgeschichte
 
+### 2.2:
+- Strafbiere haben auch Videos
+- Gesamte Infrastruktur auf Docker-Images umgestellt
+- Infrastruktur umgezogen
+    
 ### 2.1
 
 - Kleinere Fehlerbehebungen; richtige Teamnamen im Chat

@@ -3,11 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+var env = {};
+$.get({
+    url: "env",
+    async: false,
+    success: function (data) {
+        env = data;
+    }
+});
 
 console.log("Starte Flunkyball-Simulator");
 const {
-    EnumThrowStrength, EnumTeams, EnumVideoType, EnumLoginStatus, GameState,
-    ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp,
+    EnumThrowStrength, EnumRoundPhase, EnumTeams, EnumVideoType, EnumLoginStatus,
+    GameState, ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp,
     StreamStateReq, StreamStateResp, LogReq, LogResp,
     SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
     ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
@@ -84,13 +92,13 @@ jQuery(window).load(function () {
     $('.video').hide();
     $('.poster').hide();
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-    simulatorClient = new SimulatorClient('https://flunky.viings.de:8443');
+    simulatorClient = new SimulatorClient(env['BACKEND_URL']);
     subscribeStreams();
     // Try to re-register if the username field is not empty
     // This happens when the page is reloaded
     // Browsers will preserve the form input, thus the username remains set
     playerNameFormValue = $('#playername').val();
-    if(playerNameFormValue){
+    if (playerNameFormValue) {
         if (confirm('Möchtest du mit dem Namen ' + playerNameFormValue + ' beitreten?')) {
             changePlayername(playerNameFormValue);
         }
@@ -303,11 +311,15 @@ function resetGame() {
 function processNewState(state, stale = false) {
     currentGameState = state;
     console.log(currentGameState);
-    // TODO: Rename variable restingperiod to isresting
-    if (currentGameState.restingperiod) {
+    if (currentGameState.roundphase === EnumRoundPhase.RESTING_PHASE) {
         return;
     }
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
+    if (currentGameState.roundphase === EnumRoundPhase.TEAM_A_THROWING_PHASE) {
+        currentTeam = EnumTeams.TEAM_A_TEAMS;
+    } else if (currentGameState.roundphase === EnumRoundPhase.TEAM_B_THROWING_PHASE) {
+        currentTeam = EnumTeams.TEAM_B_TEAMS;
+    }
     playerTeam =
         currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
             currentGameState.playerteambList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
@@ -327,16 +339,10 @@ function processNewState(state, stale = false) {
     currentGameState.playerteamaList.forEach(function (player, index) {
         player.team = EnumTeams.TEAM_A_TEAMS
         $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteama));
-        if (player.name === currentGameState.throwingplayer) {
-            currentTeam = EnumTeams.TEAM_A_TEAMS;
-        }
     });
     currentGameState.playerteambList.forEach(function (player, index) {
         player.team = EnumTeams.TEAM_B_TEAMS
         $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteamb));
-        if (player.name === currentGameState.throwingplayer) {
-            currentTeam = EnumTeams.TEAM_B_TEAMS;
-        }
     });
     currentGameState.spectatorsList.forEach(function (player, index) {
         player.team = EnumTeams.SPECTATOR_TEAMS
@@ -501,6 +507,8 @@ function getPosterByType(videotype, mirrored) {
             return $('.poster.setup');
         case EnumVideoType.STOP_VIDEOTYPE:
             return $('.poster.stop');
+        case EnumVideoType.STRAFBIER_VIDEOTYPE:
+            return $('.poster.strafbier');
         case 'throw':
             return $('.poster.throw');
         default:
@@ -520,6 +528,8 @@ function getVideoByType(videotype) {
             return $('.video.setup');
         case EnumVideoType.STOP_VIDEOTYPE:
             return $('.video.stop');
+        case EnumVideoType.STRAFBIER_VIDEOTYPE:
+            return $('.video.strafbier');
         default:
             return null;
     }
@@ -562,9 +572,8 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
     hasAbgegebenClass = player.abgegeben ? ' disabled' : '';
 
     // disabled for own team and not abgegeben
-    mayValidateAbgabeClass = !isOwnTeam ? "" : " disabled";
-    // TODO discussion: hasStrafbier && isHimself ? "" : "disabled";
-    mayRejoinClass = ""
+    mayValidateAbgabeClass = !isOwnTeam ? "" : "disabled";
+    mayRejoinClass = hasStrafbier && isHimself ? "" : "disabled";
 
     playerSpan = name === playerName
         ? $('<span>')
@@ -607,17 +616,16 @@ function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, h
     if (!isSpectator) {
         if (player.abgegeben) {
             html.append($("<a href='#' data-toggle='tooltip' title='Strafbier übernehmen'>")
-                .addClass("btn btn-default abgebenbutton" + mayRejoinClass)
+                .addClass("btn btn-default abgebenbutton " + mayRejoinClass)
                 .click(((n) => function () {
                     toggleAbgabe(n);
-                    // TODO needs intelligent button hiding!
-                    // reduceStrafbierCount(EnumTeams.TEAM_A_TEAMS);
+                    reduceStrafbierCount(player.team);
                 })(name, player.abgegeben))
                 .append($("<span>").addClass("glyphicon glyphicon-refresh"))
             );
         } else {
             html.append($("<a href='#' data-toggle='tooltip' title='Abgabe abnehmen'>")
-                .addClass("btn btn-default abgebenbutton" + mayValidateAbgabeClass)
+                .addClass("btn btn-default abgebenbutton " + mayValidateAbgabeClass)
                 .click(((n) => () => toggleAbgabe(n))(name))
                 .append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
             );
