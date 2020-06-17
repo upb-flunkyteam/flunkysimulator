@@ -54,7 +54,7 @@ class FlunkyServer(
     override fun registerPlayer(request: RegisterPlayerReq, responseObserver: StreamObserver<RegisterPlayerResp>) {
         val name = request.playerName
 
-        val loginStatus = gameController.registerPlayer(name)
+        val loginStatus = gameController.playerManager.registerPlayer(name)
 
         if (loginStatus.status == EnumLoginStatus.LOGIN_STATUS_SUCCESS)
             messageController.sendMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
@@ -71,7 +71,7 @@ class FlunkyServer(
     override fun kickPlayer(request: KickPlayerReq?, responseObserver: StreamObserver<KickPlayerResp>?) {
         val name = request!!.targetName
 
-        if (request.playerName.isNotBlank() && gameController.removePlayer(name))
+        if (request.playerName.isNotBlank() && gameController.playerManager.removePlayer(name))
             messageController.sendMessage(request.playerName, "hat ${name} rausgeworfen.")
         else
             messageController.sendMessage(request.playerName, "konnte ${name} nicht rauswerfen.")
@@ -86,7 +86,7 @@ class FlunkyServer(
 
 
 
-        if (request.playerName.isNotBlank() && gameController.setPlayerTeam(name, team))
+        if (request.playerName.isNotBlank() && gameController.playerManager.setPlayerTeam(name, team))
             messageController.sendMessage(request.playerName, "hat $name nach ${team.positionalName()} verschoben.")
         else
             messageController.sendMessage(request.playerName, "konnte ${name} nicht verschieben.")
@@ -206,7 +206,7 @@ class FlunkyServer(
         // output current state
         responseObserver?.onNext(
             StreamStateResp.newBuilder()
-                .setState(gameController.gameState.toGRPC())
+                .setState(gameController.gameState.toGRPC(gameController.playerManager))
                 .build()
         )
 
@@ -216,7 +216,7 @@ class FlunkyServer(
                 //fails if stream is closed
                 responseObserver?.onNext(
                     StreamStateResp.newBuilder()
-                        .setState(event.state.toGRPC())
+                        .setState(event.state.toGRPC(gameController.playerManager))
                         .build()
                 )
             }
