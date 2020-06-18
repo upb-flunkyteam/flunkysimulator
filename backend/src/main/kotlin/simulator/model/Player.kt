@@ -8,9 +8,8 @@ data class Player(val name: String,
                   var wonGames: Int = 0
 ) {
 
-    fun toGRPC(abgegeben: Boolean) = Player.newBuilder()
+    fun toGRPC() = Player.newBuilder()
         .setName(name)
-        .setAbgegeben(abgegeben)
         .setWonGames(wonGames.toLong())
         .build()
 }

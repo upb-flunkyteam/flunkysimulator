@@ -17,7 +17,7 @@ class PlayerController(
     private val players: MutableList<Player> = mutableListOf()
 ): EventControllerBase<PlayerController.PlayersEvent>() {
 
-    data class PlayersEvent(val players: List<Player>)
+    data class PlayersEvent(val updateOf: Set<Team>)
 
     private val playersLock = handlerLock
 
@@ -32,8 +32,10 @@ class PlayerController(
     val Spectators: List<Player>
         get() = players.filter { p -> p.team == Team.Spectator }
 
-    private fun triggerUpdate(){
-        PlayersEvent(allPlayers)
+
+    private val all = setOf(Team.A,Team.B,Team.Spectator)
+    private fun triggerUpdate(of: Set<Team> = all){
+        PlayersEvent(of)
     }
 
     fun getPlayer(name: String?) = this.players.firstOrNull { player -> player.name == name }

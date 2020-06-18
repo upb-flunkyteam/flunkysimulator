@@ -33,7 +33,7 @@ data class GameState(
 
     fun setThrowingPlayer(name: String?): GameState = this.copy(throwingPlayer = name)
 
-    fun toGRPC(playerController: PlayerController) =
+    fun toGRPC() =
         de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
             .setThrowingPlayer(throwingPlayer ?: "")
             .setStrafbierTeamA(strafbiereA.toLong())
@@ -41,9 +41,6 @@ data class GameState(
             .setRoundPhase(roundPhase)
             .setRuleConfig(ruleConfig.toGrpc())
             .build()
-
-    private fun Iterable<Player>.toGRPC() =
-        this.map { player -> player.toGRPC(getAbgegeben(player)) }
 }
 
 

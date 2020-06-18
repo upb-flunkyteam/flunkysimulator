@@ -80,7 +80,7 @@ internal class GameControllerTest {
         val messageController = mockk<MessageController>()
         val videoController = mockk<VideoController>()
 
-        val gameController = GameController(videoController, messageController, playerList = listOf(hans))
+        val gameController = GameController(videoController, messageController, gameState, listOf(hans))
 
         assertEquals(
             true,

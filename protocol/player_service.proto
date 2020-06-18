@@ -19,8 +19,18 @@ service PlayerService {
 
   rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
 
-  //todo stream players
+  rpc StreamAllPlayers(google.protobuf.Empty) returns (PlayerListResp);
 
+  rpc StreamTeamAPlayers(google.protobuf.Empty) returns (PlayerListResp);
+
+  rpc StreamTeamBPlayers(google.protobuf.Empty) returns (PlayerListResp);
+
+  rpc StreamSpectators(google.protobuf.Empty) returns (PlayerListResp);
+
+}
+
+message PlayerListResp{
+  repeated Player players = 1;
 }
 
 message SwitchTeamResp{};

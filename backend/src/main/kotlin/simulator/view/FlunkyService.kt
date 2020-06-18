@@ -157,7 +157,7 @@ class FlunkyService(
         // output current state
         responseObserver?.onNext(
             StreamStateResp.newBuilder()
-                .setState(gameController.gameState.toGRPC(gameController.playerController))
+                .setState(gameController.gameState.toGRPC())
                 .build()
         )
 
@@ -167,7 +167,7 @@ class FlunkyService(
                 //fails if stream is closed
                 responseObserver?.onNext(
                     StreamStateResp.newBuilder()
-                        .setState(event.state.toGRPC(gameController.playerController))
+                        .setState(event.state.toGRPC())
                         .build()
                 )
             }
