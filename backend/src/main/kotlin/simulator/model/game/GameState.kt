@@ -1,7 +1,7 @@
 package simulator.model.game
 
 import de.flunkyteam.endpoints.projects.simulator.EnumRoundPhase
-import simulator.control.PlayerManager
+import simulator.control.PlayerController
 import simulator.model.Player
 
 
@@ -33,14 +33,11 @@ data class GameState(
 
     fun setThrowingPlayer(name: String?): GameState = this.copy(throwingPlayer = name)
 
-    fun toGRPC(playerManager: PlayerManager) =
+    fun toGRPC(playerController: PlayerController) =
         de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
             .setThrowingPlayer(throwingPlayer ?: "")
-            .addAllPlayerTeamA(playerManager.TeamA.toGRPC())
             .setStrafbierTeamA(strafbiereA.toLong())
-            .addAllPlayerTeamB(playerManager.TeamB.toGRPC())
             .setStrafbierTeamB(strafbiereB.toLong())
-            .addAllSpectators(playerManager.Spectators.toGRPC())
             .setRoundPhase(roundPhase)
             .setRuleConfig(ruleConfig.toGrpc())
             .build()

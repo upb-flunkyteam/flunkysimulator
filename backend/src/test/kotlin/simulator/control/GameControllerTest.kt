@@ -84,9 +84,9 @@ internal class GameControllerTest {
 
         assertEquals(
             true,
-            gameController.playerManager.setPlayerTeam("hans", EnumTeams.SPECTATOR_TEAMS)
+            gameController.playerController.setPlayerTeam("hans", EnumTeams.SPECTATOR_TEAMS)
         )
         assert(!gameController.gameState.getAbgegeben(hans))
-        assert(gameController.playerManager.getPlayer("hans")?.team == Team.Spectator)
+        assert(gameController.playerController.getPlayer("hans")?.team == Team.Spectator)
     }
 }

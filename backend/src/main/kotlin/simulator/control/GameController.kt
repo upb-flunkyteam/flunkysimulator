@@ -3,7 +3,6 @@ package simulator.control
 import de.flunkyteam.endpoints.projects.simulator.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import simulator.shuffleSplitList
 import simulator.model.game.*
 import simulator.model.video.VideoInstructions
 import simulator.model.video.VideoType
@@ -26,9 +25,7 @@ class GameController(
 
     private val gameStateLock = handlerLock
 
-    val playerManager = PlayerManager(
-        gameStateLock,
-        this::publishGamestateUpdate,
+    val playerController = PlayerController(
         this::handleRemovalOfPlayerFromTeamAndUpdate,
         playerList.toMutableList()
     )
@@ -59,7 +56,7 @@ class GameController(
             if (state.throwingPlayer == null || name != state.throwingPlayer)
                 return EnumThrowRespStatus.THROW_STATUS_NOT_THROWING_PLAYER
 
-            val player = playerManager.getPlayer(state.throwingPlayer)
+            val player = playerController.getPlayer(state.throwingPlayer)
                 ?: return EnumThrowRespStatus.THROW_STATUS_NOT_THROWING_PLAYER
 
             if (state.roundPhase == EnumRoundPhase.RESTING_PHASE) {
@@ -167,7 +164,7 @@ class GameController(
 
     fun forceThrowingPlayer(name: String): Boolean {
         gameStateLock.withLock {
-            val player = playerManager.getPlayer(name) ?: return false
+            val player = playerController.getPlayer(name) ?: return false
             val playerTeam = player.team
             val throwingPhase = playerTeam.toThrowingPhase()
             if (throwingPhase == EnumRoundPhase.UNKNOWN_PHASE) return false
@@ -219,7 +216,7 @@ class GameController(
     fun resetGameAndShuffleTeams(): Boolean {
         gameStateLock.withLock {
 
-            val (teamA,teamB) =playerManager.shuffleTeams()
+            val (teamA,teamB) =playerController.shuffleTeams()
 
             // determine starting team
             val startingTeam = when {
@@ -254,16 +251,16 @@ class GameController(
     fun setAbgegeben(judgeName: String, targetName: String, abgegeben: Boolean): EnumAbgegebenRespStatus {
         gameStateLock.withLock {
             val player =
-                playerManager.getPlayer(targetName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_TARGET
+                playerController.getPlayer(targetName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_TARGET
             val judge =
-                playerManager.getPlayer(judgeName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_JUDGE
+                playerController.getPlayer(judgeName) ?: return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_UNKNOWN_JUDGE
 
             if (abgegeben && player.team == judge.team)
                 return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_OWN_TEAM
 
             // check if team has won
             var newState = gameState.setAbgegeben(player, abgegeben)
-            if (playerManager.getTeam(player.team).all { newState.getAbgegeben(it) }
+            if (playerController.getTeam(player.team).all { newState.getAbgegeben(it) }
                 && newState.getStrafbier(player.team) == 0) {
                 newState = newState
                     .setRoundPhase(
@@ -273,7 +270,7 @@ class GameController(
                             else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR
                         }
                     )
-                playerManager.registerTeamWin(player.team)
+                playerController.registerTeamWin(player.team)
             }
 
             gameState = newState
@@ -284,19 +281,19 @@ class GameController(
     private fun getNextThrowingPlayer(team: Team): Player? {
         //if there is no previous thrower for a team or they have left start with first
         val previousThrower = if (lastThrowingPlayer.containsKey(team)
-            || !playerManager.allPlayers.contains(lastThrowingPlayer[team])
+            || !playerController.allPlayers.contains(lastThrowingPlayer[team])
         )
             lastThrowingPlayer[team]
         else
-            return playerManager.getTeam(team).firstOrNull()
+            return playerController.getTeam(team).firstOrNull()
 
-        val activeTeamWithIndex = playerManager.allPlayers
+        val activeTeamWithIndex = playerController.allPlayers
             .mapIndexed { index, player -> player to index }
             .filter { p -> p.first.team == team && !gameState.getAbgegeben(p.first) }
         // by indexing over all players instead of just one team,
         // we can handle player switching teams
 
-        val indexOfLast = playerManager.allPlayers.indexOf(previousThrower)
+        val indexOfLast = playerController.allPlayers.indexOf(previousThrower)
 
         if (activeTeamWithIndex.isEmpty())
             return null
@@ -334,7 +331,7 @@ class GameController(
     // -- Debug functions --
     fun hardReset() {
         gameStateLock.withLock {
-            playerManager.reset()
+            playerController.reset()
             gameState = GameState()
         }
     }

@@ -3,6 +3,7 @@ package simulator.control
 import org.springframework.web.util.HtmlUtils
 import de.flunkyteam.endpoints.projects.simulator.*
 import simulator.model.Player
+import simulator.model.game.GameState
 import simulator.model.game.Team
 import simulator.model.game.toKotlin
 import simulator.shuffleSplitList
@@ -11,13 +12,14 @@ import kotlin.concurrent.withLock
 import kotlin.random.Random
 
 
-class PlayerManager(
-    private val playersLock: ReentrantLock,
-    private val triggerGamestateUpdate: () -> Unit,
-    private val handleRemovalOfPlayerFromTeamAndUpdate:(Player) -> Unit,
+class PlayerController(
+    private val handleRemovalOfPlayerAndUpdate:(Player) -> Unit,
     private val players: MutableList<Player> = mutableListOf()
-) {
+): EventControllerBase<PlayerController.PlayersEvent>() {
 
+    data class PlayersEvent(val players: List<Player>)
+
+    private val playersLock = handlerLock
 
     val allPlayers: List<Player>
             get() = players.toList()
@@ -30,6 +32,10 @@ class PlayerManager(
     val Spectators: List<Player>
         get() = players.filter { p -> p.team == Team.Spectator }
 
+    private fun triggerUpdate(){
+        PlayersEvent(allPlayers)
+    }
+
     fun getPlayer(name: String?) = this.players.firstOrNull { player -> player.name == name }
 
     fun getTeam(team: Team) = when (team) {
@@ -40,17 +46,13 @@ class PlayerManager(
 
     data class LoginResp(val status: EnumLoginStatus, val registeredName: String = "")
 
-    private fun prepareNewName(name: String): String? {
-        if (name.isEmpty())
-            return null
-
-        val escapedAndTrimmedName = HtmlUtils.htmlEscape(name.trim())
-        return escapedAndTrimmedName
-    }
-
     fun registerPlayer(name: String): LoginResp {
-        val newName = prepareNewName(name)
-            ?: return LoginResp(EnumLoginStatus.LOGIN_STATUS_EMPTY)
+
+        if (name.isEmpty())
+            return LoginResp(EnumLoginStatus.LOGIN_STATUS_EMPTY)
+
+        val newName = HtmlUtils.htmlEscape(name.trim())
+
 
         playersLock.withLock {
             val player = Player(newName)
@@ -60,7 +62,6 @@ class PlayerManager(
             else
                 players.add(player)
 
-            triggerGamestateUpdate()
             return LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, newName)
         }
     }
@@ -69,7 +70,7 @@ class PlayerManager(
         playersLock.withLock {
             val player = getPlayer(name) ?: return false
             players.remove(player)
-            handleRemovalOfPlayerFromTeamAndUpdate(player)
+            handleRemovalOfPlayerAndUpdate(player)
             return true
         }
     }
@@ -78,7 +79,7 @@ class PlayerManager(
             val player = getPlayer(name) ?: return false
             player.team = team.toKotlin()
 
-            handleRemovalOfPlayerFromTeamAndUpdate(player)
+            handleRemovalOfPlayerAndUpdate(player)
 
             return true
         }
@@ -88,16 +89,7 @@ class PlayerManager(
         if (it.team == team)
             it.wonGames += 1
 
-        this.triggerUpdateIfRequired()
-    }
-
-    private fun triggerUpdateIfRequired() {
-        // the call to player manager was direct if there was no previous locking
-        // therefore we need to make the changes known by ourself and can't trust the calling function
-        // to do that for us
-        if (playersLock.holdCount == 1) {
-            this.triggerGamestateUpdate()
-        }
+        this.triggerUpdate()
     }
 
 
@@ -109,7 +101,7 @@ class PlayerManager(
         val teamA = if (randBool) newPlayers1 else newPlayers2
 
         players.forEach { it.team = if(teamA.contains(it)) Team.A else Team.B }
-
+//todo
         return (this.TeamA to this.TeamB)
     }
 

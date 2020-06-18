@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package endpoints.flunky.simulator;
+
+import "google/protobuf/empty.proto";
+
+import "game_objects.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "Players";
+option java_package = "de.flunkyteam.endpoints.projects.simulator";
+
+
+service PlayerService {
+
+  rpc RegisterPlayer(RegisterPlayerReq) returns (RegisterPlayerResp);
+
+  rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
+
+  rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
+
+  //todo stream players
+
+}
+
+message SwitchTeamResp{};
+
+message SwitchTeamReq{
+  string playerName = 1;
+  string targetName = 2;
+  EnumTeams targetTeam = 3;
+}
+
+message KickPlayerResp{};
+
+message KickPlayerReq{
+  string playerName = 1;
+  string targetName = 2;
+}
+
+
+message RegisterPlayerResp{
+  EnumLoginStatus status = 1;
+  string registeredName = 2;
+}
+
+message RegisterPlayerReq{
+  string playerName = 1;
+}
+
+enum EnumLoginStatus{
+  LOGIN_STATUS_UNKNOWN = 0;
+  LOGIN_STATUS_SUCCESS = 1;
+  // The desired name is already taken.
+  LOGIN_STATUS_NAME_TAKEN = 2;
+  // The given secret does not match
+  LOGIN_STATUS_SECRET_MISMATCH = 3;
+  // The name is empty
+  LOGIN_STATUS_EMPTY = 4;
+}
+
+message Player{
+  string name = 1;
+  bool abgegeben = 2;
+  int64 wonGames = 10;
+}

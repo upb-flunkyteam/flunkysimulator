@@ -7,10 +7,7 @@ option java_outer_classname = "GameObjects";
 option java_package = "de.flunkyteam.endpoints.projects.simulator";
 
 message GameState{
-  repeated Player playerTeamA = 1;
-  repeated Player playerTeamB = 2;
-  repeated Player spectators = 3;
-
+  repeated string abgegeben = 6;
   EnumRoundPhase roundPhase = 7;
   RuleConfig ruleConfig = 8;
 
@@ -23,11 +20,6 @@ message RuleConfig{
   int64 restingPeriodLength = 1;
 }
 
-message Player{
-  string name = 1;
-  bool abgegeben = 2;
-  int64 wonGames = 10;
-}
 
 enum EnumRoundPhase{
   UNKNOWN_PHASE = 0;

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package endpoints.flunky.simulator;
+
+import "google/protobuf/empty.proto";
+
+import "game_objects.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "Client";
+option java_package = "de.flunkyteam.endpoints.projects.simulator";
+
+
+service ClientService{
+  rpc ClientStream(ClientStreamReq) returns (stream ClientStreamResp);
+}
+
+message ClientStreamReq{
+
+}
+
+message ClientStreamResp{
+  oneof event_oneof {
+    ClientRegisterd clientRegisterd = 1;
+    AliveChallenge aliveChallenge = 2;
+  }
+}
+
+message ClientRegisterd{
+  string secret = 1;
+}
+
+message AliveChallenge{}

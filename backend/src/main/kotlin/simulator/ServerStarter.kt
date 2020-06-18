@@ -5,7 +5,9 @@ import io.grpc.ServerBuilder
 import simulator.control.GameController
 import simulator.control.MessageController
 import simulator.control.VideoController
-import simulator.view.FlunkyServer
+import simulator.view.FlunkyService
+import simulator.view.PlayerService
+import simulator.view.VideoService
 import java.io.IOException
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -31,16 +33,25 @@ class ServerStarter {
         val messageController = MessageController()
         val videoController = VideoController(videoListUrl)
         val gameController = GameController(videoController, messageController)
-        val flunkyServer = FlunkyServer(gameController, messageController, videoController)
 
         // debug print
         gameController.addEventHandler { println(it) }
         messageController.addEventHandler { println(it) }
+        gameController.playerController.addEventHandler { print(it) }
+
+
+        val flunkyService = FlunkyService(gameController, messageController)
+        val playerService = PlayerService(gameController.playerController,messageController)
+        val videoService = VideoService(videoController)
+
 
         server = ServerBuilder.forPort(port)
-            .addService(flunkyServer)
+            .addService(flunkyService)
+            .addService(playerService)
+            .addService(videoService)
             .build()
             .start()
+
         logger.log(Level.INFO, "Server started, listening on {0}", port)
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
