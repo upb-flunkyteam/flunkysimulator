@@ -14,10 +14,10 @@ import kotlin.random.Random
 class PlayerManager(
     private val playersLock: ReentrantLock,
     private val triggerGamestateUpdate: () -> Unit,
-    private val handleRemovalOfPlayerFromTeamAndUpdate:(Player) -> Unit
+    private val handleRemovalOfPlayerFromTeamAndUpdate:(Player) -> Unit,
+    private val players: MutableList<Player> = mutableListOf()
 ) {
 
-    private val players: MutableList<Player> = mutableListOf()
 
     val allPlayers: List<Player>
             get() = players.toList()

@@ -17,7 +17,8 @@ import simulator.model.Player
 class GameController(
     private val videoController: VideoController,
     private val messageController: MessageController,
-    initGamestate: GameState = GameState()
+    initGamestate: GameState = GameState(),
+    playerList: List<Player> = emptyList()
 ) :
     EventControllerBase<GameController.GameStateEvent>() {
 
@@ -28,7 +29,8 @@ class GameController(
     val playerManager = PlayerManager(
         gameStateLock,
         this::publishGamestateUpdate,
-        this::handleRemovalOfPlayerFromTeamAndUpdate
+        this::handleRemovalOfPlayerFromTeamAndUpdate,
+        playerList.toMutableList()
     )
 
     var gameState = initGamestate
@@ -231,7 +233,7 @@ class GameController(
 
             gameState = GameState(
                 throwingPlayer = startingTeam.firstOrNull()?.name,
-                abgegeben = emptySet()
+                abgegeben = emptyList()
             )
 
             videoController.playVideos(
@@ -261,7 +263,7 @@ class GameController(
 
             // check if team has won
             var newState = gameState.setAbgegeben(player, abgegeben)
-            if (playerManager.getTeam(player.team).all { gameState.getAbgegeben(it) }
+            if (playerManager.getTeam(player.team).all { newState.getAbgegeben(it) }
                 && newState.getStrafbier(player.team) == 0) {
                 newState = newState
                     .setRoundPhase(

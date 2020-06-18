@@ -10,7 +10,7 @@ data class GameState(
     val roundPhase: EnumRoundPhase = EnumRoundPhase.NO_ACTIVE_GAME_PHASE,
     val strafbiereA: Int = 0,
     val strafbiereB: Int = 0,
-    val abgegeben: Set<Player> = emptySet(),
+    val abgegeben: List<Player> = emptyList(),
     val ruleConfig: RuleConfig = RuleConfig()
 ) {
 
