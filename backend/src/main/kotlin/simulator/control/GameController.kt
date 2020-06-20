@@ -213,10 +213,11 @@ class GameController(
     }
 
 
-    fun resetGameAndShuffleTeams(): Boolean {
+    fun resetGame(): Boolean {
         gameStateLock.withLock {
 
-            val (teamA,teamB) =playerController.shuffleTeams()
+            val teamA = playerController.TeamA
+            val teamB = playerController.TeamB
 
             // determine starting team
             val startingTeam = when {
@@ -311,7 +312,7 @@ class GameController(
         }
     }
 
-    private fun handleRemovalOfPlayerFromTeamAndUpdate(player: Player) {
+    fun handleRemovalOfPlayerFromTeamAndUpdate(player: Player) {
 
         var newGameState = gameState.setAbgegeben(player, false)
 

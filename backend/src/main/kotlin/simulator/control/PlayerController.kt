@@ -3,38 +3,47 @@ package simulator.control
 import org.springframework.web.util.HtmlUtils
 import de.flunkyteam.endpoints.projects.simulator.*
 import simulator.model.Player
-import simulator.model.game.GameState
 import simulator.model.game.Team
 import simulator.model.game.toKotlin
 import simulator.shuffleSplitList
-import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 
-
+/**
+ * @param handleRemovalOfPlayer Function is called when a player is removed from a team. This might be relevant for the game
+ * state. eg. if they are the trowing player.
+ */
 class PlayerController(
-    private val handleRemovalOfPlayerAndUpdate:(Player) -> Unit,
+    private val handleRemovalOfPlayer: (Player) -> Unit,
     private val players: MutableList<Player> = mutableListOf()
-): EventControllerBase<PlayerController.PlayersEvent>() {
+) : EventControllerBase<PlayerController.PlayersEvent>() {
 
     data class PlayersEvent(val updateOf: Set<Team>)
 
     private val playersLock = handlerLock
 
     val allPlayers: List<Player>
-            get() = players.toList()
+        get() = players.toList()
     val activePlayers: List<Player>
-        get() = players.filter { p -> p.team == Team.A || p.team == Team.B }
+        get() {
+            playersLock.withLock { return players.filter { p -> p.team == Team.A || p.team == Team.B } }
+        }
     val TeamA: List<Player>
-        get() = players.filter { p -> p.team == Team.A }
+        get() {
+            playersLock.withLock { return players.filter { p -> p.team == Team.A } }
+        }
     val TeamB: List<Player>
-        get() = players.filter { p -> p.team == Team.B }
+        get() {
+            playersLock.withLock { return players.filter { p -> p.team == Team.B } }
+        }
     val Spectators: List<Player>
-        get() = players.filter { p -> p.team == Team.Spectator }
+        get() {
+            playersLock.withLock { return players.filter { p -> p.team == Team.Spectator } }
+        }
 
 
-    private val all = setOf(Team.A,Team.B,Team.Spectator)
-    private fun triggerUpdate(of: Set<Team> = all){
+    private val all = setOf(Team.A, Team.B, Team.Spectator)
+    private fun triggerUpdate(of: Set<Team> = all) {
         PlayersEvent(of)
     }
 
@@ -72,16 +81,17 @@ class PlayerController(
         playersLock.withLock {
             val player = getPlayer(name) ?: return false
             players.remove(player)
-            handleRemovalOfPlayerAndUpdate(player)
+            handleRemovalOfPlayer(player)
             return true
         }
     }
+
     internal fun setPlayerTeam(name: String, team: EnumTeams): Boolean {
         playersLock.withLock {
             val player = getPlayer(name) ?: return false
             player.team = team.toKotlin()
 
-            handleRemovalOfPlayerAndUpdate(player)
+            handleRemovalOfPlayer(player)
 
             return true
         }
@@ -95,16 +105,16 @@ class PlayerController(
     }
 
 
-    internal fun shuffleTeams(): Pair<List<Player>, List<Player>> {
-        val (newPlayers1, newPlayers2) = players.shuffleSplitList()
+    internal fun shuffleTeams() {
+        playersLock.withLock {
+            val (newPlayers1, newPlayers2) = players.shuffleSplitList()
 
-        // without this random bool one team would always be the larger one
-        val randBool = Random.nextBoolean()
-        val teamA = if (randBool) newPlayers1 else newPlayers2
+            // without this random bool one team would always be the larger one
+            val randBool = Random.nextBoolean()
+            val teamA = if (randBool) newPlayers1 else newPlayers2
 
-        players.forEach { it.team = if(teamA.contains(it)) Team.A else Team.B }
-//todo
-        return (this.TeamA to this.TeamB)
+            players.forEach { it.team = if (teamA.contains(it)) Team.A else Team.B }
+        }
     }
 
     internal fun reset() {

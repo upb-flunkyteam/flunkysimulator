@@ -44,8 +44,8 @@ class PlayerService(
         responseObserver?.onCompleted()
     }
 
-    override fun switchTeam(request: SwitchTeamReq?, responseObserver: StreamObserver<SwitchTeamResp>?) {
-        val name = request!!.targetName
+    override fun switchTeam(request: SwitchTeamReq, responseObserver: StreamObserver<SwitchTeamResp>) {
+        val name = request.targetName
         val team = request.targetTeam
 
         if (request.playerName.isNotBlank() && playerController.setPlayerTeam(name, team))
@@ -53,8 +53,21 @@ class PlayerService(
         else
             messageController.sendMessage(request.playerName, "konnte ${name} nicht verschieben.")
 
-        responseObserver?.onNext(SwitchTeamResp.getDefaultInstance())
-        responseObserver?.onCompleted()
+        responseObserver.onNext(SwitchTeamResp.getDefaultInstance())
+        responseObserver.onCompleted()
+    }
+
+    override fun shuffleTeams(request: ShuffleTeamsReq, responseObserver: StreamObserver<ShuffleTeamsResp>) {
+        val name = request.playerName
+
+        if (request.playerName.isNotBlank() && playerController.getPlayer(name) != null) {
+            playerController.shuffleTeams()
+            messageController.sendMessage(request.playerName, "hat die Teams neu gemischt.")
+        } else
+            messageController.sendMessage(request.playerName, "konnte die teams nicht neu mischen.")
+
+        responseObserver.onNext(ShuffleTeamsResp.getDefaultInstance())
+        responseObserver.onCompleted()
     }
 
     override fun streamAllPlayers(request: Empty?, responseObserver: StreamObserver<PlayerListResp>?) {
@@ -67,7 +80,7 @@ class PlayerService(
 
 
         val handler =
-            buildRegisterHandler { event: PlayerController.PlayersEvent ->
+            buildRegisterHandler { _: PlayerController.PlayersEvent ->
                 responseObserver?.onNext(
                     PlayerListResp.newBuilder()
                         .addAllPlayers(playerController.allPlayers.map { it.toGRPC() })

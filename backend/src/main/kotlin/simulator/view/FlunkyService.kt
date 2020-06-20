@@ -74,7 +74,7 @@ class FlunkyService(
 
     override fun resetGame(request: ResetGameReq, responseObserver: StreamObserver<ResetGameResp>?) {
 
-        if (request.playerName.isNotBlank() && gameController.resetGameAndShuffleTeams())
+        if (request.playerName.isNotBlank() && gameController.resetGame())
             messageController.sendMessage(
                 request.playerName,
                 "hat den Ground neu ausgemessen, die Kreide nachgezeichnet, die Center nachgefüllt und den Ball aufgepumt."

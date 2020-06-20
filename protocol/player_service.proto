@@ -19,6 +19,8 @@ service PlayerService {
 
   rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
 
+  rpc ShuffleTeams(ShuffleTeamsReq) returns (ShuffleTeamsResp);
+
   rpc StreamAllPlayers(google.protobuf.Empty) returns (PlayerListResp);
 
   rpc StreamTeamAPlayers(google.protobuf.Empty) returns (PlayerListResp);
@@ -27,6 +29,11 @@ service PlayerService {
 
   rpc StreamSpectators(google.protobuf.Empty) returns (PlayerListResp);
 
+}
+message ShuffleTeamsResp{}
+
+message ShuffleTeamsReq{
+  string playerName = 1;
 }
 
 message PlayerListResp{
