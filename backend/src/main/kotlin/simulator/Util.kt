@@ -2,6 +2,7 @@ package simulator
 
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
+import java.security.SecureRandom
 import kotlin.random.Random
 
 fun <E> List<E>.shuffleSplitList(): Pair<List<E>, List<E>> {
@@ -44,3 +45,11 @@ fun <Event> buildRegisterHandler(action: (Event) -> Unit): DeactiveableHandler<E
                 throw e
         }
     })
+
+
+private val random = SecureRandom()
+private val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+fun getRandomString(size: Int) = (1..size)
+    .map { _ -> random.nextInt(charPool.size) }
+    .map(charPool::get)
+    .joinToString("")

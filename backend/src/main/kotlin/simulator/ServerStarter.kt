@@ -2,9 +2,11 @@ package simulator
 
 import io.grpc.Server
 import io.grpc.ServerBuilder
+import simulator.control.ClientManager
 import simulator.control.GameController
 import simulator.control.MessageController
 import simulator.control.VideoController
+import simulator.view.ClientService
 import simulator.view.FlunkyService
 import simulator.view.PlayerService
 import simulator.view.VideoService
@@ -33,6 +35,7 @@ class ServerStarter {
         val messageController = MessageController()
         val videoController = VideoController(videoListUrl)
         val gameController = GameController(videoController, messageController)
+        val clientManager = ClientManager()
 
         // debug print
         gameController.addEventHandler { println(it) }
@@ -41,14 +44,16 @@ class ServerStarter {
 
 
         val flunkyService = FlunkyService(gameController, messageController)
-        val playerService = PlayerService(gameController.playerController,messageController)
+        val playerService = PlayerService(gameController.playerController,messageController,clientManager)
         val videoService = VideoService(videoController)
+        val clientService = ClientService(clientManager)
 
 
         server = ServerBuilder.forPort(port)
             .addService(flunkyService)
             .addService(playerService)
             .addService(videoService)
+            .addService(clientService)
             .build()
             .start()
 

@@ -20,25 +20,25 @@ class PlayerController(
 
     data class PlayersEvent(val updateOf: Set<Team>)
 
-    private val playersLock = handlerLock
+    private val playerListLock = handlerLock
 
     val allPlayers: List<Player>
         get() = players.toList()
     val activePlayers: List<Player>
         get() {
-            playersLock.withLock { return players.filter { p -> p.team == Team.A || p.team == Team.B } }
+            playerListLock.withLock { return players.filter { p -> p.team == Team.A || p.team == Team.B } }
         }
     val TeamA: List<Player>
         get() {
-            playersLock.withLock { return players.filter { p -> p.team == Team.A } }
+            playerListLock.withLock { return players.filter { p -> p.team == Team.A } }
         }
     val TeamB: List<Player>
         get() {
-            playersLock.withLock { return players.filter { p -> p.team == Team.B } }
+            playerListLock.withLock { return players.filter { p -> p.team == Team.B } }
         }
     val Spectators: List<Player>
         get() {
-            playersLock.withLock { return players.filter { p -> p.team == Team.Spectator } }
+            playerListLock.withLock { return players.filter { p -> p.team == Team.Spectator } }
         }
 
 
@@ -65,7 +65,7 @@ class PlayerController(
         val newName = HtmlUtils.htmlEscape(name.trim())
 
 
-        playersLock.withLock {
+        playerListLock.withLock {
             val player = Player(newName)
 
             if (players.any { it.name == newName })
@@ -78,7 +78,7 @@ class PlayerController(
     }
 
     fun removePlayer(name: String?): Boolean {
-        playersLock.withLock {
+        playerListLock.withLock {
             val player = getPlayer(name) ?: return false
             players.remove(player)
             handleRemovalOfPlayer(player)
@@ -87,7 +87,7 @@ class PlayerController(
     }
 
     internal fun setPlayerTeam(name: String, team: EnumTeams): Boolean {
-        playersLock.withLock {
+        playerListLock.withLock {
             val player = getPlayer(name) ?: return false
             player.team = team.toKotlin()
 
@@ -106,7 +106,7 @@ class PlayerController(
 
 
     internal fun shuffleTeams() {
-        playersLock.withLock {
+        playerListLock.withLock {
             val (newPlayers1, newPlayers2) = players.shuffleSplitList()
 
             // without this random bool one team would always be the larger one

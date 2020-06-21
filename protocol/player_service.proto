@@ -79,5 +79,13 @@ enum EnumLoginStatus{
 message Player{
   string name = 1;
   bool abgegeben = 2;
+  EnumConnectionStatus connectionStatus = 5;
   int64 wonGames = 10;
+}
+
+enum EnumConnectionStatus{
+  CONNECTION_UNKNOWN = 0;
+  CONNECTION_CONNECTED = 1;
+  CONNECTION_DISCONNECTED = 2;
+
 }
