@@ -1,7 +1,9 @@
 package simulator.control
 
+import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
+import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import org.springframework.web.util.HtmlUtils
-import de.flunkyteam.endpoints.projects.simulator.*
+import simulator.model.Client
 import simulator.model.Player
 import simulator.model.game.Team
 import simulator.model.game.toKotlin
@@ -15,7 +17,8 @@ import kotlin.random.Random
  */
 class PlayerController(
     private val handleRemovalOfPlayer: (Player) -> Unit,
-    private val players: MutableList<Player> = mutableListOf()
+    private val players: MutableList<Player> = mutableListOf(),
+    val clientManager: ClientManager
 ) : EventControllerBase<PlayerController.PlayersEvent>() {
 
     data class PlayersEvent(val updateOf: Set<Team>)
@@ -57,23 +60,27 @@ class PlayerController(
 
     data class LoginResp(val status: EnumLoginStatus, val registeredName: String = "")
 
-    fun registerPlayer(name: String): LoginResp {
+    fun registerPlayer(name: String, client: Client?): LoginResp {
 
         if (name.isEmpty())
             return LoginResp(EnumLoginStatus.LOGIN_STATUS_EMPTY)
 
         val newName = HtmlUtils.htmlEscape(name.trim())
 
-
         playerListLock.withLock {
-            val player = Player(newName)
-
-            if (players.any { it.name == newName })
-                return LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN, newName)
-            else
+            return getPlayer(newName)?.let { existingPlayer ->
+                if (client != null && clientManager.registerPlayer(existingPlayer, client)
+                    || client == null)
+                    LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN, newName)
+                else
+                    LoginResp(EnumLoginStatus.LOGIN_STATUS_PLAYER_TAKEN, newName)
+            } ?: let {
+                val player = Player(newName)
                 players.add(player)
 
-            return LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, newName)
+                LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, newName)
+            }
+
         }
     }
 

@@ -20,7 +20,9 @@ class PlayerService(
     override fun registerPlayer(request: RegisterPlayerReq, responseObserver: StreamObserver<RegisterPlayerResp>) {
         val name = request.playerName
 
-        val loginStatus = playerController.registerPlayer(name)
+        val client = CLIENT_CTX_KEY.get()
+
+        val loginStatus = playerController.registerPlayer(name, client)
 
         if (loginStatus.status == EnumLoginStatus.LOGIN_STATUS_SUCCESS)
             messageController.sendMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")

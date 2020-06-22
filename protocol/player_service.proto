@@ -70,8 +70,8 @@ enum EnumLoginStatus{
   LOGIN_STATUS_SUCCESS = 1;
   // The desired name is already taken.
   LOGIN_STATUS_NAME_TAKEN = 2;
-  // The given secret does not match
-  LOGIN_STATUS_SECRET_MISMATCH = 3;
+  // The player is already assigned to a client
+  LOGIN_STATUS_PLAYER_TAKEN = 3;
   // The name is empty
   LOGIN_STATUS_EMPTY = 4;
 }

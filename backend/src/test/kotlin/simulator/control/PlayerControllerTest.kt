@@ -13,21 +13,22 @@ internal class PlayerControllerTest{
     fun dryRun(){
         val messageController = mockk<MessageController>()
         val videoController = mockk<VideoController>()
-        val gameController = GameController(videoController, messageController)
+        val clientManager = mockk<ClientManager>()
+        val gameController = GameController(videoController, messageController,clientManager)
 
         val playerController = gameController.playerController
 
-        val res1 =  playerController.registerPlayer("hans")
+        val res1 =  playerController.registerPlayer("hans",null)
         assertEquals(PlayerController.LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS,"hans"),
             res1)
 
-        val res2 = playerController.registerPlayer("hans")
+        val res2 = playerController.registerPlayer("hans",null)
         assertEquals(PlayerController.LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN,"hans"),
             res2)
 
-        playerController.registerPlayer("lola")
-        playerController.registerPlayer("peter")
-        playerController.registerPlayer("anna")
+        playerController.registerPlayer("lola",null)
+        playerController.registerPlayer("peter",null)
+        playerController.registerPlayer("anna",null)
 
         val hans = playerController.getPlayer("hans")
         assertNotNull(hans)

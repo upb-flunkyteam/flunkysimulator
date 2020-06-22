@@ -16,6 +16,7 @@ import simulator.model.Player
 class GameController(
     private val videoController: VideoController,
     private val messageController: MessageController,
+    clientManager: ClientManager,
     initGamestate: GameState = GameState(),
     playerList: List<Player> = emptyList()
 ) :
@@ -27,7 +28,8 @@ class GameController(
 
     val playerController = PlayerController(
         this::handleRemovalOfPlayerFromTeamAndUpdate,
-        playerList.toMutableList()
+        playerList.toMutableList(),
+        clientManager
     )
 
     var gameState = initGamestate

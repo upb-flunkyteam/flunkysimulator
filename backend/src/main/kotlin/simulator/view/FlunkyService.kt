@@ -11,7 +11,7 @@ import simulator.model.game.positionalName
 class FlunkyService(
     private val gameController: GameController,
     private val messageController: MessageController
-) : SimulatorGrpc.SimulatorImplBase() {
+) : FlunkyServiceGrpc.FlunkyServiceImplBase() {
 
     override fun throw_(request: ThrowReq?, responseObserver: StreamObserver<ThrowResp>?) {
 

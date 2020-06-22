@@ -14,6 +14,19 @@ import simulator.model.game.Team
 
 internal class GameControllerTest {
 
+
+
+    private fun gameController(
+        state: GameState,
+        players: List<Player>
+    ): GameController {
+        val messageController = mockk<MessageController>()
+        val videoController = mockk<VideoController>()
+        val clientManager = mockk<ClientManager>()
+        val gameController = GameController(videoController, messageController, clientManager, state, players)
+        return gameController
+    }
+
     @Test
     fun `detect winning team on abgabe`() {
 
@@ -31,9 +44,7 @@ internal class GameControllerTest {
         )
 
 
-        val messageController = mockk<MessageController>()
-        val videoController = mockk<VideoController>()
-        val gameController = GameController(videoController, messageController, state,players)
+        val gameController = gameController(state, players)
 
         val abgegebenResult = gameController.setAbgegeben("peter1", hans.name, true)
 
@@ -58,10 +69,7 @@ internal class GameControllerTest {
             roundPhase = EnumRoundPhase.TEAM_A_THROWING_PHASE
         )
 
-
-        val messageController = mockk<MessageController>()
-        val videoController = mockk<VideoController>()
-        val gameController = GameController(videoController, messageController, state,players)
+        val gameController = gameController(state,players)
 
         assertEquals(
             EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS,
@@ -77,10 +85,7 @@ internal class GameControllerTest {
         val hans = Player("hans", team = Team.B)
         val gameState = GameState(abgegeben = listOf(hans))
 
-        val messageController = mockk<MessageController>()
-        val videoController = mockk<VideoController>()
-
-        val gameController = GameController(videoController, messageController, gameState, listOf(hans))
+        val gameController = gameController( gameState, listOf(hans))
 
         assertEquals(
             true,

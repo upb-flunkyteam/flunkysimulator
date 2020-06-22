@@ -1,13 +1,14 @@
 package simulator.view
 
 import io.grpc.*
+import simulator.control.ClientManager
 import java.util.logging.Logger
 
 
 /**
- * A interceptor to handle server header.
+ * A interceptor to handle client secret header.
  */
-class ClientAuthenticationInterceptor : ServerInterceptor {
+class ClientAuthenticationInterceptor(private val clientManager: ClientManager) : ServerInterceptor {
     override fun <ReqT, RespT> interceptCall(
         call: ServerCall<ReqT, RespT>,
         requestHeaders: Metadata,
@@ -16,11 +17,22 @@ class ClientAuthenticationInterceptor : ServerInterceptor {
 
         logger.info("header received from client:$requestHeaders")
 
-        call.close(Status.UNAUTHENTICATED.withDescription("no or unknown secret"),requestHeaders)
+        val secret = requestHeaders.get(CLIENT_SECRET_KEY)
 
-        //TODO get client and put in context
+        if (secret == null) {
+            call.close(Status.UNAUTHENTICATED.withDescription("no or unknown secret"), requestHeaders)
+            return object : ServerCall.Listener<ReqT>() {} //dummy object https://github.com/grpc/grpc-java/issues/3298
+        }
 
-        return next.startCall(call,requestHeaders)
+        val client = clientManager.getClient(secret)
+        if (client == null){
+            call.close(Status.UNAUTHENTICATED.withDescription("unknown secret"), requestHeaders)
+            return object : ServerCall.Listener<ReqT>() {} //dummy object https://github.com/grpc/grpc-java/issues/3298
+        }
+
+        val context = Context.current().withValue(CLIENT_CTX_KEY, client)
+
+        return Contexts.interceptCall(context, call, requestHeaders, next)
     }
 
     private val logger =
