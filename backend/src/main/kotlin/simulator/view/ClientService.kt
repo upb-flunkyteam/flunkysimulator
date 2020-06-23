@@ -4,7 +4,9 @@ import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
+import simulator.ServerStarter
 import simulator.control.ClientManager
+import java.util.logging.Logger
 
 class ClientService(private val clientManager: ClientManager): ClientServiceGrpc.ClientServiceImplBase(){
 
@@ -20,19 +22,22 @@ class ClientService(private val clientManager: ClientManager): ClientServiceGrpc
                 success = true
             } catch (e: StatusRuntimeException) {
                 if (e.status.code == Status.Code.CANCELLED) {
-                    println("A client was poked and found dead. Message: \n ${e.message}")
+                    logger.info("A client was poked and found dead. Message: \n ${e.message}")
                 } else
                     throw e
             }
             success
         }
 
-        val secret = clientManager.registerClient (aliveChallenge)
+        val client = clientManager.registerClient (aliveChallenge)
 
         responseObserver.onNext(ClientStreamResp.newBuilder()
             .setClientRegisterd(ClientRegisterd.newBuilder()
-                .setSecret(secret)
+                .setSecret(client.secret)
                 .build())
             .build())
     }
 }
+
+private val logger = Logger.getLogger(ClientService::class.simpleName)
+

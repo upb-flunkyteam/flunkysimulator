@@ -41,12 +41,15 @@ class ClientManager {
 
     fun getClient(secret: String): Client? = clients.firstOrNull { it.secret == secret }
 
-    fun registerClient(isAliveChallenge: () -> Boolean): String {
+    /**
+     * @return secret of the client
+     */
+    fun registerClient(isAliveChallenge: () -> Boolean): Client {
         clientLock.withLock {
             val client = Client(getRandomString(10))
             clients = clients + client
             idsToAliveChallenges = idsToAliveChallenges + (client.id to isAliveChallenge)
-            return client.secret
+            return client
         }
     }
 
