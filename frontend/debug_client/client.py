@@ -25,13 +25,14 @@ players = 'hans jurgen marie lola jana'.split()
 req = clientService.ClientStreamReq()
 clientStream = clientStub.ClientStream(req)
 secret = clientStream.next().clientRegisterd.secret
+metadataSecret = [('client_secret_key',secret)]
 
       
 def registerPlayer(name):
   req = playerService.RegisterPlayerReq()
   req.playerName = name
 
-  return playerStub.RegisterPlayer(req)
+  return playerStub.RegisterPlayer(req,metadata=metadataSecret)
 
 def kickPlayer(name):
   req = flunkyService.KickPlayerReq()

@@ -2,6 +2,7 @@ package simulator.view
 
 import io.grpc.*
 import simulator.control.ClientManager
+import java.util.logging.Level
 import java.util.logging.Logger
 
 
@@ -15,7 +16,7 @@ class ClientAuthenticationInterceptor(private val clientManager: ClientManager) 
         next: ServerCallHandler<ReqT, RespT>
     ): ServerCall.Listener<ReqT> {
 
-        logger.info("header received from client:$requestHeaders")
+        logger.log(Level.FINEST,"header received from client:$requestHeaders")
 
         val secret = requestHeaders.get(CLIENT_SECRET_KEY)
 
