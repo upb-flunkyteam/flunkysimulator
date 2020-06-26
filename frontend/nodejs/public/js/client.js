@@ -24,8 +24,15 @@ const {
     StreamVideoEventsReq, StreamVideoEventsResp
 } = require('./flunkyprotocol_pb');
 const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
+const {PlayerManager} = require('./playerManager');
+
+PlayerManager.external.sendMessage = sendMessage;
+PlayerManager.external.processNewState = function(){processNewState(currentGameState, true)};
+PlayerManager.external.toggleAbgabe = toggleAbgabe;
+PlayerManager.external.reduceStrafbierCount = reduceStrafbierCount;
+PlayerManager.external.selectThrowingPlayer = selectThrowingPlayer;
+
 var simulatorClient = null;
-var playerName = null;
 var playerTeam = null;
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
@@ -53,7 +60,7 @@ jQuery(window).load(function () {
         $('#playername').trigger("submission");
     });
     $('#playername').bind("submission", function (e) {
-        changePlayername($('#playername').val());
+        PlayerManager.changePlayername($('#playername').val());
     });
     $('#switchplayerbutton').click(function () {
         $('#registerform').show();
@@ -100,7 +107,7 @@ jQuery(window).load(function () {
     playerNameFormValue = $('#playername').val();
     if (playerNameFormValue) {
         if (confirm('Möchtest du mit dem Namen ' + playerNameFormValue + ' beitreten?')) {
-            changePlayername(playerNameFormValue);
+            PlayerManager.changePlayername(playerNameFormValue);
         }
     }
 });
@@ -135,54 +142,6 @@ function subscribeStreams() {
     });
 }
 
-function changePlayername(desiredPlayername) {
-    if (desiredPlayername === '') {
-        console.log("Warning: Cannot register empty player name");
-        return;
-    }
-
-    // Discourage false flag attacks, the player was already registered
-    playerName ? sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt') : '';
-
-    const request = new RegisterPlayerReq();
-    request.setPlayername(desiredPlayername);
-    console.log(request.toObject());
-    simulatorClient.registerPlayer(request, {}, function (err, response) {
-        if (err) {
-            console.log(err.code);
-            console.log(err.message);
-        } else {
-            response = response.toObject();
-            console.log(response);
-            switch (response.status) {
-                case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
-                case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
-                    if (response.registeredname) {
-                        playerName = response.registeredname;
-                    } else {
-                        // TODO: This is a bug in the server
-                        console.log('Got empty registered name in response.');
-                        playerName = $('<div>').text(desiredPlayername).html();
-                        console.log('Player name: ' + playerName);
-                    }
-                    $('#playername').text(playerName);
-                    $('#registerform').hide();
-                    // Force re-evaluation of game state, e.g. do I need to throw
-                    processNewState(currentGameState, true);
-                    break;
-                case EnumLoginStatus.LOGIN_STATUS_EMPTY:
-                    window.alert('Registrierung fehlgeschlagen! Dein Benutzername ist leer.');
-                    break;
-                case EnumLoginStatus.LOGIN_STATUS_SECRET_MISMATCH:
-                    window.alert('Registrierung fehlgeschlagen! Passwort falsch.');
-                    break;
-                case EnumLoginStatus.LOGIN_STATUS_UNKNOWN:
-                    window.alert('Registrierung fehlgeschlagen!');
-                    break;
-            }
-        }
-    });
-}
 
 function throwing(strength) {
     // disable the buttons so they cannot be used twice
@@ -190,7 +149,7 @@ function throwing(strength) {
     // Remove annoying flashing
     $('.actionbox').removeClass('flashingbackground');
     const request = new ThrowReq();
-    request.setPlayername(playerName);
+    request.setPlayername(PlayerManager.ownPlayerName);
     request.setStrength(strength);
     console.log(request.toObject());
     simulatorClient.throw(request, {}, function (err, response) {
@@ -203,7 +162,7 @@ function throwing(strength) {
 
 function sendMessage(content) {
     const request = new SendMessageReq();
-    request.setPlayername(playerName);
+    request.setPlayername(PlayerManager.ownPlayerName);
     request.setContent(content);
     console.log(request.toObject());
     simulatorClient.sendMessage(request, {}, function (err, response) {
@@ -214,32 +173,7 @@ function sendMessage(content) {
     });
 }
 
-function switchTeam(targetTeam, targetName) {
-    const request = new SwitchTeamReq();
-    request.setPlayername(playerName);
-    request.setTargetteam(targetTeam);
-    request.setTargetname(targetName);
-    console.log(request.toObject());
-    simulatorClient.switchTeam(request, {}, function (err, response) {
-        if (err) {
-            console.log(err.code);
-            console.log(err.message);
-        }
-    });
-}
 
-function kickPlayer(targetName) {
-    var request = new KickPlayerReq();
-    request.setPlayername(playerName);
-    request.setTargetname(targetName);
-    console.log(request.toObject());
-    simulatorClient.kickPlayer(request, {}, function (err, response) {
-        if (err) {
-            console.log(err.code);
-            console.log(err.message);
-        }
-    });
-}
 
 function increaseStrafbierCount(team) {
     modifyStrafbierCount(team, true);
@@ -252,7 +186,7 @@ function reduceStrafbierCount(team) {
 
 function modifyStrafbierCount(team, increment) {
     var request = new ModifyStrafbierCountReq();
-    request.setPlayername(playerName);
+    request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetteam(team);
     request.setIncrement(increment);
     console.log(request.toObject());
@@ -266,7 +200,7 @@ function modifyStrafbierCount(team, increment) {
 
 function selectThrowingPlayer(targetName) {
     var request = new SelectThrowingPlayerReq();
-    request.setPlayername(playerName);
+    request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetname(targetName);
     console.log(request.toObject());
     simulatorClient.selectThrowingPlayer(request, {}, function (err, response) {
@@ -279,7 +213,7 @@ function selectThrowingPlayer(targetName) {
 
 function toggleAbgabe(targetName) {
     var request = new AbgegebenReq();
-    request.setPlayername(playerName);
+    request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetname(targetName);
     players = currentGameState.playerteamaList.concat(currentGameState.playerteambList);
     players.forEach(function (player, index) {
@@ -298,7 +232,7 @@ function toggleAbgabe(targetName) {
 
 function resetGame() {
     var request = new ResetGameReq();
-    request.setPlayername(playerName);
+    request.setPlayername(PlayerManager.ownPlayerName);
     console.log(request.toObject());
     simulatorClient.resetGame(request, {}, function (err, response) {
         if (err) {
@@ -321,9 +255,9 @@ function processNewState(state, stale = false) {
         currentTeam = EnumTeams.TEAM_B_TEAMS;
     }
     playerTeam =
-        currentGameState.playerteamaList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_A_TEAMS :
-            currentGameState.playerteambList.map(a => a.name).includes(playerName) ? EnumTeams.TEAM_B_TEAMS :
-                currentGameState.spectatorsList.map(a => a.name).includes(playerName) ? EnumTeams.SPECTATOR_TEAMS :
+        currentGameState.playerteamaList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.TEAM_A_TEAMS :
+            currentGameState.playerteambList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.TEAM_B_TEAMS :
+                currentGameState.spectatorsList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.SPECTATOR_TEAMS :
                     EnumTeams.UNKNOWN_TEAMS;
 
     // TODO wont work because of  #82
@@ -338,15 +272,15 @@ function processNewState(state, stale = false) {
     $('#teamaarea, #teambarea, #spectatorarea').empty();
     currentGameState.playerteamaList.forEach(function (player, index) {
         player.team = EnumTeams.TEAM_A_TEAMS
-        $('#teamaarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteama));
+        $('#teamaarea').append(PlayerManager.generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteama));
     });
     currentGameState.playerteambList.forEach(function (player, index) {
         player.team = EnumTeams.TEAM_B_TEAMS
-        $('#teambarea').append(generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteamb));
+        $('#teambarea').append(PlayerManager.generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteamb));
     });
     currentGameState.spectatorsList.forEach(function (player, index) {
         player.team = EnumTeams.SPECTATOR_TEAMS
-        $('#spectatorarea').append(generateSpectatorHTML(player));
+        $('#spectatorarea').append(PlayerManager.generateSpectatorHTML(player));
     });
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
@@ -358,7 +292,7 @@ function processNewState(state, stale = false) {
 
 
     // Throwing player related highlighting
-    if (currentGameState.throwingplayer === playerName) {
+    if (currentGameState.throwingplayer === PlayerManager.ownPlayerName) {
         // It's my turn, display the throwing buttons!
         $('#throwactionbuttons').show();
         $('.throwbutton').prop('disabled', false);
@@ -372,7 +306,7 @@ function processNewState(state, stale = false) {
         } else {
             console.log('resting')
         }
-        document.title = `Wirf ${playerName}!`;
+        document.title = `Wirf ${PlayerManager.ownPlayerName}!`;
     } else {
         document.title = title;
         // Remove annoying flashing
@@ -560,90 +494,6 @@ function changeLowBandwidthMode() {
     }
 }
 
-function generateSpectatorHTML(player) {
-    return generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = true);
-}
-
-function generatePlayerHTML(player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = false) {
-    name = player.name;
-    isHimself = name === playerName;
-    turnClass = name === throwingPlayer ? ' btn-primary' : ' btn-default';
-    egoClass = isHimself ? ' egoplayer' : '';
-    hasAbgegebenClass = player.abgegeben ? ' disabled' : '';
-
-    // disabled for own team and not abgegeben
-    mayValidateAbgabeClass = !isOwnTeam ? "" : "disabled";
-    mayRejoinClass = hasStrafbier && isHimself ? "" : "disabled";
-
-    playerSpan = name === playerName
-        ? $('<span>')
-            .append($('<span class="glyphicon glyphicon-chevron-right smaller-font">'))
-            .append(name)
-            .append($('<span class="glyphicon glyphicon-chevron-left smaller-font">'))
-        : name;
-    playerbutton = $("<a href='#'>").addClass("btn namebutton" + turnClass + egoClass + hasAbgegebenClass).html(playerSpan)
-    if (!isSpectator) {
-        playerbutton
-            .click(((n) => () => selectThrowingPlayer(n))(name))
-            .attr({
-                "data-toggle": "tooltip",
-                "title": "Werfer machen"
-            });
-    }
-
-    html = $('<div role="group">').addClass("btn-group btn-group-justified vspace-small playerbuttongroup")
-        .append(playerbutton)
-        .append($('<div role="group">').addClass("btn-group")
-            .append($("<a href='#'>").addClass("btn btn-default dropdown-toggle").attr({
-                "type": "button",
-                "data-toggle": "dropdown",
-                "data-toggle-second": "tooltip",
-                "aria-haspopup": "true",
-                "aria-expanded": "false",
-                "title": "Spieler verschieben",
-            }).append($("<span>").addClass("glyphicon glyphicon-transfer")))
-            .append($("<ul>").addClass("dropdown-menu")
-                .append($("<li>")
-                    .append($("<a href='#'>").addClass("switchteamabutton").text("Linkes Team"))
-                    .click(((n) => () => switchTeam(EnumTeams.TEAM_A_TEAMS, n))(name)))
-                .append($("<li>")
-                    .append($("<a href='#'>").addClass("switchteambbutton").text("Rechtes Team"))
-                    .click(((n) => () => switchTeam(EnumTeams.TEAM_B_TEAMS, n))(name)))
-                .append($("<li>")
-                    .append($("<a href='#'>").addClass("switchspectatorbutton").text("Zuschauer"))
-                    .click(((n) => () => switchTeam(EnumTeams.SPECTATOR_TEAMS, n))(name)))));
-    // Abgabe / TakeStrafbier button
-    if (!isSpectator) {
-        if (player.abgegeben) {
-            html.append($("<a href='#' data-toggle='tooltip' title='Strafbier übernehmen'>")
-                .addClass("btn btn-default abgebenbutton " + mayRejoinClass)
-                .click(((n) => function () {
-                    toggleAbgabe(n);
-                    reduceStrafbierCount(player.team);
-                })(name, player.abgegeben))
-                .append($("<span>").addClass("glyphicon glyphicon-refresh"))
-            );
-        } else {
-            html.append($("<a href='#' data-toggle='tooltip' title='Abgabe abnehmen'>")
-                .addClass("btn btn-default abgebenbutton " + mayValidateAbgabeClass)
-                .click(((n) => () => toggleAbgabe(n))(name))
-                .append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
-            );
-        }
-    }
-
-    html.append($("<a href='#' data-toggle='tooltip' title='Spieler kicken'>")
-        .addClass("btn btn-default kickbutton")
-        .click(((n) => function () {
-            if (confirm(`Möchtest du "${n}" wirklich kicken?`)) {
-                kickPlayer(n);
-            }
-        })(name))
-        .append($("<span>").addClass("glyphicon glyphicon-ban-circle"))
-    );
-
-    return html;
-}
 
 function generateStrafbierHTML(number, team) {
     teamclass = team === EnumTeams.TEAM_A_TEAMS ? ' strafbierteamabutton' :
