@@ -32,13 +32,13 @@ PlayerManager.external.toggleAbgabe = toggleAbgabe;
 PlayerManager.external.reduceStrafbierCount = reduceStrafbierCount;
 PlayerManager.external.selectThrowingPlayer = selectThrowingPlayer;
 
+const {VideoManager} = require('./videoManager');
+
 var simulatorClient = null;
 var playerTeam = null;
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = null;
-var lowBandwidth = false;
-var preparedVideos = {};
 const title = document.title;
 
 jQuery(window).load(function () {
@@ -86,10 +86,10 @@ jQuery(window).load(function () {
     if (desktop) {
         $('#lowbandwidthbutton').bootstrapToggle('on');
     }
-    lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
+    VideoManager.lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
     $('#lowbandwidthbutton').change(function () {
-        lowBandwidth = !$(this).prop('checked');
-        changeLowBandwidthMode();
+        VideoManager.lowBandwidth = !$(this).prop('checked');
+        VideoManager.changeLowBandwidthMode();
     });
     // do not autohide hit-videos, in order to hold the last frame of the video until the stop video is played (#4)
     $('.video:not(.hit)').on('ended', function () {
@@ -131,17 +131,9 @@ function subscribeStreams() {
         console.log('Error in log stream:');
         console.log(response);
     });
-    var videoEventsRequest = new StreamVideoEventsReq();
-    var videoEventStream = simulatorClient.streamVideoEvents(videoEventsRequest, {});
-    videoEventStream.on('data', (response) => {
-        processNewVideoEvent(response.getEvent().toObject());
-    });
-    videoEventStream.on('error', (response) => {
-        console.log('Error in video event stream:');
-        console.log(response);
-    });
-}
 
+    VideoManager.subscribeVideoStream()
+}
 
 function throwing(strength) {
     // disable the buttons so they cannot be used twice
@@ -332,166 +324,6 @@ function processNewLog(sender, content) {
         return text + '\n' + sender + ' ' + content;
     });
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-}
-
-function processNewVideoEvent(videoEvent) {
-    if (typeof videoEvent.preparevideo !== 'undefined') {
-        console.log('Got prepare video event');
-        console.log(videoEvent.preparevideo);
-        preparedVideos[videoEvent.preparevideo.videotype] = videoEvent.preparevideo.url;
-        if (!lowBandwidth) {
-            prepareVideo(videoEvent.preparevideo.url, videoEvent.preparevideo.videotype);
-        }
-    }
-    if (typeof videoEvent.playvideos !== 'undefined') {
-        console.log('Got play video event');
-        console.log(videoEvent.playvideos);
-        if (lowBandwidth) {
-            videoEvent.playvideos.videosList.forEach(function (video, index) {
-                type = video.videotype;
-                if (type === EnumVideoType.HIT_VIDEOTYPE || type === EnumVideoType.MISS_VIDEOTYPE || type === EnumVideoType.NEAR_MISS_VIDEOTYPE) {
-                    // Do not spoil the result just yet
-                    console.log('Spoiler alert!');
-                    setTimeout(() => {
-                        playPoster('throw', video.mirrored);
-                    }, video.delay);
-                    setTimeout(() => {
-                        playPoster(video.videotype, video.mirrored);
-                    }, video.delay + 2500);
-                } else {
-                    setTimeout(() => {
-                        playPoster(video.videotype, video.mirrored);
-                    }, video.delay);
-                }
-            });
-        } else {
-            videolist = videoEvent.playvideos.videosList;
-            first = videolist[0];
-            if (videolist.length === 1) {
-                setTimeout(() => {
-                    playVideo(first.videotype, first.mirrored);
-                }, first.delay);
-            }
-            if (videolist.length === 2) {
-                setTimeout(() => {
-                    playVideo(first.videotype, first.mirrored);
-                }, first.delay);
-                second = videolist[1];
-                scheduleSecondVideo(first, second);
-            }
-        }
-    }
-}
-
-function prepareVideo(url, videotype) {
-    video = getVideoByType(videotype);
-    video.attr('src', url);
-    video[0].load();
-    // Force loading of the video by starting to play it muted and hidden
-    video.prop('muted', true).trigger('play');
-}
-
-function playVideo(videotype, mirrored) {
-    // Abort all previously playing videos
-    stopVideos();
-    $('.logoposter').hide();
-    video = getVideoByType(videotype);
-    if (mirrored) {
-        video.addClass('mirroredvideo');
-    } else {
-        video.removeClass('mirroredvideo');
-    }
-    video.show().prop('muted', false).trigger('play');
-    return video;
-}
-
-function scheduleSecondVideo(first, second) {
-    firstVideo = getVideoByType(first.videotype)[0];
-    if (firstVideo.currentTime >= 2.5) {
-        // Ready to play, we have played the first 2.5 seconds
-        setTimeout(() => {
-            playVideo(second.videotype, second.mirrored);
-        }, second.delay - first.delay - 2500);
-    } else {
-        // Try again in 100ms
-        setTimeout(() => {
-            scheduleSecondVideo(first, second);
-        }, 100);
-    }
-}
-
-function playPoster(videotype, mirrored) {
-    // Hide all previous posters
-    $('.poster').hide();
-    $('.logoposter').hide();
-    poster = getPosterByType(videotype);
-    poster.show();
-    return poster;
-}
-
-function getPosterByType(videotype, mirrored) {
-    switch (videotype) {
-        case EnumVideoType.HIT_VIDEOTYPE:
-            return $('.poster.hit');
-        case EnumVideoType.MISS_VIDEOTYPE:
-            return $('.poster.miss');
-        case EnumVideoType.NEAR_MISS_VIDEOTYPE:
-            return $('.poster.nearmiss');
-        case EnumVideoType.SETUP_VIDEOTYPE:
-            return $('.poster.setup');
-        case EnumVideoType.STOP_VIDEOTYPE:
-            return $('.poster.stop');
-        case EnumVideoType.STRAFBIER_VIDEOTYPE:
-            return $('.poster.strafbier');
-        case 'throw':
-            return $('.poster.throw');
-        default:
-            return null;
-    }
-}
-
-function getVideoByType(videotype) {
-    switch (videotype) {
-        case EnumVideoType.HIT_VIDEOTYPE:
-            return $('.video.hit');
-        case EnumVideoType.MISS_VIDEOTYPE:
-            return $('.video.miss');
-        case EnumVideoType.NEAR_MISS_VIDEOTYPE:
-            return $('.video.nearmiss');
-        case EnumVideoType.SETUP_VIDEOTYPE:
-            return $('.video.setup');
-        case EnumVideoType.STOP_VIDEOTYPE:
-            return $('.video.stop');
-        case EnumVideoType.STRAFBIER_VIDEOTYPE:
-            return $('.video.strafbier');
-        default:
-            return null;
-    }
-}
-
-function stopVideos() {
-    $('.video').each(function (key, value) {
-        value.pause();
-        value.currentTime = 0;
-        $(value).hide();
-    });
-}
-
-function changeLowBandwidthMode() {
-    if (lowBandwidth) {
-        // Hide all the videos
-        stopVideos();
-    } else {
-        // Hide all the posters
-        $('.poster').hide();
-        $('.logoposter').show();
-        // Preload everything we ignored
-        for (var videotype in preparedVideos) {
-            var url = preparedVideos[videotype];
-            prepareVideo(url, videotype);
-        }
-
-    }
 }
 
 
