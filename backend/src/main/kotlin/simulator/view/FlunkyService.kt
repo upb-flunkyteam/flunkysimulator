@@ -147,7 +147,7 @@ class FlunkyService(
     }
 
     override fun sendMessage(request: SendMessageReq?, responseObserver: StreamObserver<SendMessageResp>?) {
-        messageController.sendMessage(request!!.playerName, request.content)
+        messageController.sendMessage(request!!.playerName, ":"+request.content)
 
         responseObserver?.onNext(SendMessageResp.getDefaultInstance())
         responseObserver?.onCompleted()
