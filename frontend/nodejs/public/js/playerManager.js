@@ -1,4 +1,3 @@
-
 var env = {};
 $.get({
     url: "env",
@@ -9,22 +8,17 @@ $.get({
 });
 
 const {
-    EnumThrowStrength, EnumRoundPhase, EnumTeams, EnumVideoType, EnumLoginStatus,
-    GameState, ThrowReq, ThrowResp, RegisterPlayerReq, RegisterPlayerResp,
-    StreamStateReq, StreamStateResp, LogReq, LogResp,
-    SendMessageReq, SendMessageResp, KickPlayerReq, KickPlayerResp,
-    ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
-    ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
-    AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
-    StreamVideoEventsReq, StreamVideoEventsResp
-} = require('./flunkyprotocol_pb');
-const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
+    EnumTeams, EnumConnectionStatus, EnumLoginStatus, KickPlayerReq, KickPlayerResp, Player,
+    PlayerListResp, RegisterPlayerReq, RegisterPlayerResp, ShuffleTeamsReq,
+    ShuffleTeamsResp, SwitchTeamReq, SwitchTeamResp
+} = require('./player_service_pb');
+const {PlayerServiceClient} = require('./player_service_grpc_web_pb');
 
-var simulatorClient = null;
+var playerService = null;
 export const PlayerManager = {};
 
 jQuery(window).load(function () {
-    simulatorClient = new SimulatorClient(env['BACKEND_URL']);
+    playerService = new PlayerServiceClient(env['BACKEND_URL']);
 });
 
 PlayerManager.ownPlayerName = null;
@@ -37,13 +31,84 @@ PlayerManager.external.toggleAbgabe = null;
 PlayerManager.external.reduceStrafbierCount = null;
 PlayerManager.external.selectThrowingPlayer = null;
 
-PlayerManager.switchTeam = function(targetTeam, targetName) {
+PlayerManager.external.ClientManager = null
+
+var metadata = {}
+
+//https://stackoverflow.com/questions/7307983/while-variable-is-not-defined-wait
+function __delay__(timer) {
+    return new Promise(resolve => {
+        timer = timer || 1000;
+        setTimeout(function () {
+            resolve();
+        }, timer);
+    });
+};
+
+async function subscribeTeamStreams() {
+
+    while (!PlayerManager.external.ClientManager.metadata())
+        await __delay__(1000);
+
+    metadata = PlayerManager.external.ClientManager.metadata()
+
+    const teamAStream = playerService.streamTeamAPlayers({}, metadata);
+    teamAStream.on('data', (response) => {
+        $('#teamaarea').empty();
+        response.players.forEach(function (player, index) {
+            player.team = EnumTeams.TEAM_A_TEAMS
+            $('#teamaarea').append(
+                PlayerManager.generatePlayerHTML(player,
+                    false,
+                    player.team === playerTeam,
+                    true));
+            // TODO: fix trowing player & rejoin button
+        });
+    })
+    teamAStream.on('error', (response) => {
+        console.log('Error in teamAStream:');
+        console.log(response);
+    });
+
+    const teamBStream = playerService.streamTeamBPlayers({}, metadata);
+    teamBStream.on('data', (response) => {
+        $('#teambarea').empty();
+        response.players.forEach(function (player, index) {
+            player.team = EnumTeams.TEAM_B_TEAMS
+            $('#teamaarea').append(
+                PlayerManager.generatePlayerHTML(player,
+                    false,
+                    player.team === playerTeam,
+                    true));
+            // TODO: fix trowing player & rejoin button
+        });
+    })
+    teamBStream.on('error', (response) => {
+        console.log('Error in teamBStream:');
+        console.log(response);
+    });
+
+    const spectatorStream = playerService.streamSpectator({},metadata);
+    spectatorStream.on('data', (response) => {
+        $('#spectatorarea').empty();
+        response.players.forEach(function (player, index) {
+            player.team = EnumTeams.SPECTATOR_TEAMS
+            $('#spectatorarea').append(PlayerManager.generateSpectatorHTML(player));
+        });
+    })
+    spectatorStream.on('error', (response) => {
+        console.log('Error in spectatorStream:');
+        console.log(response);
+    });
+}
+
+PlayerManager.switchTeam = function (targetTeam, targetName) {
     const request = new SwitchTeamReq();
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetteam(targetTeam)
     request.setTargetname(targetName);
     console.log(request.toObject());
-    simulatorClient.switchTeam(request, {}, function (err, response) {
+    playerService.switchTeam(request, metadata, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -51,12 +116,12 @@ PlayerManager.switchTeam = function(targetTeam, targetName) {
     });
 }
 
-PlayerManager.kickPlayer = function(targetName) {
+PlayerManager.kickPlayer = function (targetName) {
     var request = new KickPlayerReq();
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetname(targetName);
     console.log(request.toObject());
-    simulatorClient.kickPlayer(request, {}, function (err, response) {
+    playerService.kickPlayer(request, metadata, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -64,7 +129,7 @@ PlayerManager.kickPlayer = function(targetName) {
     });
 }
 
-PlayerManager.changePlayername = function(desiredPlayername) {
+PlayerManager.changePlayername = function (desiredPlayername) {
     if (desiredPlayername === '') {
         console.log("Warning: Cannot register empty player name");
         return;
@@ -76,7 +141,7 @@ PlayerManager.changePlayername = function(desiredPlayername) {
     const request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);
     console.log(request.toObject());
-    simulatorClient.registerPlayer(request, {}, function (err, response) {
+    playerService.registerPlayer(request, metadata, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -113,12 +178,15 @@ PlayerManager.changePlayername = function(desiredPlayername) {
     });
 }
 
-
-PlayerManager.generateSpectatorHTML = function(player) {
-    return PlayerManager.generatePlayerHTML(player, false,  false, false, true);
+PlayerManager.generateSpectatorHTML = function (player) {
+    return PlayerManager.generatePlayerHTML(player, false, false, false, true);
 }
 
-PlayerManager.generatePlayerHTML = function (player, throwingPlayer = false, isOwnTeam = false, hasStrafbier = false, isSpectator = false) {
+PlayerManager.generatePlayerHTML = function (player,
+                                             throwingPlayer = false,
+                                             isOwnTeam = false,
+                                             hasStrafbier = false,
+                                             isSpectator = false) {
     let name = player.name;
     let isHimself = name === PlayerManager.ownPlayerName;
     let turnClass = name === throwingPlayer ? ' btn-primary' : ' btn-default';

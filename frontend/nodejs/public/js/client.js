@@ -22,8 +22,11 @@ const {
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
     AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
     StreamVideoEventsReq, StreamVideoEventsResp
-} = require('./flunkyprotocol_pb');
-const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
+} = require('./flunky_service_pb');
+const {FlunkyServiceClient} = require('./flunky_service_grpc_web_pb');
+
+const {VideoManager} = require('./videoManager');
+const {ClientManager} = require('./clientManager')
 const {PlayerManager} = require('./playerManager');
 
 PlayerManager.external.sendMessage = sendMessage;
@@ -31,10 +34,10 @@ PlayerManager.external.processNewState = function(){processNewState(currentGameS
 PlayerManager.external.toggleAbgabe = toggleAbgabe;
 PlayerManager.external.reduceStrafbierCount = reduceStrafbierCount;
 PlayerManager.external.selectThrowingPlayer = selectThrowingPlayer;
+PlayerManager.external.ClientManager = ClientManager;
 
-const {VideoManager} = require('./videoManager');
 
-var simulatorClient = null;
+var flunkyService = null;
 var playerTeam = null;
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
@@ -82,39 +85,16 @@ jQuery(window).load(function () {
     });
     // secondary data-toogle to enable tooltips and dropdown at the same time
     $('[data-toggle-second="tooltip"]').tooltip();
-    desktop = window.matchMedia("(min-width: 992px)").matches;
-    if (desktop) {
-        $('#lowbandwidthbutton').bootstrapToggle('on');
-    }
-    VideoManager.lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
-    $('#lowbandwidthbutton').change(function () {
-        VideoManager.lowBandwidth = !$(this).prop('checked');
-        VideoManager.changeLowBandwidthMode();
-    });
-    // do not autohide hit-videos, in order to hold the last frame of the video until the stop video is played (#4)
-    $('.video:not(.hit)').on('ended', function () {
-        $(this).hide();
-        $('.logoposter').show();
-    });
-    $('.video').hide();
-    $('.poster').hide();
+
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-    simulatorClient = new SimulatorClient(env['BACKEND_URL']);
+
+    flunkyService = new FlunkyServiceClient(env['BACKEND_URL']);
     subscribeStreams();
-    // Try to re-register if the username field is not empty
-    // This happens when the page is reloaded
-    // Browsers will preserve the form input, thus the username remains set
-    playerNameFormValue = $('#playername').val();
-    if (playerNameFormValue) {
-        if (confirm('Möchtest du mit dem Namen ' + playerNameFormValue + ' beitreten?')) {
-            PlayerManager.changePlayername(playerNameFormValue);
-        }
-    }
 });
 
 function subscribeStreams() {
     var stateRequest = new StreamStateReq();
-    var stateStream = simulatorClient.streamState(stateRequest, {});
+    var stateStream = flunkyService.streamState(stateRequest, {});
     stateStream.on('data', (response) => {
         processNewState(response.getState().toObject());
     });
@@ -122,8 +102,10 @@ function subscribeStreams() {
         console.log('Error in state stream:');
         console.log(response);
     });
+
+    //TODO create logManager.js
     var logRequest = new LogReq();
-    var logStream = simulatorClient.streamLog(logRequest, {});
+    var logStream = flunkyService.streamLog(logRequest, {});
     logStream.on('data', (response) => {
         processNewLog(response.getSender(), response.getContent());
     });
@@ -131,8 +113,6 @@ function subscribeStreams() {
         console.log('Error in log stream:');
         console.log(response);
     });
-
-    VideoManager.subscribeVideoStream()
 }
 
 function throwing(strength) {
@@ -144,7 +124,7 @@ function throwing(strength) {
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setStrength(strength);
     console.log(request.toObject());
-    simulatorClient.throw(request, {}, function (err, response) {
+    flunkyService.throw(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -157,15 +137,13 @@ function sendMessage(content) {
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setContent(content);
     console.log(request.toObject());
-    simulatorClient.sendMessage(request, {}, function (err, response) {
+    flunkyService.sendMessage(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
         }
     });
 }
-
-
 
 function increaseStrafbierCount(team) {
     modifyStrafbierCount(team, true);
@@ -175,14 +153,13 @@ function reduceStrafbierCount(team) {
     modifyStrafbierCount(team, false);
 }
 
-
 function modifyStrafbierCount(team, increment) {
     var request = new ModifyStrafbierCountReq();
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetteam(team);
     request.setIncrement(increment);
     console.log(request.toObject());
-    simulatorClient.modifyStrafbierCount(request, {}, function (err, response) {
+    flunkyService.modifyStrafbierCount(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -195,7 +172,7 @@ function selectThrowingPlayer(targetName) {
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetname(targetName);
     console.log(request.toObject());
-    simulatorClient.selectThrowingPlayer(request, {}, function (err, response) {
+    flunkyService.selectThrowingPlayer(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -214,7 +191,7 @@ function toggleAbgabe(targetName) {
         }
     });
     console.log(request.toObject());
-    simulatorClient.abgegeben(request, {}, function (err, response) {
+    flunkyService.abgegeben(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -226,7 +203,7 @@ function resetGame() {
     var request = new ResetGameReq();
     request.setPlayername(PlayerManager.ownPlayerName);
     console.log(request.toObject());
-    simulatorClient.resetGame(request, {}, function (err, response) {
+    flunkyService.resetGame(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -260,20 +237,7 @@ function processNewState(state, stale = false) {
         console.log('player appears to be kicked -> Playername reset to null');
     }*/
 
-    // Create players
-    $('#teamaarea, #teambarea, #spectatorarea').empty();
-    currentGameState.playerteamaList.forEach(function (player, index) {
-        player.team = EnumTeams.TEAM_A_TEAMS
-        $('#teamaarea').append(PlayerManager.generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteama));
-    });
-    currentGameState.playerteambList.forEach(function (player, index) {
-        player.team = EnumTeams.TEAM_B_TEAMS
-        $('#teambarea').append(PlayerManager.generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteamb));
-    });
-    currentGameState.spectatorsList.forEach(function (player, index) {
-        player.team = EnumTeams.SPECTATOR_TEAMS
-        $('#spectatorarea').append(PlayerManager.generateSpectatorHTML(player));
-    });
+    // display strafbier
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
 
