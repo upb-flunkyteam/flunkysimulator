@@ -7,8 +7,8 @@ $.get({
     }
 });
 
-const {AliveChallenge,ClientRegisterd,ClientStreamReq,ClientStreamResp,
-    EventOneofCase} = require('./client_service_pb');
+const {AliveChallenge,ClientRegisterd,ClientStreamReq,ClientStreamResp} = require('./client_service_pb');
+const EventOneofCase = ClientStreamResp.EventOneofCase
 const {ClientServiceClient} = require('./client_service_grpc_web_pb');
 
 var clientService = null;
@@ -16,26 +16,31 @@ export const ClientManager = {};
 
 jQuery(window).load(function () {
     clientService = new ClientServiceClient(env['BACKEND_URL']);
+    subscribeClientStream()
 });
 
-ClientManager.secret = null
+var secret = null
 
 ClientManager.metadata = function() {
     if (secret){
-        return {'client_secret_key': ClientManager.secret}
+        return {'client_secret_key': secret}
     }else {
         return null
     }}
 
-ClientManager.subscribeClientStream = function(){
+function subscribeClientStream() {
     const req = new ClientStreamReq()
-    const clientStream = clientService.clientStream(req,{});
+    var clientStream = clientService.clientStream(req,{});
     clientStream.on('data', (response) => {
-        if (typeof response.secret !== 'undefined'){
-            //ClientRegistered
-            ClientManager.secret = response.secret
-        } else {
+        let tmp =response.getEventOneofCase();
+        if (tmp === EventOneofCase.CLIENTREGISTERD){
+            let event = response.getClientregisterd().toObject()
+            secret = event.secret;
+
+        } else if (response.getEventOneofCase() === EventOneofCase.ALIVECHALLENGE) {
             //alive challenge - do nothing
+        } else {
+            console.log("Unknown client stream event");
         }
     })
     clientStream.on('error', (response) => {

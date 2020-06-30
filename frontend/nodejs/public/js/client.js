@@ -223,11 +223,14 @@ function processNewState(state, stale = false) {
     } else if (currentGameState.roundphase === EnumRoundPhase.TEAM_B_THROWING_PHASE) {
         currentTeam = EnumTeams.TEAM_B_TEAMS;
     }
+
+    /* TODO
     playerTeam =
         currentGameState.playerteamaList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.TEAM_A_TEAMS :
             currentGameState.playerteambList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.TEAM_B_TEAMS :
                 currentGameState.spectatorsList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.SPECTATOR_TEAMS :
                     EnumTeams.UNKNOWN_TEAMS;
+    */
 
     // TODO wont work because of  #82
     //  umlaut playernames are never correctly assigned to their team and will be removed nevertheless

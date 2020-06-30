@@ -17,9 +17,13 @@ const {PlayerServiceClient} = require('./player_service_grpc_web_pb');
 var playerService = null;
 export const PlayerManager = {};
 
+
 jQuery(window).load(function () {
     playerService = new PlayerServiceClient(env['BACKEND_URL']);
+    subscribeTeamStreams()
 });
+
+
 
 PlayerManager.ownPlayerName = null;
 
@@ -52,7 +56,7 @@ async function subscribeTeamStreams() {
 
     metadata = PlayerManager.external.ClientManager.metadata()
 
-    const teamAStream = playerService.streamTeamAPlayers({}, metadata);
+    var teamAStream = playerService.streamTeamAPlayers({}, metadata);
     teamAStream.on('data', (response) => {
         $('#teamaarea').empty();
         response.players.forEach(function (player, index) {
@@ -70,7 +74,7 @@ async function subscribeTeamStreams() {
         console.log(response);
     });
 
-    const teamBStream = playerService.streamTeamBPlayers({}, metadata);
+    var teamBStream = playerService.streamTeamBPlayers({}, metadata);
     teamBStream.on('data', (response) => {
         $('#teambarea').empty();
         response.players.forEach(function (player, index) {
@@ -88,7 +92,7 @@ async function subscribeTeamStreams() {
         console.log(response);
     });
 
-    const spectatorStream = playerService.streamSpectator({},metadata);
+    var spectatorStream = playerService.streamSpectator({},metadata);
     spectatorStream.on('data', (response) => {
         $('#spectatorarea').empty();
         response.players.forEach(function (player, index) {
