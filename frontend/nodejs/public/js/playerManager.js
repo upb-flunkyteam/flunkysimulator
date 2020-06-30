@@ -7,6 +7,8 @@ $.get({
     }
 });
 
+var {Empty} = require('google-protobuf/google/protobuf/empty_pb.js')
+
 const {
     EnumTeams, EnumConnectionStatus, EnumLoginStatus, KickPlayerReq, KickPlayerResp, Player,
     PlayerListResp, RegisterPlayerReq, RegisterPlayerResp, ShuffleTeamsReq,
@@ -56,7 +58,7 @@ async function subscribeTeamStreams() {
 
     metadata = PlayerManager.external.ClientManager.metadata()
 
-    var teamAStream = playerService.streamTeamAPlayers({}, metadata);
+    var teamAStream = playerService.streamTeamAPlayers(new Empty(), metadata);
     teamAStream.on('data', (response) => {
         $('#teamaarea').empty();
         response.players.forEach(function (player, index) {
@@ -74,7 +76,7 @@ async function subscribeTeamStreams() {
         console.log(response);
     });
 
-    var teamBStream = playerService.streamTeamBPlayers({}, metadata);
+    var teamBStream = playerService.streamTeamBPlayers(new Empty(), metadata);
     teamBStream.on('data', (response) => {
         $('#teambarea').empty();
         response.players.forEach(function (player, index) {
@@ -92,7 +94,7 @@ async function subscribeTeamStreams() {
         console.log(response);
     });
 
-    var spectatorStream = playerService.streamSpectator({},metadata);
+    var spectatorStream = playerService.streamSpectators(new Empty(),metadata);
     spectatorStream.on('data', (response) => {
         $('#spectatorarea').empty();
         response.players.forEach(function (player, index) {
