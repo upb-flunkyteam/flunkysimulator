@@ -30,22 +30,47 @@ jQuery(window).load(function () {
     let playerNameFormValue = $('#playername').val();
     if (playerNameFormValue) {
         if (confirm('Möchtest du mit dem Namen ' + playerNameFormValue + ' beitreten?')) {
-            PlayerManager.changePlayername(playerNameFormValue);
+            changePlayername(playerNameFormValue);
         }
     }
+
+    $('#playername').keyup(function (e) {
+        if (e.keyCode === 13) {
+            $(this).trigger("submission");
+        }
+    });
+    $('#playernamebutton').click(function () {
+        $('#playername').trigger("submission");
+    });
+    $('#playername').bind("submission", function (e) {
+        changePlayername($('#playername').val());
+    });
+    $('#switchplayerbutton').click(function () {
+        $('#registerform').show();
+        $('#playernamebutton').text('Spielernamen ändern');
+    });
+
+    $('#shufflebutton').click(function () {
+        if (confirm('Möchtest du wirklich die Teams neu mischen?')) {
+            PlayerManager.shuffleTeams();
+        }
+    });
+
 });
 
-
-
 PlayerManager.ownPlayerName = null;
+PlayerManager.ownTeam = EnumTeams.SPECTATOR_TEAMS;
 
 //external functions
 PlayerManager.external = {}
 PlayerManager.external.sendMessage = null;
-PlayerManager.external.processNewState = null; // TODO DECIDE: Might not be needed anymore
+PlayerManager.external.processNewState = null;
 PlayerManager.external.toggleAbgabe = null;
 PlayerManager.external.reduceStrafbierCount = null;
 PlayerManager.external.selectThrowingPlayer = null;
+PlayerManager.external.getThrowingPlayerName = () => "";
+PlayerManager.external.getStrafbierteamA = () => 0;
+PlayerManager.external.getStrafbierteamB = () => 0;
 
 PlayerManager.external.ClientManager = null
 
@@ -68,55 +93,51 @@ async function subscribeTeamStreams() {
 
     metadata = PlayerManager.external.ClientManager.metadata()
 
-    var teamAStream = playerService.streamTeamAPlayers(new Empty(), metadata);
-    teamAStream.on('data', (response) => {
+    // I would love to use the team specific streams but js continues to be js :/
+    var playersStream = playerService.streamAllPlayers(new Empty(), metadata);
+    playersStream.on('data', (response) => {
         $('#teamaarea').empty();
-        response.getPlayersList().forEach(function (playerProto, index) {
-            let player = playerProto.toObject();
-            player.team = EnumTeams.TEAM_A_TEAMS
-            $('#teamaarea').append(
-                PlayerManager.generatePlayerHTML(player,
-                    false,
-                    player.team === playerTeam,
-                    true));
-            // TODO: fix trowing player & rejoin button
-        });
-    })
-    teamAStream.on('error', (response) => {
-        console.log('Errin teamAStream:');
-        console.log(response);
-    });
-
-    var teamBStream = playerService.streamTeamBPlayers(new Empty(), metadata);
-    teamBStream.on('data', (response) => {
         $('#teambarea').empty();
-        response.getPlayersList().forEach(function (playerProto, index) {
-            let player = playerProto.toObject();
-            player.team = EnumTeams.TEAM_B_TEAMS
+        $('#spectatorarea').empty();
+        let players = response.getPlayersList().map( p => p.toObject());
+
+        players.forEach(player => {
+            if(player.name === PlayerManager.ownPlayerName){
+                PlayerManager.ownTeam = player.team;
+            }
+        })
+
+        let teamA = players.filter(p => p.team === EnumTeams.TEAM_A_TEAMS)
+        let teamB = players.filter(p => p.team === EnumTeams.TEAM_B_TEAMS)
+        let spectators = players.filter(p => p.team === EnumTeams.SPECTATOR_TEAMS)
+
+        let strafbierA = PlayerManager.external.getStrafbierteamA();
+        let strafbierB = PlayerManager.external.getStrafbierteamB();
+        let throwingPlayer = PlayerManager.external.getThrowingPlayerName();
+        let isThrowingPlayer = PlayerManager.ownPlayerName === throwingPlayer;
+
+        teamA.forEach(player => {
             $('#teamaarea').append(
                 PlayerManager.generatePlayerHTML(player,
-                    false,
-                    player.team === playerTeam,
-                    true));
-            // TODO: fix trowing player & rejoin button
+                    isThrowingPlayer,
+                    player.team === PlayerManager.ownTeam,
+                    strafbierA > 0));
         });
-    });
-    teamBStream.on('error', (response) => {
-        console.log('Error in teamBStream:');
-        console.log(response);
-    });
+        teamB.forEach(player => {
+            $('#teambarea').append(
+                PlayerManager.generatePlayerHTML(player,
+                    isThrowingPlayer,
+                    player.team === PlayerManager.ownTeam,
+                    strafbierB > 0));
+        });
 
-    var spectatorStream = playerService.streamSpectators(new Empty(), metadata);
-    spectatorStream.on('data', (response) => {
-        $('#spectatorarea').empty();
-        response.getPlayersList().forEach(function (playerProto, index) {
-            let player = playerProto.toObject();
-            player.team = EnumTeams.SPECTATOR_TEAMS
+        spectators.forEach(player => {
             $('#spectatorarea').append(PlayerManager.generateSpectatorHTML(player));
         });
-    });
-    spectatorStream.on('error', (response) => {
-        console.log('Error in spectatorStream:');
+
+    })
+    playersStream.on('error', (response) => {
+        console.log('Error in players stream:');
         console.log(response);
     });
 }
@@ -135,6 +156,18 @@ PlayerManager.switchTeam = function (targetTeam, targetName) {
     });
 }
 
+PlayerManager.shuffleTeams = function(){
+    const request = new ShuffleTeamsReq();
+    request.setPlayername(PlayerManager.ownPlayerName);
+    playerService.shuffleTeams(request,metadata,function (err, response) {
+        if (err) {
+            console.log(err.code);
+            console.log(err.message);
+        }
+    });
+
+}
+
 PlayerManager.kickPlayer = function (targetName) {
     var request = new KickPlayerReq();
     request.setPlayername(PlayerManager.ownPlayerName);
@@ -148,11 +181,14 @@ PlayerManager.kickPlayer = function (targetName) {
     });
 }
 
-PlayerManager.changePlayername = function (desiredPlayername) {
+async function changePlayername (desiredPlayername) {
     if (desiredPlayername === '') {
         console.log("Warning: Cannot register empty player name");
         return;
     }
+
+    while (!PlayerManager.external.ClientManager.metadata())
+        await __delay__(1000);
 
     // Discourage false flag attacks, the player was already registered
     PlayerManager.ownPlayerName ? PlayerManager.external.sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt') : '';
@@ -170,14 +206,7 @@ PlayerManager.changePlayername = function (desiredPlayername) {
             switch (response.status) {
                 case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
                 case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
-                    if (response.registeredname) {
-                        PlayerManager.ownPlayerName = response.registeredname
-                    } else {
-                        // TODO: This is a bug in the server
-                        console.log('Got empty registered name in response.');
-                        PlayerManager.ownPlayerName = $('<div>').text(desiredPlayername).html();
-                        console.log('Player name: ' + playerName);
-                    }
+                    PlayerManager.ownPlayerName = response.registeredname
                     $('#playername').text(PlayerManager.ownPlayerName);
                     $('#registerform').hide();
                     // Force re-evaluation of game state, e.g. do I need to throw

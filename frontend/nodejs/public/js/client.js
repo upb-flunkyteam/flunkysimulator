@@ -35,16 +35,21 @@ PlayerManager.external.toggleAbgabe = toggleAbgabe;
 PlayerManager.external.reduceStrafbierCount = reduceStrafbierCount;
 PlayerManager.external.selectThrowingPlayer = selectThrowingPlayer;
 PlayerManager.external.ClientManager = ClientManager;
+PlayerManager.external.getThrowingPlayerName = () => {return currentGameState.throwingplayer};
+PlayerManager.external.getStrafbierteamA = () => {return currentGameState.strafbierteama};
+PlayerManager.external.getStrafbierteamB = () => {return currentGameState.strafbierteama};
 
 
 var flunkyService = null;
-var playerTeam = null;
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
-var currentGameState = null;
+var currentGameState = new GameState().toObject();
 const title = document.title;
 
 jQuery(window).load(function () {
+    flunkyService = new FlunkyServiceClient(env['BACKEND_URL']);
+    subscribeStreams();
+
     $('#softthrowbutton').click(function () {
         throwing(EnumThrowStrength.SOFT_THROW_STRENGTH);
     });
@@ -53,21 +58,6 @@ jQuery(window).load(function () {
     });
     $('#hardthrowbutton').click(function () {
         throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
-    });
-    $('#playername').keyup(function (e) {
-        if (e.keyCode === 13) {
-            $(this).trigger("submission");
-        }
-    });
-    $('#playernamebutton').click(function () {
-        $('#playername').trigger("submission");
-    });
-    $('#playername').bind("submission", function (e) {
-        PlayerManager.changePlayername($('#playername').val());
-    });
-    $('#switchplayerbutton').click(function () {
-        $('#registerform').show();
-        $('#playernamebutton').text('Spielernamen ändern');
     });
     $('#chatinput').bind("enterKey", function (e) {
         sendMessage($('#chatinput').val());
@@ -87,9 +77,6 @@ jQuery(window).load(function () {
     $('[data-toggle-second="tooltip"]').tooltip();
 
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-
-    flunkyService = new FlunkyServiceClient(env['BACKEND_URL']);
-    subscribeStreams();
 });
 
 function subscribeStreams() {
@@ -224,14 +211,6 @@ function processNewState(state, stale = false) {
         currentTeam = EnumTeams.TEAM_B_TEAMS;
     }
 
-    /* TODO
-    playerTeam =
-        currentGameState.playerteamaList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.TEAM_A_TEAMS :
-            currentGameState.playerteambList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.TEAM_B_TEAMS :
-                currentGameState.spectatorsList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.SPECTATOR_TEAMS :
-                    EnumTeams.UNKNOWN_TEAMS;
-    */
-
     // TODO wont work because of  #82
     //  umlaut playernames are never correctly assigned to their team and will be removed nevertheless
     /*if (!stale && playerName && playerTeam === EnumTeams.UNKNOWN_TEAMS) {
@@ -242,11 +221,13 @@ function processNewState(state, stale = false) {
 
     // display strafbier
     //TODO introduce strafbeer area, because player manager may clear it
-    $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
-    $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
+    $('#teamastrafbierarea').empty();
+    $('#teambstrafbierarea').empty();
+    $('#teamastrafbierarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
+    $('#teambstrafbierarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
 
     // Throwing Team related highlighting
-    playerTeam === currentTeam
+    PlayerManager.ownTeam === currentTeam
         ? $('.video').addClass('highlight')
         : $('.video').removeClass('highlight');
 
