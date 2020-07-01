@@ -16,7 +16,7 @@ import kotlin.random.Random
  * state. eg. if they are the trowing player.
  */
 class PlayerController(
-    private val handleRemovalOfPlayer: (Player) -> Unit,
+    private val handleRemovalOfPlayer: (Player) -> Unit, //TODO wrap in own thread to avoid deadlock
     private val players: MutableList<Player> = mutableListOf(),
     val clientManager: ClientManager
 ) : EventControllerBase<PlayerController.PlayersEvent>() {
@@ -47,7 +47,7 @@ class PlayerController(
 
     private val all = setOf(Team.A, Team.B, Team.Spectator)
     private fun triggerUpdate(of: Set<Team> = all) {
-        PlayersEvent(of)
+        this.onEvent(PlayersEvent(of))
     }
 
     fun getPlayer(name: String?) = this.players.firstOrNull { player -> player.name == name }
@@ -77,7 +77,7 @@ class PlayerController(
             } ?: let {
                 val player = Player(newName)
                 players.add(player)
-
+                triggerUpdate(setOf(player.team))
                 LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, newName)
             }
 
@@ -88,6 +88,7 @@ class PlayerController(
         playerListLock.withLock {
             val player = getPlayer(name) ?: return false
             players.remove(player)
+            triggerUpdate(setOf(player.team))
             handleRemovalOfPlayer(player)
             return true
         }
@@ -98,6 +99,7 @@ class PlayerController(
             val player = getPlayer(name) ?: return false
             player.team = team.toKotlin()
 
+            triggerUpdate(setOf(player.team))
             handleRemovalOfPlayer(player)
 
             return true
@@ -121,6 +123,7 @@ class PlayerController(
             val teamA = if (randBool) newPlayers1 else newPlayers2
 
             players.forEach { it.team = if (teamA.contains(it)) Team.A else Team.B }
+            triggerUpdate()
         }
     }
 

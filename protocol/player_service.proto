@@ -21,13 +21,13 @@ service PlayerService {
 
   rpc ShuffleTeams(ShuffleTeamsReq) returns (ShuffleTeamsResp);
 
-  rpc StreamAllPlayers(google.protobuf.Empty) returns (PlayerListResp);
+  rpc StreamAllPlayers(google.protobuf.Empty) returns (stream PlayerListResp);
 
-  rpc StreamTeamAPlayers(google.protobuf.Empty) returns (PlayerListResp);
+  rpc StreamTeamAPlayers(google.protobuf.Empty) returns (stream PlayerListResp);
 
-  rpc StreamTeamBPlayers(google.protobuf.Empty) returns (PlayerListResp);
+  rpc StreamTeamBPlayers(google.protobuf.Empty) returns (stream PlayerListResp);
 
-  rpc StreamSpectators(google.protobuf.Empty) returns (PlayerListResp);
+  rpc StreamSpectators(google.protobuf.Empty) returns (stream PlayerListResp);
 
 }
 message ShuffleTeamsResp{}
@@ -79,6 +79,7 @@ enum EnumLoginStatus{
 message Player{
   string name = 1;
   bool abgegeben = 2;
+  EnumTeams team = 3;
   EnumConnectionStatus connectionStatus = 5;
   int64 wonGames = 10;
 }

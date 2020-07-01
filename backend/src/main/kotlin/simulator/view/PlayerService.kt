@@ -82,7 +82,6 @@ class PlayerService(
                 .build()
         )
 
-
         val handler =
             buildRegisterHandler { _: PlayerController.PlayersEvent ->
                 responseObserver?.onNext(
