@@ -241,6 +241,7 @@ function processNewState(state, stale = false) {
     }*/
 
     // display strafbier
+    //TODO introduce strafbeer area, because player manager may clear it
     $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
     $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
 

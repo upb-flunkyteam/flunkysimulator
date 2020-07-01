@@ -23,6 +23,16 @@ export const PlayerManager = {};
 jQuery(window).load(function () {
     playerService = new PlayerServiceClient(env['BACKEND_URL']);
     subscribeTeamStreams()
+
+    // Try to re-register if the username field is not empty
+    // This happens when the page is reloaded
+    // Browsers will preserve the form input, thus the username remains set
+    let playerNameFormValue = $('#playername').val();
+    if (playerNameFormValue) {
+        if (confirm('Möchtest du mit dem Namen ' + playerNameFormValue + ' beitreten?')) {
+            PlayerManager.changePlayername(playerNameFormValue);
+        }
+    }
 });
 
 
@@ -61,7 +71,8 @@ async function subscribeTeamStreams() {
     var teamAStream = playerService.streamTeamAPlayers(new Empty(), metadata);
     teamAStream.on('data', (response) => {
         $('#teamaarea').empty();
-        response.players.forEach(function (player, index) {
+        response.getPlayersList().forEach(function (playerProto, index) {
+            let player = playerProto.toObject();
             player.team = EnumTeams.TEAM_A_TEAMS
             $('#teamaarea').append(
                 PlayerManager.generatePlayerHTML(player,
@@ -72,14 +83,15 @@ async function subscribeTeamStreams() {
         });
     })
     teamAStream.on('error', (response) => {
-        console.log('Error in teamAStream:');
+        console.log('Errin teamAStream:');
         console.log(response);
     });
 
     var teamBStream = playerService.streamTeamBPlayers(new Empty(), metadata);
     teamBStream.on('data', (response) => {
         $('#teambarea').empty();
-        response.players.forEach(function (player, index) {
+        response.getPlayersList().forEach(function (playerProto, index) {
+            let player = playerProto.toObject();
             player.team = EnumTeams.TEAM_B_TEAMS
             $('#teamaarea').append(
                 PlayerManager.generatePlayerHTML(player,
@@ -88,20 +100,21 @@ async function subscribeTeamStreams() {
                     true));
             // TODO: fix trowing player & rejoin button
         });
-    })
+    });
     teamBStream.on('error', (response) => {
         console.log('Error in teamBStream:');
         console.log(response);
     });
 
-    var spectatorStream = playerService.streamSpectators(new Empty(),metadata);
+    var spectatorStream = playerService.streamSpectators(new Empty(), metadata);
     spectatorStream.on('data', (response) => {
         $('#spectatorarea').empty();
-        response.players.forEach(function (player, index) {
+        response.getPlayersList().forEach(function (playerProto, index) {
+            let player = playerProto.toObject();
             player.team = EnumTeams.SPECTATOR_TEAMS
             $('#spectatorarea').append(PlayerManager.generateSpectatorHTML(player));
         });
-    })
+    });
     spectatorStream.on('error', (response) => {
         console.log('Error in spectatorStream:');
         console.log(response);
