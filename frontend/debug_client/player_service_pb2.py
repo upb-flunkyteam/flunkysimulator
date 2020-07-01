@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='endpoints.flunky.simulator',
   syntax='proto3',
   serialized_options=b'\n*de.flunkyteam.endpoints.projects.simulatorB\007PlayersP\001',
-  serialized_pb=b'\n\x14player_service.proto\x12\x1a\x65ndpoints.flunky.simulator\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12game_objects.proto\"\x12\n\x10ShuffleTeamsResp\"%\n\x0fShuffleTeamsReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\"E\n\x0ePlayerListResp\x12\x33\n\x07players\x18\x01 \x03(\x0b\x32\".endpoints.flunky.simulator.Player\"\x10\n\x0eSwitchTeamResp\"r\n\rSwitchTeamReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\x12\x39\n\ntargetTeam\x18\x03 \x01(\x0e\x32%.endpoints.flunky.simulator.EnumTeams\"\x10\n\x0eKickPlayerResp\"7\n\rKickPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\"i\n\x12RegisterPlayerResp\x12;\n\x06status\x18\x01 \x01(\x0e\x32+.endpoints.flunky.simulator.EnumLoginStatus\x12\x16\n\x0eregisteredName\x18\x02 \x01(\t\"\'\n\x11RegisterPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\"\x87\x01\n\x06Player\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\tabgegeben\x18\x02 \x01(\x08\x12J\n\x10\x63onnectionStatus\x18\x05 \x01(\x0e\x32\x30.endpoints.flunky.simulator.EnumConnectionStatus\x12\x10\n\x08wonGames\x18\n \x01(\x03*\x99\x01\n\x0f\x45numLoginStatus\x12\x18\n\x14LOGIN_STATUS_UNKNOWN\x10\x00\x12\x18\n\x14LOGIN_STATUS_SUCCESS\x10\x01\x12\x1b\n\x17LOGIN_STATUS_NAME_TAKEN\x10\x02\x12\x1d\n\x19LOGIN_STATUS_PLAYER_TAKEN\x10\x03\x12\x16\n\x12LOGIN_STATUS_EMPTY\x10\x04*e\n\x14\x45numConnectionStatus\x12\x16\n\x12\x43ONNECTION_UNKNOWN\x10\x00\x12\x18\n\x14\x43ONNECTION_CONNECTED\x10\x01\x12\x1b\n\x17\x43ONNECTION_DISCONNECTED\x10\x02\x32\x99\x06\n\rPlayerService\x12o\n\x0eRegisterPlayer\x12-.endpoints.flunky.simulator.RegisterPlayerReq\x1a..endpoints.flunky.simulator.RegisterPlayerResp\x12\x63\n\nKickPlayer\x12).endpoints.flunky.simulator.KickPlayerReq\x1a*.endpoints.flunky.simulator.KickPlayerResp\x12\x63\n\nSwitchTeam\x12).endpoints.flunky.simulator.SwitchTeamReq\x1a*.endpoints.flunky.simulator.SwitchTeamResp\x12i\n\x0cShuffleTeams\x12+.endpoints.flunky.simulator.ShuffleTeamsReq\x1a,.endpoints.flunky.simulator.ShuffleTeamsResp\x12V\n\x10StreamAllPlayers\x12\x16.google.protobuf.Empty\x1a*.endpoints.flunky.simulator.PlayerListResp\x12X\n\x12StreamTeamAPlayers\x12\x16.google.protobuf.Empty\x1a*.endpoints.flunky.simulator.PlayerListResp\x12X\n\x12StreamTeamBPlayers\x12\x16.google.protobuf.Empty\x1a*.endpoints.flunky.simulator.PlayerListResp\x12V\n\x10StreamSpectators\x12\x16.google.protobuf.Empty\x1a*.endpoints.flunky.simulator.PlayerListRespB7\n*de.flunkyteam.endpoints.projects.simulatorB\x07PlayersP\x01\x62\x06proto3'
+  serialized_pb=b'\n\x14player_service.proto\x12\x1a\x65ndpoints.flunky.simulator\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12game_objects.proto\"\x12\n\x10ShuffleTeamsResp\"%\n\x0fShuffleTeamsReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\"E\n\x0ePlayerListResp\x12\x33\n\x07players\x18\x01 \x03(\x0b\x32\".endpoints.flunky.simulator.Player\"\x10\n\x0eSwitchTeamResp\"r\n\rSwitchTeamReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\x12\x39\n\ntargetTeam\x18\x03 \x01(\x0e\x32%.endpoints.flunky.simulator.EnumTeams\"\x10\n\x0eKickPlayerResp\"7\n\rKickPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\x12\x12\n\ntargetName\x18\x02 \x01(\t\"i\n\x12RegisterPlayerResp\x12;\n\x06status\x18\x01 \x01(\x0e\x32+.endpoints.flunky.simulator.EnumLoginStatus\x12\x16\n\x0eregisteredName\x18\x02 \x01(\t\"\'\n\x11RegisterPlayerReq\x12\x12\n\nplayerName\x18\x01 \x01(\t\"\xbc\x01\n\x06Player\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\tabgegeben\x18\x02 \x01(\x08\x12\x33\n\x04team\x18\x03 \x01(\x0e\x32%.endpoints.flunky.simulator.EnumTeams\x12J\n\x10\x63onnectionStatus\x18\x05 \x01(\x0e\x32\x30.endpoints.flunky.simulator.EnumConnectionStatus\x12\x10\n\x08wonGames\x18\n \x01(\x03*\x99\x01\n\x0f\x45numLoginStatus\x12\x18\n\x14LOGIN_STATUS_UNKNOWN\x10\x00\x12\x18\n\x14LOGIN_STATUS_SUCCESS\x10\x01\x12\x1b\n\x17LOGIN_STATUS_NAME_TAKEN\x10\x02\x12\x1d\n\x19LOGIN_STATUS_PLAYER_TAKEN\x10\x03\x12\x16\n\x12LOGIN_STATUS_EMPTY\x10\x04*e\n\x14\x45numConnectionStatus\x12\x16\n\x12\x43ONNECTION_UNKNOWN\x10\x00\x12\x18\n\x14\x43ONNECTION_CONNECTED\x10\x01\x12\x1b\n\x17\x43ONNECTION_DISCONNECTED\x10\x02\x32\xa1\x06\n\rPlayerService\x12o\n\x0eRegisterPlayer\x12-.endpoints.flunky.simulator.RegisterPlayerReq\x1a..endpoints.flunky.simulator.RegisterPlayerResp\x12\x63\n\nKickPlayer\x12).endpoints.flunky.simulator.KickPlayerReq\x1a*.endpoints.flunky.simulator.KickPlayerResp\x12\x63\n\nSwitchTeam\x12).endpoints.flunky.simulator.SwitchTeamReq\x1a*.endpoints.flunky.simulator.SwitchTeamResp\x12i\n\x0cShuffleTeams\x12+.endpoints.flunky.simulator.ShuffleTeamsReq\x1a,.endpoints.flunky.simulator.ShuffleTeamsResp\x12X\n\x10StreamAllPlayers\x12\x16.google.protobuf.Empty\x1a*.endpoints.flunky.simulator.PlayerListResp0\x01\x12Z\n\x12StreamTeamAPlayers\x12\x16.google.protobuf.Empty\x1a*.endpoints.flunky.simulator.PlayerListResp0\x01\x12Z\n\x12StreamTeamBPlayers\x12\x16.google.protobuf.Empty\x1a*.endpoints.flunky.simulator.PlayerListResp0\x01\x12X\n\x10StreamSpectators\x12\x16.google.protobuf.Empty\x1a*.endpoints.flunky.simulator.PlayerListResp0\x01\x42\x37\n*de.flunkyteam.endpoints.projects.simulatorB\x07PlayersP\x01\x62\x06proto3'
   ,
   dependencies=[google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,game__objects__pb2.DESCRIPTOR,])
 
@@ -54,8 +54,8 @@ _ENUMLOGINSTATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=727,
-  serialized_end=880,
+  serialized_start=780,
+  serialized_end=933,
 )
 _sym_db.RegisterEnumDescriptor(_ENUMLOGINSTATUS)
 
@@ -81,8 +81,8 @@ _ENUMCONNECTIONSTATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=882,
-  serialized_end=983,
+  serialized_start=935,
+  serialized_end=1036,
 )
 _sym_db.RegisterEnumDescriptor(_ENUMCONNECTIONSTATUS)
 
@@ -406,14 +406,21 @@ _PLAYER = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='connectionStatus', full_name='endpoints.flunky.simulator.Player.connectionStatus', index=2,
+      name='team', full_name='endpoints.flunky.simulator.Player.team', index=2,
+      number=3, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='connectionStatus', full_name='endpoints.flunky.simulator.Player.connectionStatus', index=3,
       number=5, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='wonGames', full_name='endpoints.flunky.simulator.Player.wonGames', index=3,
+      name='wonGames', full_name='endpoints.flunky.simulator.Player.wonGames', index=4,
       number=10, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -432,12 +439,13 @@ _PLAYER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=589,
-  serialized_end=724,
+  serialized_end=777,
 )
 
 _PLAYERLISTRESP.fields_by_name['players'].message_type = _PLAYER
 _SWITCHTEAMREQ.fields_by_name['targetTeam'].enum_type = game__objects__pb2._ENUMTEAMS
 _REGISTERPLAYERRESP.fields_by_name['status'].enum_type = _ENUMLOGINSTATUS
+_PLAYER.fields_by_name['team'].enum_type = game__objects__pb2._ENUMTEAMS
 _PLAYER.fields_by_name['connectionStatus'].enum_type = _ENUMCONNECTIONSTATUS
 DESCRIPTOR.message_types_by_name['ShuffleTeamsResp'] = _SHUFFLETEAMSRESP
 DESCRIPTOR.message_types_by_name['ShuffleTeamsReq'] = _SHUFFLETEAMSREQ
@@ -532,8 +540,8 @@ _PLAYERSERVICE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=986,
-  serialized_end=1779,
+  serialized_start=1039,
+  serialized_end=1840,
   methods=[
   _descriptor.MethodDescriptor(
     name='RegisterPlayer',

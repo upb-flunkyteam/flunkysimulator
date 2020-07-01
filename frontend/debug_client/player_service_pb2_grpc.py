@@ -35,22 +35,22 @@ class PlayerServiceStub(object):
         request_serializer=player__service__pb2.ShuffleTeamsReq.SerializeToString,
         response_deserializer=player__service__pb2.ShuffleTeamsResp.FromString,
         )
-    self.StreamAllPlayers = channel.unary_unary(
+    self.StreamAllPlayers = channel.unary_stream(
         '/endpoints.flunky.simulator.PlayerService/StreamAllPlayers',
         request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
         response_deserializer=player__service__pb2.PlayerListResp.FromString,
         )
-    self.StreamTeamAPlayers = channel.unary_unary(
+    self.StreamTeamAPlayers = channel.unary_stream(
         '/endpoints.flunky.simulator.PlayerService/StreamTeamAPlayers',
         request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
         response_deserializer=player__service__pb2.PlayerListResp.FromString,
         )
-    self.StreamTeamBPlayers = channel.unary_unary(
+    self.StreamTeamBPlayers = channel.unary_stream(
         '/endpoints.flunky.simulator.PlayerService/StreamTeamBPlayers',
         request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
         response_deserializer=player__service__pb2.PlayerListResp.FromString,
         )
-    self.StreamSpectators = channel.unary_unary(
+    self.StreamSpectators = channel.unary_stream(
         '/endpoints.flunky.simulator.PlayerService/StreamSpectators',
         request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
         response_deserializer=player__service__pb2.PlayerListResp.FromString,
@@ -140,22 +140,22 @@ def add_PlayerServiceServicer_to_server(servicer, server):
           request_deserializer=player__service__pb2.ShuffleTeamsReq.FromString,
           response_serializer=player__service__pb2.ShuffleTeamsResp.SerializeToString,
       ),
-      'StreamAllPlayers': grpc.unary_unary_rpc_method_handler(
+      'StreamAllPlayers': grpc.unary_stream_rpc_method_handler(
           servicer.StreamAllPlayers,
           request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
           response_serializer=player__service__pb2.PlayerListResp.SerializeToString,
       ),
-      'StreamTeamAPlayers': grpc.unary_unary_rpc_method_handler(
+      'StreamTeamAPlayers': grpc.unary_stream_rpc_method_handler(
           servicer.StreamTeamAPlayers,
           request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
           response_serializer=player__service__pb2.PlayerListResp.SerializeToString,
       ),
-      'StreamTeamBPlayers': grpc.unary_unary_rpc_method_handler(
+      'StreamTeamBPlayers': grpc.unary_stream_rpc_method_handler(
           servicer.StreamTeamBPlayers,
           request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
           response_serializer=player__service__pb2.PlayerListResp.SerializeToString,
       ),
-      'StreamSpectators': grpc.unary_unary_rpc_method_handler(
+      'StreamSpectators': grpc.unary_stream_rpc_method_handler(
           servicer.StreamSpectators,
           request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
           response_serializer=player__service__pb2.PlayerListResp.SerializeToString,

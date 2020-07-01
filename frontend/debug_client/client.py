@@ -40,6 +40,11 @@ def kickPlayer(name):
   req.targeName = name
   flunkyStub.KickPlayer(req)
 
+def shuffleTeams(sender):
+  req = playerService.ShuffleTeamsReq()
+  req.playerName = sender
+  return playerStub.ShuffleTeams(req, metadata=metadataSecret)
+
 def getState():
   req = flunkyService.StreamStateReq()
   resp = flunkyStub.StreamState(req)
@@ -156,6 +161,20 @@ if (len(sys.argv) == 2):
     req = flunkyService.StreamVideoEventsReq()
     for x in flunkyStub.StreamVideoEvents(req):
       sys.stdout.write(str(x)) ; sys.stdout.flush()
+
+  if(arg == "listenP"):
+    sys.stdout.write('listen to all players stream   ') ; sys.stdout.flush()
+    req = emptyMessage.Empty()
+    for x in playerStub.StreamAllPlayers(req,metadata=metadataSecret):
+      sys.stdout.write(str(x)) ; sys.stdout.flush()
+
+  if(arg == "hans"):
+    sys.stdout.write('Register player hans') ; sys.stdout.flush()
+    registerPlayer("hans")
+    
+
+      
+
     
 
 
