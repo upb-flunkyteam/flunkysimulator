@@ -38,7 +38,7 @@ internal class GameControllerTest {
         val players = listOf(hans, player1, player2, player3)
 
         val state = GameState(
-            abgegeben = listOf(player1, player3),
+            abgegeben = listOf(player1.name, player3.name),
             throwingPlayer = hans.name,
             roundPhase = EnumRoundPhase.TEAM_A_THROWING_PHASE
         )
@@ -64,7 +64,7 @@ internal class GameControllerTest {
         val players = listOf(hans, player1, player2, player3)
 
         val state = GameState(
-            abgegeben = listOf(player1),
+            abgegeben = listOf(player1.name),
             throwingPlayer = hans.name,
             roundPhase = EnumRoundPhase.TEAM_A_THROWING_PHASE
         )
@@ -83,7 +83,7 @@ internal class GameControllerTest {
     fun `move player to spectator`() {
 
         val hans = Player("hans", team = Team.B)
-        val gameState = GameState(abgegeben = listOf(hans))
+        val gameState = GameState(abgegeben = listOf(hans.name))
 
         val gameController = gameController( gameState, listOf(hans))
 
