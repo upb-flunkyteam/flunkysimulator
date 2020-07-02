@@ -16,23 +16,42 @@ const {
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
     AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
     StreamVideoEventsReq, StreamVideoEventsResp
-} = require('./flunkyprotocol_pb');
-const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
+} = require('./video_service_pb');
+const {VideoServiceClient} = require('./video_service_grpc_web_pb');
 
-var simulatorClient = null;
+var videoService = null;
 export const VideoManager = {};
 
 jQuery(window).load(function () {
-    simulatorClient = new SimulatorClient(env['BACKEND_URL']);
+    videoService = new VideoServiceClient(env['BACKEND_URL']);
+    subscribeVideoStream()
+
+    let desktop = window.matchMedia("(min-width: 992px)").matches;
+    if (desktop) {
+        $('#lowbandwidthbutton').bootstrapToggle('on');
+    }
+    VideoManager.lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
+    $('#lowbandwidthbutton').change(function () {
+        VideoManager.lowBandwidth = !$(this).prop('checked');
+        VideoManager.changeLowBandwidthMode();
+    });
+    // do not autohide hit-videos, in order to hold the last frame of the video until the stop video is played (#4)
+    $('.video:not(.hit)').on('ended', function () {
+        $(this).hide();
+        $('.logoposter').show();
+    });
+    $('.video').hide();
+    $('.poster').hide();
+
 });
 
 VideoManager.lowBandwidth = false;
 var preparedVideos = {};
 
-VideoManager.subscribeVideoStream = function(){
+function subscribeVideoStream(){
 
     var videoEventsRequest = new StreamVideoEventsReq();
-    var videoEventStream = simulatorClient.streamVideoEvents(videoEventsRequest, {});
+    var videoEventStream = videoService.streamVideoEvents(videoEventsRequest, {});
     videoEventStream.on('data', (response) => {
         processNewVideoEvent(response.getEvent().toObject());
     });

@@ -42,15 +42,18 @@ head
             .statearea
                 h3 Linkes Team
                 #teamaarea
-                h3 Zuschauer
+                #teamastrafbierarea
+                h3 Vestibül
                 #spectatorarea
             button#resetbutton.btn.btn-default Spiel neu starten
+            button#shufflebutton.btn.btn-default Teams mischen
             a#switchplayerbutton.btn.btn-default(href="#registerform") Spieler wechseln
             input#lowbandwidthbutton(type="checkbox" data-toggle="toggle" data-on="Videomodus" data-off="Textmodus")
         .col-md-3.col-sm-6
             .statearea
                 h3 Rechtes Team
                 #teambarea
+                #teambstrafbierarea
             h3 Chat
             textarea#logbox.form-control(rows=10 disabled)
             input#chatinput.form-control(type="text" placeholder="Nachricht")

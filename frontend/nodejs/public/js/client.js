@@ -22,8 +22,11 @@ const {
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
     AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
     StreamVideoEventsReq, StreamVideoEventsResp
-} = require('./flunkyprotocol_pb');
-const {SimulatorClient} = require('./flunkyprotocol_grpc_web_pb');
+} = require('./flunky_service_pb');
+const {FlunkyServiceClient} = require('./flunky_service_grpc_web_pb');
+
+const {VideoManager} = require('./videoManager');
+const {ClientManager} = require('./clientManager')
 const {PlayerManager} = require('./playerManager');
 
 PlayerManager.external.sendMessage = sendMessage;
@@ -31,17 +34,23 @@ PlayerManager.external.processNewState = function(){processNewState(currentGameS
 PlayerManager.external.toggleAbgabe = toggleAbgabe;
 PlayerManager.external.reduceStrafbierCount = reduceStrafbierCount;
 PlayerManager.external.selectThrowingPlayer = selectThrowingPlayer;
+PlayerManager.external.ClientManager = ClientManager;
+PlayerManager.external.getThrowingPlayerName = () => {return currentGameState.throwingplayer};
+PlayerManager.external.getStrafbierteamA = () => {return currentGameState.strafbierteama};
+PlayerManager.external.getStrafbierteamB = () => {return currentGameState.strafbierteamb};
+PlayerManager.external.hasAbgegeben = (name) => {return currentGameState.abgegebenList.includes(name)};
 
-const {VideoManager} = require('./videoManager');
 
-var simulatorClient = null;
-var playerTeam = null;
+var flunkyService = null;
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
-var currentGameState = null;
+var currentGameState = new GameState().toObject();
 const title = document.title;
 
 jQuery(window).load(function () {
+    flunkyService = new FlunkyServiceClient(env['BACKEND_URL']);
+    subscribeStreams();
+
     $('#softthrowbutton').click(function () {
         throwing(EnumThrowStrength.SOFT_THROW_STRENGTH);
     });
@@ -50,21 +59,6 @@ jQuery(window).load(function () {
     });
     $('#hardthrowbutton').click(function () {
         throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
-    });
-    $('#playername').keyup(function (e) {
-        if (e.keyCode === 13) {
-            $(this).trigger("submission");
-        }
-    });
-    $('#playernamebutton').click(function () {
-        $('#playername').trigger("submission");
-    });
-    $('#playername').bind("submission", function (e) {
-        PlayerManager.changePlayername($('#playername').val());
-    });
-    $('#switchplayerbutton').click(function () {
-        $('#registerform').show();
-        $('#playernamebutton').text('Spielernamen ändern');
     });
     $('#chatinput').bind("enterKey", function (e) {
         sendMessage($('#chatinput').val());
@@ -82,39 +76,13 @@ jQuery(window).load(function () {
     });
     // secondary data-toogle to enable tooltips and dropdown at the same time
     $('[data-toggle-second="tooltip"]').tooltip();
-    desktop = window.matchMedia("(min-width: 992px)").matches;
-    if (desktop) {
-        $('#lowbandwidthbutton').bootstrapToggle('on');
-    }
-    VideoManager.lowBandwidth = !$('#lowbandwidthbutton').prop('checked');
-    $('#lowbandwidthbutton').change(function () {
-        VideoManager.lowBandwidth = !$(this).prop('checked');
-        VideoManager.changeLowBandwidthMode();
-    });
-    // do not autohide hit-videos, in order to hold the last frame of the video until the stop video is played (#4)
-    $('.video:not(.hit)').on('ended', function () {
-        $(this).hide();
-        $('.logoposter').show();
-    });
-    $('.video').hide();
-    $('.poster').hide();
+
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-    simulatorClient = new SimulatorClient(env['BACKEND_URL']);
-    subscribeStreams();
-    // Try to re-register if the username field is not empty
-    // This happens when the page is reloaded
-    // Browsers will preserve the form input, thus the username remains set
-    playerNameFormValue = $('#playername').val();
-    if (playerNameFormValue) {
-        if (confirm('Möchtest du mit dem Namen ' + playerNameFormValue + ' beitreten?')) {
-            PlayerManager.changePlayername(playerNameFormValue);
-        }
-    }
 });
 
 function subscribeStreams() {
     var stateRequest = new StreamStateReq();
-    var stateStream = simulatorClient.streamState(stateRequest, {});
+    var stateStream = flunkyService.streamState(stateRequest, {});
     stateStream.on('data', (response) => {
         processNewState(response.getState().toObject());
     });
@@ -122,8 +90,10 @@ function subscribeStreams() {
         console.log('Error in state stream:');
         console.log(response);
     });
+
+    //TODO create logManager.js
     var logRequest = new LogReq();
-    var logStream = simulatorClient.streamLog(logRequest, {});
+    var logStream = flunkyService.streamLog(logRequest, {});
     logStream.on('data', (response) => {
         processNewLog(response.getSender(), response.getContent());
     });
@@ -131,8 +101,6 @@ function subscribeStreams() {
         console.log('Error in log stream:');
         console.log(response);
     });
-
-    VideoManager.subscribeVideoStream()
 }
 
 function throwing(strength) {
@@ -144,7 +112,7 @@ function throwing(strength) {
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setStrength(strength);
     console.log(request.toObject());
-    simulatorClient.throw(request, {}, function (err, response) {
+    flunkyService.throw(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -157,15 +125,13 @@ function sendMessage(content) {
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setContent(content);
     console.log(request.toObject());
-    simulatorClient.sendMessage(request, {}, function (err, response) {
+    flunkyService.sendMessage(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
         }
     });
 }
-
-
 
 function increaseStrafbierCount(team) {
     modifyStrafbierCount(team, true);
@@ -175,14 +141,13 @@ function reduceStrafbierCount(team) {
     modifyStrafbierCount(team, false);
 }
 
-
 function modifyStrafbierCount(team, increment) {
     var request = new ModifyStrafbierCountReq();
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetteam(team);
     request.setIncrement(increment);
     console.log(request.toObject());
-    simulatorClient.modifyStrafbierCount(request, {}, function (err, response) {
+    flunkyService.modifyStrafbierCount(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -195,7 +160,7 @@ function selectThrowingPlayer(targetName) {
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetname(targetName);
     console.log(request.toObject());
-    simulatorClient.selectThrowingPlayer(request, {}, function (err, response) {
+    flunkyService.selectThrowingPlayer(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -207,14 +172,10 @@ function toggleAbgabe(targetName) {
     var request = new AbgegebenReq();
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetname(targetName);
-    players = currentGameState.playerteamaList.concat(currentGameState.playerteambList);
-    players.forEach(function (player, index) {
-        if (player.name === targetName) {
-            request.setSetto(!player.abgegeben);
-        }
-    });
+    let hasAbgegeben = currentGameState.abgegebenList.includes(targetName)
+    request.setSetto(!hasAbgegeben);
     console.log(request.toObject());
-    simulatorClient.abgegeben(request, {}, function (err, response) {
+    flunkyService.abgegeben(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -226,7 +187,7 @@ function resetGame() {
     var request = new ResetGameReq();
     request.setPlayername(PlayerManager.ownPlayerName);
     console.log(request.toObject());
-    simulatorClient.resetGame(request, {}, function (err, response) {
+    flunkyService.resetGame(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -246,11 +207,6 @@ function processNewState(state, stale = false) {
     } else if (currentGameState.roundphase === EnumRoundPhase.TEAM_B_THROWING_PHASE) {
         currentTeam = EnumTeams.TEAM_B_TEAMS;
     }
-    playerTeam =
-        currentGameState.playerteamaList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.TEAM_A_TEAMS :
-            currentGameState.playerteambList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.TEAM_B_TEAMS :
-                currentGameState.spectatorsList.map(a => a.name).includes(PlayerManager.ownPlayerName) ? EnumTeams.SPECTATOR_TEAMS :
-                    EnumTeams.UNKNOWN_TEAMS;
 
     // TODO wont work because of  #82
     //  umlaut playernames are never correctly assigned to their team and will be removed nevertheless
@@ -260,25 +216,14 @@ function processNewState(state, stale = false) {
         console.log('player appears to be kicked -> Playername reset to null');
     }*/
 
-    // Create players
-    $('#teamaarea, #teambarea, #spectatorarea').empty();
-    currentGameState.playerteamaList.forEach(function (player, index) {
-        player.team = EnumTeams.TEAM_A_TEAMS
-        $('#teamaarea').append(PlayerManager.generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteama));
-    });
-    currentGameState.playerteambList.forEach(function (player, index) {
-        player.team = EnumTeams.TEAM_B_TEAMS
-        $('#teambarea').append(PlayerManager.generatePlayerHTML(player, currentGameState.throwingplayer, player.team === playerTeam, currentGameState.strafbierteamb));
-    });
-    currentGameState.spectatorsList.forEach(function (player, index) {
-        player.team = EnumTeams.SPECTATOR_TEAMS
-        $('#spectatorarea').append(PlayerManager.generateSpectatorHTML(player));
-    });
-    $('#teamaarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
-    $('#teambarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
+    // display strafbier
+    $('#teamastrafbierarea').empty();
+    $('#teambstrafbierarea').empty();
+    $('#teamastrafbierarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
+    $('#teambstrafbierarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
 
     // Throwing Team related highlighting
-    playerTeam === currentTeam
+    PlayerManager.ownTeam === currentTeam
         ? $('.video').addClass('highlight')
         : $('.video').removeClass('highlight');
 
@@ -290,14 +235,7 @@ function processNewState(state, stale = false) {
         $('.throwbutton').prop('disabled', false);
         $('#throwerdisplayarea').hide();
         // Make sure user notices
-        // TODO rename after namechange isResting
-        console.log(state.restingperiod)
-        if (!state.restingperiod) {
-            console.log('not resting')
-            $('.actionbox').addClass('flashingbackground');
-        } else {
-            console.log('resting')
-        }
+        $('.actionbox').addClass('flashingbackground');
         document.title = `Wirf ${PlayerManager.ownPlayerName}!`;
     } else {
         document.title = title;
@@ -316,6 +254,8 @@ function processNewState(state, stale = false) {
         $('#throwactionbuttons').hide();
         $('#throwerdisplayarea').show();
     }
+
+    PlayerManager.refreshPlayers();
 }
 
 function processNewLog(sender, content) {

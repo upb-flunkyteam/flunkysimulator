@@ -1,88 +1,108 @@
 import grpc
-import flunkyprotocol_pb2 as proto
-import flunkyprotocol_pb2_grpc
-import sys
-import random
+import flunky_service_pb2 as flunkyService
+import flunky_service_pb2_grpc
+import player_service_pb2 as playerService
+import player_service_pb2_grpc
+import client_service_pb2 as clientService
+import client_service_pb2_grpc
 from google.protobuf import empty_pb2 as emptyMessage
 
-#channel = grpc.insecure_channel('flunky.viings.de:11049') # master
-channel = grpc.insecure_channel('flunky.viings.de:64809') # develop
-#channel = grpc.insecure_channel('localhost:11049')
+import sys
+import random
 
-stub = flunkyprotocol_pb2_grpc.SimulatorStub(channel)
+CLIENT_SECRET_KEY = "client_secret_key"
+
+#channel = grpc.insecure_channel('flunky.viings.de:11049') # master
+#channel = grpc.insecure_channel('flunky.viings.de:64809') # develop
+channel = grpc.insecure_channel('localhost:11049')
+
+flunkyStub = flunky_service_pb2_grpc.FlunkyServiceStub(channel)
+playerStub = player_service_pb2_grpc.PlayerServiceStub(channel)
+clientStub = client_service_pb2_grpc.ClientServiceStub(channel)
 
 players = 'hans jurgen marie lola jana'.split()
 
+req = clientService.ClientStreamReq()
+clientStream = clientStub.ClientStream(req)
+secret = clientStream.next().clientRegisterd.secret
+metadataSecret = [('client_secret_key',secret)]
+
+      
 def registerPlayer(name):
-  req = proto.RegisterPlayerReq()
+  req = playerService.RegisterPlayerReq()
   req.playerName = name
 
-  return stub.RegisterPlayer(req)
+  return playerStub.RegisterPlayer(req,metadata=metadataSecret)
 
 def kickPlayer(name):
-  req = proto.KickPlayerReq()
+  req = flunkyService.KickPlayerReq()
   req.playerName = "egal"
   req.targeName = name
-  stub.KickPlayer(req)
+  flunkyStub.KickPlayer(req)
+
+def shuffleTeams(sender):
+  req = playerService.ShuffleTeamsReq()
+  req.playerName = sender
+  return playerStub.ShuffleTeams(req, metadata=metadataSecret)
 
 def getState():
-  req = proto.StreamStateReq()
-  resp = stub.StreamState(req)
+  req = flunkyService.StreamStateReq()
+  resp = flunkyStub.StreamState(req)
   print (next(resp))
 
 def registerPlayersAndStartGame():
   for pname in 'hans jurgen marie lola jana'.split():
-    req = proto.RegisterPlayerReq()
+    req = flunkyService.RegisterPlayerReq()
     req.playerName = pname
-    stub.RegisterPlayer(req)
+    flunkyStub.RegisterPlayer(req)
     print("Added "+pname)
 
   #start game
-  req = proto.ResetGameReq()
+  req = flunkyService.ResetGameReq()
   req.playerName = "hans"
-  stub.ResetGame(req)
+  flunkyStub.ResetGame(req)
   
 def throw(name, strength = 1):
-  req = proto.ThrowReq()
+  req = flunkyService.ThrowReq()
   req.playerName = name
   req.strength = strength
-  return stub.Throw(req)
+  return flunkyStub.Throw(req)
 
 def throwNext( strength = 1):
-  state = next(stub.StreamState(proto.StreamStateReq()))
+  state = next(flunkyStub.StreamState(flunkyService.StreamStateReq()))
   name = state.state.throwingPlayer
   print( name + " is throwing")
   return throw(name,strength)
 
 def setAbgegeben(judge, player, abgegeben = True):
-  req = proto.AbgegebenReq()
+  req = flunkyService.AbgegebenReq()
   req.playerName = judge
   req.targetName = player
   req.setTo = abgegeben
-  return stub.Abgegeben(req)
+  return flunkyStub.Abgegeben(req)
 
 def modifyStrafbier(increment = True,team = 2):
-  req = proto.ModifyStrafbierCountReq()
+  req = flunkyService.ModifyStrafbierCountReq()
   req.playerName = "Strafbierboy"
   req.targetTeam = team
   req.increment = increment
-  stub.ModifyStrafbierCount(req)
+  flunkyStub.ModifyStrafbierCount(req)
 
 
 # debug rpcs
 def setRestingPeriod(milliseconds, active):
-  req = proto.RestingPeriodReq()
+  req = flunkyService.RestingPeriodReq()
   req.active = active
   req.milliseconds = milliseconds
-  stub.SetRestingPeriod(req)
+  flunkyStub.SetRestingPeriod(req)
 
 def hardReset():
-  stub.HardReset(emptyMessage.Empty())
+  flunkyStub.HardReset(emptyMessage.Empty())
 
 def playGame():
   registerPlayersAndStartGame()
   
-  state = next(stub.StreamState(proto.StreamStateReq()))
+  state = next(flunkyStub.StreamState(flunkyService.StreamStateReq()))
   print (state)
 
   throw(state.state.throwingPlayer)
@@ -111,14 +131,14 @@ def playGame():
 
   pnames= [p.name for p in playersA]
   for pname in pnames:
-      req = proto.KickPlayerReq()
+      req = flunkyService.KickPlayerReq()
       req.targeName = pname
       req.playerName =pname
       print "kicking "+pname
-      stub.KickPlayer(req)
+      flunkyStub.KickPlayer(req)
 
   #%%
-  state = next(stub.StreamState(proto.StreamStateReq()))
+  state = next(flunkyStub.StreamState(flunkyService.StreamStateReq()))
   pnames= [p.name for p in state.state.spectators]
 
 
@@ -126,21 +146,35 @@ if (len(sys.argv) == 2):
   arg = sys.argv[1]
   if(arg == "listenS"):
     sys.stdout.write('listen to state stream  ') ; sys.stdout.flush()
-    req = proto.StreamStateReq()
-    for x in stub.StreamState(req):
+    req = flunkyService.StreamStateReq()
+    for x in flunkyStub.StreamState(req):
       sys.stdout.write(str(x)) ; sys.stdout.flush()
       
   if(arg == "listenL"):
     sys.stdout.write('listen to log stream   ') ; sys.stdout.flush()
-    req = proto.LogReq()
-    for x in stub.StreamLog(req):
+    req = flunkyService.LogReq()
+    for x in flunkyStub.StreamLog(req):
       sys.stdout.write(str(x)) ; sys.stdout.flush()
       
   if(arg == "listenV"):
     sys.stdout.write('listen to video event stream   ') ; sys.stdout.flush()
-    req = proto.StreamVideoEventsReq()
-    for x in stub.StreamVideoEvents(req):
+    req = flunkyService.StreamVideoEventsReq()
+    for x in flunkyStub.StreamVideoEvents(req):
       sys.stdout.write(str(x)) ; sys.stdout.flush()
+
+  if(arg == "listenP"):
+    sys.stdout.write('listen to all players stream   ') ; sys.stdout.flush()
+    req = emptyMessage.Empty()
+    for x in playerStub.StreamAllPlayers(req,metadata=metadataSecret):
+      sys.stdout.write(str(x)) ; sys.stdout.flush()
+
+  if(arg == "hans"):
+    sys.stdout.write('Register player hans') ; sys.stdout.flush()
+    registerPlayer("hans")
+    
+
+      
+
     
 
 

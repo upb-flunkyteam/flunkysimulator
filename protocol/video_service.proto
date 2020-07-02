@@ -3,8 +3,19 @@ syntax = "proto3";
 package endpoints.flunky.simulator;
 
 option java_multiple_files = true;
-option java_outer_classname = "VideoObjects";
+option java_outer_classname = "Video";
 option java_package = "de.flunkyteam.endpoints.projects.simulator";
+
+service VideoService{
+  rpc StreamVideoEvents(StreamVideoEventsReq) returns (stream StreamVideoEventsResp);
+}
+
+message StreamVideoEventsResp{
+  VideoEvent event = 1;
+}
+
+message StreamVideoEventsReq{}
+
 
 message VideoEvent{
   oneof event_oneof {

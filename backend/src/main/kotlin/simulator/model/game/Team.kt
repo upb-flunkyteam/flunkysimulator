@@ -18,6 +18,12 @@ fun Team.otherTeam() = when (this) {
     else -> throw IllegalArgumentException("There is no other Team for $this.")
 }
 
+fun Team.toGrpc() = when(this) {
+    Team.Spectator -> EnumTeams.SPECTATOR_TEAMS
+    Team.A -> EnumTeams.TEAM_A_TEAMS
+    Team.B -> EnumTeams.TEAM_B_TEAMS
+}
+
 fun EnumTeams.toKotlin() = when(this){
     EnumTeams.TEAM_A_TEAMS -> Team.A
     EnumTeams.TEAM_B_TEAMS -> Team.B

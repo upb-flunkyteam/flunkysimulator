@@ -11,4 +11,8 @@
 
 ### Docker
 
-- use jetBrains integration
+#### Get Grpc generated with docker
+
+- start docker frontend container
+- docker ps, look for container name
+- docker cp $container name$:frontend/public/js .
