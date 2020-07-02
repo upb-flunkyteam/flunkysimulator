@@ -10,7 +10,7 @@ data class GameState(
     val roundPhase: EnumRoundPhase = EnumRoundPhase.NO_ACTIVE_GAME_PHASE,
     val strafbiereA: Int = 0,
     val strafbiereB: Int = 0,
-    val abgegeben: List<Player> = emptyList(),
+    val abgegeben: List<String> = emptyList(),
     val ruleConfig: RuleConfig = RuleConfig()
 ) {
 
@@ -21,9 +21,11 @@ data class GameState(
         else -> -1
     }
 
-    fun getAbgegeben(player: Player) = this.abgegeben.contains(player)
+    fun getAbgegeben(player: Player) = getAbgegeben(player.name)
+    fun getAbgegeben(player: String) = this.abgegeben.contains(player)
 
-    fun setAbgegeben(player: Player, value: Boolean) = if (value)
+    fun setAbgegeben(player: Player, value: Boolean) = setAbgegeben(player.name, value)
+    fun setAbgegeben(player: String, value: Boolean) = if (value)
         this.copy(abgegeben = abgegeben.plus(player))
     else
         this.copy(abgegeben = abgegeben.minus(player))
@@ -35,6 +37,7 @@ data class GameState(
 
     fun toGRPC() =
         de.flunkyteam.endpoints.projects.simulator.GameState.newBuilder()
+            .addAllAbgegeben(abgegeben)
             .setThrowingPlayer(throwingPlayer ?: "")
             .setStrafbierTeamA(strafbiereA.toLong())
             .setStrafbierTeamB(strafbiereB.toLong())

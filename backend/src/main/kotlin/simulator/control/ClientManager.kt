@@ -74,8 +74,9 @@ class ClientManager {
                     removeClient(oldOwnerId) //guess they are dead, time to move on
             }
 
-            playerToClients = playerToClients.plus(player to client.id)
-            updateClient(client.copy(players = client.players.plus(player)))
+            playerToClients = playerToClients.minus(client.players).plus(player to client.id)
+            //TODO allow more than one player?
+            updateClient(client.copy(players = listOf(player)))
 
             return true
         }

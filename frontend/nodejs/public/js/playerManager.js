@@ -19,6 +19,29 @@ const {PlayerServiceClient} = require('./player_service_grpc_web_pb');
 var playerService = null;
 export const PlayerManager = {};
 
+PlayerManager.ownPlayerName = null;
+PlayerManager.ownTeam = EnumTeams.SPECTATOR_TEAMS;
+
+//external functions
+PlayerManager.external = {}
+PlayerManager.external.sendMessage = null;
+PlayerManager.external.processNewState = null;
+PlayerManager.external.toggleAbgabe = null;
+PlayerManager.external.reduceStrafbierCount = null;
+PlayerManager.external.selectThrowingPlayer = null;
+PlayerManager.external.getThrowingPlayerName = () => "";
+PlayerManager.external.getStrafbierteamA = () => 0;
+PlayerManager.external.getStrafbierteamB = () => 0;
+PlayerManager.external.hasAbgegeben = (name) => false;
+
+PlayerManager.external.ClientManager = null
+
+var metadata = {}
+var players = []
+var teamA = []
+var teamB = []
+var spectators = []
+
 
 jQuery(window).load(function () {
     playerService = new PlayerServiceClient(env['BACKEND_URL']);
@@ -58,24 +81,6 @@ jQuery(window).load(function () {
 
 });
 
-PlayerManager.ownPlayerName = null;
-PlayerManager.ownTeam = EnumTeams.SPECTATOR_TEAMS;
-
-//external functions
-PlayerManager.external = {}
-PlayerManager.external.sendMessage = null;
-PlayerManager.external.processNewState = null;
-PlayerManager.external.toggleAbgabe = null;
-PlayerManager.external.reduceStrafbierCount = null;
-PlayerManager.external.selectThrowingPlayer = null;
-PlayerManager.external.getThrowingPlayerName = () => "";
-PlayerManager.external.getStrafbierteamA = () => 0;
-PlayerManager.external.getStrafbierteamB = () => 0;
-
-PlayerManager.external.ClientManager = null
-
-var metadata = {}
-
 //https://stackoverflow.com/questions/7307983/while-variable-is-not-defined-wait
 function __delay__(timer) {
     return new Promise(resolve => {
@@ -84,7 +89,43 @@ function __delay__(timer) {
             resolve();
         }, timer);
     });
-};
+}
+
+PlayerManager.refreshPlayers = function () {
+    // figure out own team
+    players.forEach(player => {
+        if (player.name === PlayerManager.ownPlayerName) {
+            PlayerManager.ownTeam = player.team;
+        }
+    })
+
+    $('#teamaarea').empty();
+    $('#teambarea').empty();
+    $('#spectatorarea').empty();
+
+    let strafbierA = PlayerManager.external.getStrafbierteamA();
+    let strafbierB = PlayerManager.external.getStrafbierteamB();
+    let throwingPlayer = PlayerManager.external.getThrowingPlayerName();
+
+    teamA.forEach(player => {
+        $('#teamaarea').append(
+            generatePlayerHTML(player,
+                player.name === throwingPlayer,
+                player.team === PlayerManager.ownTeam,
+                strafbierA > 0));
+    });
+    teamB.forEach(player => {
+        $('#teambarea').append(
+            generatePlayerHTML(player,
+                player.name === throwingPlayer,
+                player.team === PlayerManager.ownTeam,
+                strafbierB > 0));
+    });
+
+    spectators.forEach(player => {
+        $('#spectatorarea').append(generateSpectatorHTML(player));
+    });
+}
 
 async function subscribeTeamStreams() {
 
@@ -96,45 +137,12 @@ async function subscribeTeamStreams() {
     // I would love to use the team specific streams but js continues to be js :/
     var playersStream = playerService.streamAllPlayers(new Empty(), metadata);
     playersStream.on('data', (response) => {
-        $('#teamaarea').empty();
-        $('#teambarea').empty();
-        $('#spectatorarea').empty();
-        let players = response.getPlayersList().map( p => p.toObject());
+        players = response.getPlayersList().map(p => p.toObject());
+        teamA = players.filter(p => p.team === EnumTeams.TEAM_A_TEAMS)
+        teamB = players.filter(p => p.team === EnumTeams.TEAM_B_TEAMS)
+        spectators = players.filter(p => p.team === EnumTeams.SPECTATOR_TEAMS)
 
-        players.forEach(player => {
-            if(player.name === PlayerManager.ownPlayerName){
-                PlayerManager.ownTeam = player.team;
-            }
-        })
-
-        let teamA = players.filter(p => p.team === EnumTeams.TEAM_A_TEAMS)
-        let teamB = players.filter(p => p.team === EnumTeams.TEAM_B_TEAMS)
-        let spectators = players.filter(p => p.team === EnumTeams.SPECTATOR_TEAMS)
-
-        let strafbierA = PlayerManager.external.getStrafbierteamA();
-        let strafbierB = PlayerManager.external.getStrafbierteamB();
-        let throwingPlayer = PlayerManager.external.getThrowingPlayerName();
-        let isThrowingPlayer = PlayerManager.ownPlayerName === throwingPlayer;
-
-        teamA.forEach(player => {
-            $('#teamaarea').append(
-                PlayerManager.generatePlayerHTML(player,
-                    isThrowingPlayer,
-                    player.team === PlayerManager.ownTeam,
-                    strafbierA > 0));
-        });
-        teamB.forEach(player => {
-            $('#teambarea').append(
-                PlayerManager.generatePlayerHTML(player,
-                    isThrowingPlayer,
-                    player.team === PlayerManager.ownTeam,
-                    strafbierB > 0));
-        });
-
-        spectators.forEach(player => {
-            $('#spectatorarea').append(PlayerManager.generateSpectatorHTML(player));
-        });
-
+        PlayerManager.refreshPlayers();
     })
     playersStream.on('error', (response) => {
         console.log('Error in players stream:');
@@ -156,10 +164,10 @@ PlayerManager.switchTeam = function (targetTeam, targetName) {
     });
 }
 
-PlayerManager.shuffleTeams = function(){
+PlayerManager.shuffleTeams = function () {
     const request = new ShuffleTeamsReq();
     request.setPlayername(PlayerManager.ownPlayerName);
-    playerService.shuffleTeams(request,metadata,function (err, response) {
+    playerService.shuffleTeams(request, metadata, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -181,7 +189,7 @@ PlayerManager.kickPlayer = function (targetName) {
     });
 }
 
-async function changePlayername (desiredPlayername) {
+async function changePlayername(desiredPlayername) {
     if (desiredPlayername === '') {
         console.log("Warning: Cannot register empty player name");
         return;
@@ -212,11 +220,11 @@ async function changePlayername (desiredPlayername) {
                     // Force re-evaluation of game state, e.g. do I need to throw
                     PlayerManager.external.processNewState();
                     break;
+                case EnumLoginStatus.LOGIN_STATUS_PLAYER_TAKEN:
+                    window.alert('Registrierung fehlgeschlagen! Aktive Sitzung für diesen Namen bereits vorhanden.')
+                    break;
                 case EnumLoginStatus.LOGIN_STATUS_EMPTY:
                     window.alert('Registrierung fehlgeschlagen! Dein Benutzername ist leer.');
-                    break;
-                case EnumLoginStatus.LOGIN_STATUS_SECRET_MISMATCH:
-                    window.alert('Registrierung fehlgeschlagen! Passwort falsch.');
                     break;
                 case EnumLoginStatus.LOGIN_STATUS_UNKNOWN:
                     window.alert('Registrierung fehlgeschlagen!');
@@ -226,26 +234,27 @@ async function changePlayername (desiredPlayername) {
     });
 }
 
-PlayerManager.generateSpectatorHTML = function (player) {
-    return PlayerManager.generatePlayerHTML(player, false, false, false, true);
+function generateSpectatorHTML(player) {
+    return generatePlayerHTML(player, false, false, false, true);
 }
 
-PlayerManager.generatePlayerHTML = function (player,
-                                             throwingPlayer = false,
-                                             isOwnTeam = false,
-                                             hasStrafbier = false,
-                                             isSpectator = false) {
+function generatePlayerHTML(player,
+                            throwingPlayer = false,
+                            isOwnTeam = false,
+                            hasStrafbier = false,
+                            isSpectator = false) {
     let name = player.name;
     let isHimself = name === PlayerManager.ownPlayerName;
-    let turnClass = name === throwingPlayer ? ' btn-primary' : ' btn-default';
+    let turnClass = throwingPlayer ? ' btn-primary' : ' btn-default';
     let egoClass = isHimself ? ' egoplayer' : '';
-    let hasAbgegebenClass = player.abgegeben ? ' disabled' : '';
+    let hasAbgegeben = PlayerManager.external.hasAbgegeben(player.name);
+    let hasAbgegebenClass = hasAbgegeben ? ' disabled' : '';
 
     // disabled for own team and not abgegeben
     let mayValidateAbgabeClass = !isOwnTeam ? "" : "disabled";
     let mayRejoinClass = hasStrafbier && isHimself ? "" : "disabled";
 
-    let playerSpan = name === PlayerManager.ownPlayerName
+    let playerSpan = isHimself
         ? $('<span>')
             .append($('<span class="glyphicon glyphicon-chevron-right smaller-font">'))
             .append(name)
@@ -284,13 +293,13 @@ PlayerManager.generatePlayerHTML = function (player,
                     .click(((n) => () => PlayerManager.switchTeam(EnumTeams.SPECTATOR_TEAMS, n))(name)))));
     // Abgabe / TakeStrafbier button
     if (!isSpectator) {
-        if (player.abgegeben) {
+        if (hasAbgegeben) {
             html.append($("<a href='#' data-toggle='tooltip' title='Strafbier übernehmen'>")
                 .addClass("btn btn-default abgebenbutton " + mayRejoinClass)
                 .click(((n) => function () {
                     PlayerManager.external.toggleAbgabe(n);
                     PlayerManager.external.reduceStrafbierCount(player.team);
-                })(name, player.abgegeben))
+                })(name))
                 .append($("<span>").addClass("glyphicon glyphicon-refresh"))
             );
         } else {

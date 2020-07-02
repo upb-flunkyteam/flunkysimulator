@@ -37,7 +37,8 @@ PlayerManager.external.selectThrowingPlayer = selectThrowingPlayer;
 PlayerManager.external.ClientManager = ClientManager;
 PlayerManager.external.getThrowingPlayerName = () => {return currentGameState.throwingplayer};
 PlayerManager.external.getStrafbierteamA = () => {return currentGameState.strafbierteama};
-PlayerManager.external.getStrafbierteamB = () => {return currentGameState.strafbierteama};
+PlayerManager.external.getStrafbierteamB = () => {return currentGameState.strafbierteamb};
+PlayerManager.external.hasAbgegeben = (name) => {return currentGameState.abgegebenList.includes(name)};
 
 
 var flunkyService = null;
@@ -171,12 +172,8 @@ function toggleAbgabe(targetName) {
     var request = new AbgegebenReq();
     request.setPlayername(PlayerManager.ownPlayerName);
     request.setTargetname(targetName);
-    players = currentGameState.playerteamaList.concat(currentGameState.playerteambList);
-    players.forEach(function (player, index) {
-        if (player.name === targetName) {
-            request.setSetto(!player.abgegeben);
-        }
-    });
+    let hasAbgegeben = currentGameState.abgegebenList.includes(targetName)
+    request.setSetto(!hasAbgegeben);
     console.log(request.toObject());
     flunkyService.abgegeben(request, {}, function (err, response) {
         if (err) {
@@ -265,6 +262,8 @@ function processNewState(state, stale = false) {
         $('#throwactionbuttons').hide();
         $('#throwerdisplayarea').show();
     }
+
+    PlayerManager.refreshPlayers();
 }
 
 function processNewLog(sender, content) {
