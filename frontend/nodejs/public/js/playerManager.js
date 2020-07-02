@@ -47,6 +47,8 @@ jQuery(window).load(function () {
     playerService = new PlayerServiceClient(env['BACKEND_URL']);
     subscribeTeamStreams()
 
+    /* TODO does not work currently
+    It looks like it is not possible to send a request this early in startup.
     // Try to re-register if the username field is not empty
     // This happens when the page is reloaded
     // Browsers will preserve the form input, thus the username remains set
@@ -55,7 +57,7 @@ jQuery(window).load(function () {
         if (confirm('Möchtest du mit dem Namen ' + playerNameFormValue + ' beitreten?')) {
             changePlayername(playerNameFormValue);
         }
-    }
+    }*/
 
     $('#playername').keyup(function (e) {
         if (e.keyCode === 13) {

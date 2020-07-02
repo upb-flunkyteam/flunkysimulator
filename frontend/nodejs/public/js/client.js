@@ -217,7 +217,6 @@ function processNewState(state, stale = false) {
     }*/
 
     // display strafbier
-    //TODO introduce strafbeer area, because player manager may clear it
     $('#teamastrafbierarea').empty();
     $('#teambstrafbierarea').empty();
     $('#teamastrafbierarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
@@ -236,14 +235,7 @@ function processNewState(state, stale = false) {
         $('.throwbutton').prop('disabled', false);
         $('#throwerdisplayarea').hide();
         // Make sure user notices
-        // TODO rename after namechange isResting
-        console.log(state.restingperiod)
-        if (!state.restingperiod) {
-            console.log('not resting')
-            $('.actionbox').addClass('flashingbackground');
-        } else {
-            console.log('resting')
-        }
+        $('.actionbox').addClass('flashingbackground');
         document.title = `Wirf ${PlayerManager.ownPlayerName}!`;
     } else {
         document.title = title;
