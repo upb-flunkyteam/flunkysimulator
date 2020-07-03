@@ -46,6 +46,7 @@ class ServerStarter {
         val playerService = PlayerService(playerController,messageController,clientManager)
         val videoService = VideoService(videoController)
         val clientService = ClientService(clientManager)
+        val messageService = MessageService(messageController)
 
         val authInterceptor = ClientAuthenticationInterceptor(clientManager)
 
@@ -54,6 +55,7 @@ class ServerStarter {
             .addService(ServerInterceptors.intercept(playerService,authInterceptor))
             .addService(videoService)
             .addService(clientService)
+            .addService(messageService)
             .build()
             .start()
 

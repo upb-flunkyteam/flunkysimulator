@@ -25,7 +25,7 @@ class PlayerService(
         val loginStatus = playerController.registerPlayer(name, client)
 
         if (loginStatus.status == EnumLoginStatus.LOGIN_STATUS_SUCCESS)
-            messageController.sendMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
+            messageController.sendLogMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
 
         responseObserver.onNext(
             RegisterPlayerResp.newBuilder()
@@ -40,9 +40,9 @@ class PlayerService(
         val name = request!!.targetName
 
         if (request.playerName.isNotBlank() && playerController.removePlayer(name))
-            messageController.sendMessage(request.playerName, "hat ${name} rausgeworfen.")
+            messageController.sendLogMessage(request.playerName, "hat ${name} rausgeworfen.")
         else
-            messageController.sendMessage(request.playerName, "konnte ${name} nicht rauswerfen.")
+            messageController.sendLogMessage(request.playerName, "konnte ${name} nicht rauswerfen.")
 
         responseObserver?.onNext(KickPlayerResp.getDefaultInstance())
         responseObserver?.onCompleted()
@@ -53,9 +53,9 @@ class PlayerService(
         val team = request.targetTeam
 
         if (request.playerName.isNotBlank() && playerController.setPlayerTeam(name, team))
-            messageController.sendMessage(request.playerName, "hat $name nach ${team.positionalName()} verschoben.")
+            messageController.sendLogMessage(request.playerName, "hat $name nach ${team.positionalName()} verschoben.")
         else
-            messageController.sendMessage(request.playerName, "konnte ${name} nicht verschieben.")
+            messageController.sendLogMessage(request.playerName, "konnte ${name} nicht verschieben.")
 
         responseObserver.onNext(SwitchTeamResp.getDefaultInstance())
         responseObserver.onCompleted()
@@ -66,9 +66,9 @@ class PlayerService(
 
         if (request.playerName.isNotBlank() && playerController.getPlayer(name) != null) {
             playerController.shuffleTeams()
-            messageController.sendMessage(request.playerName, "hat die Teams neu gemischt.")
+            messageController.sendLogMessage(request.playerName, "hat die Teams neu gemischt.")
         } else
-            messageController.sendMessage(request.playerName, "konnte die teams nicht neu mischen.")
+            messageController.sendLogMessage(request.playerName, "konnte die teams nicht neu mischen.")
 
         responseObserver.onNext(ShuffleTeamsResp.getDefaultInstance())
         responseObserver.onCompleted()

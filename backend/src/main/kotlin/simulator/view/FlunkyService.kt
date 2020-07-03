@@ -18,21 +18,21 @@ class FlunkyService(
         val result = gameController.throwBall(request!!.playerName, request.strength)
         when (result) {
             EnumThrowRespStatus.THROW_STATUS_SUCCESS ->
-                messageController.sendMessage(
+                messageController.sendLogMessage(
                     request.playerName,
                     "hat ${request.strength.toPrettyString()} geworfen"
                 )
             EnumThrowRespStatus.THROW_STATUS_RESTING_PERIOD ->
-                messageController.sendMessage(
+                messageController.sendLogMessage(
                     request.playerName,
                     "darf noch nicht werfen, da wir uns noch vom letzten Wurf erholen."
                 )
             EnumThrowRespStatus.THROW_STATUS_NOT_THROWING_PLAYER ->
-                messageController.sendMessage(
+                messageController.sendLogMessage(
                     request.playerName,
                     "ist nicht dran und darf daher nicht werfen."
                 )
-            else -> messageController.sendMessage(
+            else -> messageController.sendLogMessage(
                 request.playerName,
                 "darf nicht werfen"
             )
@@ -60,9 +60,9 @@ class FlunkyService(
                         "hinzugefügt"
                     else
                         "entfernt"
-            messageController.sendMessage(request.playerName, text)
+            messageController.sendLogMessage(request.playerName, text)
         } else {
-            messageController.sendMessage(
+            messageController.sendLogMessage(
                 request.playerName,
                 " hat die Strafbiere für ${request.targetTeam.positionalName()} nicht verändert."
             )
@@ -75,12 +75,12 @@ class FlunkyService(
     override fun resetGame(request: ResetGameReq, responseObserver: StreamObserver<ResetGameResp>?) {
 
         if (request.playerName.isNotBlank() && gameController.resetGame())
-            messageController.sendMessage(
+            messageController.sendLogMessage(
                 request.playerName,
                 "hat den Ground neu ausgemessen, die Kreide nachgezeichnet, die Center nachgefüllt und den Ball aufgepumt."
             )
         else
-            messageController.sendMessage(request.playerName, "konnte das Spiel nicht neustarten")
+            messageController.sendLogMessage(request.playerName, "konnte das Spiel nicht neustarten")
 
         responseObserver?.onNext(ResetGameResp.getDefaultInstance())
         responseObserver?.onCompleted()
@@ -91,12 +91,12 @@ class FlunkyService(
         responseObserver: StreamObserver<SelectThrowingPlayerResp>?
     ) {
         if (request.playerName.isNotBlank() && gameController.forceThrowingPlayer(request.targetName))
-            messageController.sendMessage(
+            messageController.sendLogMessage(
                 request.playerName,
                 "hat ${request.targetName} als werfenden Spieler festgelegt."
             )
         else
-            messageController.sendMessage(
+            messageController.sendLogMessage(
                 request.playerName,
                 "konnte ${request.targetName} nicht als Werfer/in festlegen. Spielt nicht mit oder nicht existent?"
             )
@@ -122,17 +122,17 @@ class FlunkyService(
                     text += " Abgabe abgenommen."
                 } else
                     text += " ein Bier geöffnet."
-                messageController.sendMessage(request.playerName, text)
+                messageController.sendLogMessage(request.playerName, text)
             }
             EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_OWN_TEAM -> {
                 var text = "kann ${request.targetName}"
                 if (!request.targetName.endsWith("s"))
                     text += "s"
                 text += " Abgabe nicht abnehmen, da sie im selben Team sind."
-                messageController.sendMessage(request.playerName, text)
+                messageController.sendLogMessage(request.playerName, text)
             }
             else ->
-                messageController.sendMessage(
+                messageController.sendLogMessage(
                     request.playerName,
                     "konnte ${request.targetName} Abgabestatus nicht ändern."
                 )
@@ -143,13 +143,6 @@ class FlunkyService(
                 .setStatus(result)
                 .build()
         )
-        responseObserver?.onCompleted()
-    }
-
-    override fun sendMessage(request: SendMessageReq?, responseObserver: StreamObserver<SendMessageResp>?) {
-        messageController.sendMessage(request!!.playerName, ":"+request.content)
-
-        responseObserver?.onNext(SendMessageResp.getDefaultInstance())
         responseObserver?.onCompleted()
     }
 
@@ -176,29 +169,6 @@ class FlunkyService(
     }
 
 
-
-    override fun streamLog(request: LogReq, responseObserver: StreamObserver<LogResp>) {
-
-        val handler =
-            buildRegisterHandler { event: MessageController.MessageEvent ->
-                responseObserver.onNext(
-                    LogResp.newBuilder()
-                        .setContent(event.content)
-                        .setSender(event.sender)
-                        .build()
-                )
-            }
-
-        responseObserver.onNext(LogResp.newBuilder()
-            .setSender("Server:")
-            .setContent(patchNotes)
-            .build())
-
-        messageController.addEventHandler(handler::doAction)
-
-
-    }
-
     // -- Debug rpcs --
 
     override fun hardReset(request: Empty?, responseObserver: StreamObserver<Empty>) {
@@ -223,8 +193,4 @@ class FlunkyService(
         EnumThrowStrength.UNRECOGNIZED -> "unbekannt"
     }
 
-    private val patchNotes = """Version 2.2:
-    - Strafbiere haben auch Videos
-    - Gesamte Infrastruktur auf Docker-Images umgestellt
-    - Infrastruktur umgezogen"""
 }

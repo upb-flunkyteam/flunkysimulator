@@ -26,12 +26,7 @@ service FlunkyService {
 
   rpc ModifyStrafbierCount(ModifyStrafbierCountReq) returns (ModifyStrafbierCountResp);
 
-  rpc SendMessage(SendMessageReq) returns (SendMessageResp);
-
   rpc StreamState(StreamStateReq) returns (stream StreamStateResp);
-
-  rpc StreamLog(LogReq) returns (stream LogResp);
-
 
   // Debug rpcs
   rpc HardReset(google.protobuf.Empty) returns (google.protobuf.Empty);
@@ -41,43 +36,25 @@ service FlunkyService {
 }
 
 
-message LogResp{
-  string content = 1;
-  string sender = 2;
-}
-
-message LogReq{}
-
 message StreamStateResp{
   GameState state = 1;
 }
-
 message StreamStateReq {}
 
 message SelectThrowingPlayerResp {}
-
 message SelectThrowingPlayerReq{
   string playerName = 1;
   string targetName = 2;
 }
 
 message ModifyStrafbierCountResp{}
-
 message ModifyStrafbierCountReq{
   string playerName = 1;
   EnumTeams targetTeam = 2;
   bool increment = 3;
 }
 
-message SendMessageResp{}
-
-message SendMessageReq{
-  string playerName = 1;
-  string content = 2;
-}
-
 message ResetGameResp {}
-
 message ResetGameReq{
   string playerName = 1;
 }
@@ -86,13 +63,11 @@ message ResetGameReq{
 message AbgegebenResp{
 	EnumAbgegebenRespStatus status = 1;
 };
-
 message AbgegebenReq{
   string playerName = 1;
   string targetName = 2;
   bool setTo = 3;
 }
-
 enum EnumAbgegebenRespStatus{
   ABGEGEBEN_STATUS_UNKNOWN = 0;
   ABGEGEBEN_STATUS_SUCCESS = 1;
@@ -109,11 +84,9 @@ message ThrowReq{
   string playerName = 1;
   EnumThrowStrength strength = 2;
 }
-
 message ThrowResp{
   EnumThrowRespStatus status = 1;
 }
-
 enum EnumThrowRespStatus{
     THROW_STATUS_UNKNOWN = 0;
     THROW_STATUS_SUCCESS = 1;

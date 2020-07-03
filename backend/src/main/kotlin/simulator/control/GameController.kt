@@ -142,12 +142,12 @@ class GameController(
                 delay(restingTime.toLong())
 
                 if (hit)
-                    messageController.sendMessage(
+                    messageController.sendLogMessage(
                         player.name,
                         "hat für ${throwingTeam.positionalName()} getroffen."
                     )
                 else
-                    messageController.sendMessage(
+                    messageController.sendLogMessage(
                         player.name,
                         "hat nicht für ${throwingTeam.positionalName()} getroffen."
                     )
@@ -156,7 +156,7 @@ class GameController(
                     .setThrowingPlayer(nextThrowingPlayer?.name)
                     .setRoundPhase(nextThrowingPhase)
 
-                messageController.sendMessage(nextThrowingPlayer?.name ?: "Niemand", "ist mit werfen dran.")
+                messageController.sendLogMessage(nextThrowingPlayer?.name ?: "Niemand", "ist mit werfen dran.")
             }
 
             gameState = gameState.setRoundPhase(EnumRoundPhase.RESTING_PHASE)
