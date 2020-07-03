@@ -21,7 +21,7 @@ const {
     ResetGameReq, ResetGameResp, SwitchTeamReq, SwitchTeamResp,
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
     AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
-    StreamVideoEventsReq, StreamVideoEventsResp
+    StreamVideoEventsReq, StreamVideoEventsResp,RestingPeriodReq
 } = require('./generated/flunky_service_pb');
 const {FlunkyServiceClient} = require('./generated/flunky_service_grpc_web_pb');
 
@@ -71,6 +71,8 @@ jQuery(window).load(function () {
     });
     // secondary data-toogle to enable tooltips and dropdown at the same time
     $('[data-toggle-second="tooltip"]').tooltip();
+
+    initDebugFunction()
 });
 
 function subscribeStreams() {
@@ -186,10 +188,12 @@ function processNewState(state, stale = false) {
     }*/
 
     // display strafbier
-    $('#teamastrafbierarea').empty();
-    $('#teambstrafbierarea').empty();
-    $('#teamastrafbierarea').append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
-    $('#teambstrafbierarea').append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
+    let teamastrafbierarea = $('#teamastrafbierarea');
+    teamastrafbierarea.empty();
+    let teambstrafbierarea = $('#teambstrafbierarea');
+    teambstrafbierarea.empty();
+    teamastrafbierarea.append(generateStrafbierHTML(currentGameState.strafbierteama, EnumTeams.TEAM_A_TEAMS));
+    teambstrafbierarea.append(generateStrafbierHTML(currentGameState.strafbierteamb, EnumTeams.TEAM_B_TEAMS));
 
     // Throwing Team related highlighting
     PlayerManager.ownTeam === currentTeam
@@ -224,6 +228,10 @@ function processNewState(state, stale = false) {
         $('#throwerdisplayarea').show();
     }
 
+    //update settings view
+    const settingsView = $('#settingscontent')
+    settingsView.text("Rest time: "+state.ruleconfig.restingperiodlength)
+
     PlayerManager.refreshPlayers();
 }
 
@@ -253,3 +261,36 @@ function generateStrafbierHTML(number, team) {
     );
     return html;
 }
+
+function initDebugFunction(){
+    // debug functions which can be called from the browser console
+    window.debug = {};
+
+    // ---- settings modal ----
+    // Get the modal
+    const modal = document.getElementById("settingsModal");
+    // Get the <span> element that closes the modal
+    const span = document.getElementsByClassName("close")[0];
+
+    window.debug.settings = function(){
+        modal.style.display = "block";
+    };
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    };
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    // ---- set resting period ----
+    window.debug.setRestingPeriod = function(milliseconds){
+        const request = new RestingPeriodReq()
+        request.setMilliseconds(milliseconds)
+        flunkyService.setRestingPeriod(request,{}, () => {})
+    };
+}
+
