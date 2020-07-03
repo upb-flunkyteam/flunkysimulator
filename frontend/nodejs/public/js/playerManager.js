@@ -24,7 +24,6 @@ PlayerManager.ownTeam = EnumTeams.SPECTATOR_TEAMS;
 
 //external functions
 PlayerManager.external = {}
-PlayerManager.external.sendMessage = null;
 PlayerManager.external.processNewState = null;
 PlayerManager.external.toggleAbgabe = null;
 PlayerManager.external.reduceStrafbierCount = null;
@@ -34,7 +33,8 @@ PlayerManager.external.getStrafbierteamA = () => 0;
 PlayerManager.external.getStrafbierteamB = () => 0;
 PlayerManager.external.hasAbgegeben = (name) => false;
 
-PlayerManager.external.ClientManager = null
+PlayerManager.external.ClientManager = null;
+PlayerManager.external.MessageManager = null;
 
 var metadata = {}
 var players = []
@@ -201,7 +201,9 @@ async function changePlayername(desiredPlayername) {
         await __delay__(1000);
 
     // Discourage false flag attacks, the player was already registered
-    PlayerManager.ownPlayerName ? PlayerManager.external.sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt') : '';
+    PlayerManager.ownPlayerName ?
+        PlayerManager.external.MessageManager
+            .sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt', true) : '';
 
     const request = new RegisterPlayerReq();
     request.setPlayername(desiredPlayername);

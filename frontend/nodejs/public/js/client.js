@@ -28,17 +28,20 @@ const {FlunkyServiceClient} = require('./generated/flunky_service_grpc_web_pb');
 const {VideoManager} = require('./videoManager');
 const {ClientManager} = require('./clientManager')
 const {PlayerManager} = require('./playerManager');
+const {MessageManager} = require('./messageManager');
 
-PlayerManager.external.sendMessage = sendMessage;
+PlayerManager.external.ClientManager = ClientManager;
+PlayerManager.external.MessageManager = MessageManager;
 PlayerManager.external.processNewState = function(){processNewState(currentGameState, true)};
 PlayerManager.external.toggleAbgabe = toggleAbgabe;
 PlayerManager.external.reduceStrafbierCount = reduceStrafbierCount;
 PlayerManager.external.selectThrowingPlayer = selectThrowingPlayer;
-PlayerManager.external.ClientManager = ClientManager;
 PlayerManager.external.getThrowingPlayerName = () => {return currentGameState.throwingplayer};
 PlayerManager.external.getStrafbierteamA = () => {return currentGameState.strafbierteama};
 PlayerManager.external.getStrafbierteamB = () => {return currentGameState.strafbierteamb};
 PlayerManager.external.hasAbgegeben = (name) => {return currentGameState.abgegebenList.includes(name)};
+
+MessageManager.external.playerManager = PlayerManager;
 
 
 var flunkyService = null;
@@ -60,15 +63,7 @@ jQuery(window).load(function () {
     $('#hardthrowbutton').click(function () {
         throwing(EnumThrowStrength.HARD_THROW_STRENGTH);
     });
-    $('#chatinput').bind("enterKey", function (e) {
-        sendMessage($('#chatinput').val());
-        $('#chatinput').val('');
-    });
-    $('#chatinput').keyup(function (e) {
-        if (e.keyCode === 13) {
-            $(this).trigger("enterKey");
-        }
-    });
+
     $('#resetbutton').click(function () {
         if (confirm('Möchtest du wirklich das Spiel für alle Teilnehmenden neu starten?')) {
             resetGame();
@@ -76,8 +71,6 @@ jQuery(window).load(function () {
     });
     // secondary data-toogle to enable tooltips and dropdown at the same time
     $('[data-toggle-second="tooltip"]').tooltip();
-
-    $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
 });
 
 function subscribeStreams() {
@@ -88,17 +81,6 @@ function subscribeStreams() {
     });
     stateStream.on('error', (response) => {
         console.log('Error in state stream:');
-        console.log(response);
-    });
-
-    //TODO create logManager.js
-    var logRequest = new LogReq();
-    var logStream = flunkyService.streamLog(logRequest, {});
-    logStream.on('data', (response) => {
-        processNewLog(response.getSender(), response.getContent());
-    });
-    logStream.on('error', (response) => {
-        console.log('Error in log stream:');
         console.log(response);
     });
 }
@@ -113,19 +95,6 @@ function throwing(strength) {
     request.setStrength(strength);
     console.log(request.toObject());
     flunkyService.throw(request, {}, function (err, response) {
-        if (err) {
-            console.log(err.code);
-            console.log(err.message);
-        }
-    });
-}
-
-function sendMessage(content) {
-    const request = new SendMessageReq();
-    request.setPlayername(PlayerManager.ownPlayerName);
-    request.setContent(content);
-    console.log(request.toObject());
-    flunkyService.sendMessage(request, {}, function (err, response) {
         if (err) {
             console.log(err.code);
             console.log(err.message);
@@ -257,15 +226,6 @@ function processNewState(state, stale = false) {
 
     PlayerManager.refreshPlayers();
 }
-
-function processNewLog(sender, content) {
-    console.log("New log message: " + content);
-    $('#logbox').val(function (i, text) {
-        return text + '\n' + sender + ' ' + content;
-    });
-    $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
-}
-
 
 function generateStrafbierHTML(number, team) {
     teamclass = team === EnumTeams.TEAM_A_TEAMS ? ' strafbierteamabutton' :
