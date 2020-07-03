@@ -9,7 +9,7 @@ RUN curl -OL https://github.com/grpc/grpc-web/releases/download/1.0.3/protoc-gen
     mv protoc-gen-grpc-web-1.0.3-linux-x86_64 /usr/local/bin/protoc-gen-grpc-web
 RUN protoc -I=/proto \
   --js_out=import_style=commonjs:/frontend/public/js/\
-  --grpc-web_out=mode=grpcwebtext,import_style=commonjs:/frontend/public/js/\
+  --grpc-web_out=mode=grpcwebtext,import_style=commonjs:/frontend/public/js/generated\
   /proto/*.proto
 
 WORKDIR /frontend

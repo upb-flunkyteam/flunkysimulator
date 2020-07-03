@@ -22,8 +22,8 @@ const {
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
     AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
     StreamVideoEventsReq, StreamVideoEventsResp
-} = require('./flunky_service_pb');
-const {FlunkyServiceClient} = require('./flunky_service_grpc_web_pb');
+} = require('./generated/flunky_service_pb');
+const {FlunkyServiceClient} = require('./generated/flunky_service_grpc_web_pb');
 
 const {VideoManager} = require('./videoManager');
 const {ClientManager} = require('./clientManager')

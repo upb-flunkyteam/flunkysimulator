@@ -16,8 +16,8 @@ const {
     ModifyStrafbierCountReq, ModifyStrafbierCountResp, AbgegebenReq,
     AbgegebenResp, SelectThrowingPlayerReq, SelectThrowingPlayerResp,
     StreamVideoEventsReq, StreamVideoEventsResp
-} = require('./video_service_pb');
-const {VideoServiceClient} = require('./video_service_grpc_web_pb');
+} = require('./generated/video_service_pb');
+const {VideoServiceClient} = require('./generated/video_service_grpc_web_pb');
 
 var videoService = null;
 export const VideoManager = {};

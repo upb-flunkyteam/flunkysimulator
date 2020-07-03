@@ -13,8 +13,8 @@ const {
     EnumTeams, EnumConnectionStatus, EnumLoginStatus, KickPlayerReq, KickPlayerResp, Player,
     PlayerListResp, RegisterPlayerReq, RegisterPlayerResp, ShuffleTeamsReq,
     ShuffleTeamsResp, SwitchTeamReq, SwitchTeamResp
-} = require('./player_service_pb');
-const {PlayerServiceClient} = require('./player_service_grpc_web_pb');
+} = require('./generated/player_service_pb');
+const {PlayerServiceClient} = require('./generated/player_service_grpc_web_pb');
 
 var playerService = null;
 export const PlayerManager = {};

@@ -7,9 +7,9 @@ $.get({
     }
 });
 
-const {AliveChallenge,ClientRegisterd,ClientStreamReq,ClientStreamResp} = require('./client_service_pb');
+const {AliveChallenge,ClientRegisterd,ClientStreamReq,ClientStreamResp} = require('./generated/client_service_pb');
 const EventOneofCase = ClientStreamResp.EventOneofCase
-const {ClientServiceClient} = require('./client_service_grpc_web_pb');
+const {ClientServiceClient} = require('./generated/client_service_grpc_web_pb');
 
 var clientService = null;
 export const ClientManager = {};
