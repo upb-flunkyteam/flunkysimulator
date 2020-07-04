@@ -8,9 +8,16 @@ import simulator.getRandomString
 import simulator.model.Client
 import simulator.model.Player
 import java.util.concurrent.locks.ReentrantLock
+import java.util.logging.Logger
 import kotlin.concurrent.withLock
 
-class ClientManager {
+/*
+This is not a controller as the other classes in this package because our controllers are
+responsible for one event handler. This class on the other hand handles multiple client events/streams
+and to distinguish that it is not called a controller.
+ */
+
+class ClientManager (private val pokeInterval: Int = 10){
 
     private val clientLock = ReentrantLock()
 
@@ -39,8 +46,10 @@ class ClientManager {
             delay(1000 * 10)
             // wait 10 sek otherwise stuff might not be initialized at startup
             // kinda dirty, I know
-            pokeClients()
-            delay(1000 * 60) // 1 min
+            while (true) {
+                pokeClients()
+                delay(1000L * pokeInterval)
+            }
         }
     }
 
@@ -101,6 +110,7 @@ class ClientManager {
             ?: EnumConnectionStatus.CONNECTION_DISCONNECTED
 
     private fun pokeClients() {
+        logger.info("Poking clients")
         var allAlive = true
         idsToAliveChallenges.forEach {
             if (!it.value()) {
@@ -113,4 +123,5 @@ class ClientManager {
             triggerPlayerUpdate()
         }
     }
+    private val logger = Logger.getLogger(this::class.java.name)
 }

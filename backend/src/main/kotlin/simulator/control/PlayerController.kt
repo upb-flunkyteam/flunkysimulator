@@ -84,13 +84,16 @@ class PlayerController(
         playerListLock.withLock {
             return getPlayer(newName)?.let { existingPlayer ->
                 if (client != null && clientManager.registerPlayer(existingPlayer, client)
-                    || client == null)
+                    || client == null) {
+                    triggerUpdate(setOf(existingPlayer.team))
                     LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN, newName)
+                }
                 else
                     LoginResp(EnumLoginStatus.LOGIN_STATUS_PLAYER_TAKEN, newName)
             } ?: let {
                 val player = Player(newName)
                 players.add(player)
+                client?.let{clientManager.registerPlayer(player, it)}
                 triggerUpdate(setOf(player.team))
                 LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, newName)
             }

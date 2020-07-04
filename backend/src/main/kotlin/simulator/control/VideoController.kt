@@ -149,6 +149,7 @@ class VideoController(private val videoListUrl: String?) :
             .map { it.key to it.value.map { typeToUrl -> typeToUrl.second } }
             .toMap()
     }
+    private val logger = Logger.getLogger(this::class.java.name)
 }
 
 fun main() {
@@ -158,5 +159,3 @@ fun main() {
     a.forEach { println("${it.key}: ${it.value}") }
 }
 
-
-private val logger = Logger.getLogger(ServerStarter::class.java.name)
