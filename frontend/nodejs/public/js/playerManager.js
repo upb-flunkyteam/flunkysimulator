@@ -271,7 +271,7 @@ function generatePlayerHTML(player,
             .append(name+' ')
 
     if (player.connectionstatus === EnumConnectionStatus.CONNECTION_DISCONNECTED){
-        playerSpan = playerSpan.append($('<span class="glyphicon glyphicon-ban-circle smaller-font">'))
+        playerSpan = playerSpan.append($('<span class="glyphicon glyphicon-flash">'))
     }
     if (player.connectionstatus === EnumConnectionStatus.CONNECTION_CONNECTED){
         playerSpan = playerSpan.append($('<span class="glyphicon glyphicon-cloud">'))
