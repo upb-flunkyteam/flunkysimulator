@@ -16,21 +16,14 @@ import simulator.model.Player
 class GameController(
     private val videoController: VideoController,
     private val messageController: MessageController,
-    clientManager: ClientManager,
-    initGamestate: GameState = GameState(),
-    playerList: List<Player> = emptyList()
+    private val playerController: PlayerController,
+    initGamestate: GameState = GameState()
 ) :
     EventControllerBase<GameController.GameStateEvent>() {
 
     data class GameStateEvent(val state: GameState)
 
     private val gameStateLock = handlerLock
-
-    val playerController = PlayerController(
-        this::handleRemovalOfPlayerFromTeamAndUpdate,
-        playerList.toMutableList(),
-        clientManager
-    )
 
     var gameState = initGamestate
         private set(value) {
@@ -314,6 +307,9 @@ class GameController(
         }
     }
 
+    /**
+     * Used by PlayerCotnroller
+     */
     fun handleRemovalOfPlayerFromTeamAndUpdate(player: Player) {
 
         var newGameState = gameState.setAbgegeben(player, false)

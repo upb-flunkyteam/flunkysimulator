@@ -2,6 +2,8 @@ package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.springframework.web.util.HtmlUtils
 import simulator.model.Client
 import simulator.model.Player
@@ -11,19 +13,29 @@ import simulator.shuffleSplitList
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 
-/**
- * @param handleRemovalOfPlayer Function is called when a player is removed from a team. This might be relevant for the game
- * state. eg. if they are the trowing player.
- */
+
 class PlayerController(
-    private val handleRemovalOfPlayer: (Player) -> Unit, //TODO wrap in own thread to avoid deadlock
-    private val players: MutableList<Player> = mutableListOf(),
-    val clientManager: ClientManager
+    val clientManager: ClientManager,
+    private val players: MutableList<Player> = mutableListOf()
 ) : EventControllerBase<PlayerController.PlayersEvent>() {
 
     data class PlayersEvent(val updateOf: Set<Team>)
 
     private val playerListLock = handlerLock
+
+    private lateinit var handleRemovalOfPlayerCoroutine: (Player) -> Unit
+
+    /**
+     * @param handleRemovalOfPlayer Function is called when a player is removed from a team. This might be relevant for the game
+     * state. eg. if they are the trowing player or having the abgegeben status.
+     */
+    fun init(handleRemovalOfPlayer: (Player) -> Unit){
+        handleRemovalOfPlayerCoroutine =  {p: Player ->
+            GlobalScope.launch {
+                handleRemovalOfPlayer(p)
+            }
+        }
+    }
 
     val allPlayers: List<Player>
         get() = players.toList()
@@ -46,8 +58,10 @@ class PlayerController(
 
 
     private val all = setOf(Team.A, Team.B, Team.Spectator)
-    private fun triggerUpdate(of: Set<Team> = all) {
-        this.onEvent(PlayersEvent(of))
+    fun triggerUpdate(of: Set<Team> = all) {
+        playerListLock.withLock {
+            this.onEvent(PlayersEvent(of))
+        }
     }
 
     fun getPlayer(name: String?) = this.players.firstOrNull { player -> player.name == name }
@@ -89,7 +103,7 @@ class PlayerController(
             val player = getPlayer(name) ?: return false
             players.remove(player)
             triggerUpdate(setOf(player.team))
-            handleRemovalOfPlayer(player)
+            handleRemovalOfPlayerCoroutine(player)
             return true
         }
     }
@@ -100,7 +114,7 @@ class PlayerController(
             player.team = team.toKotlin()
 
             triggerUpdate(setOf(player.team))
-            handleRemovalOfPlayer(player)
+            handleRemovalOfPlayerCoroutine(player)
 
             return true
         }
@@ -130,5 +144,4 @@ class PlayerController(
     internal fun reset() {
         players.clear()
     }
-
 }

@@ -3,10 +3,7 @@ package simulator
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import io.grpc.ServerInterceptors
-import simulator.control.ClientManager
-import simulator.control.GameController
-import simulator.control.MessageController
-import simulator.control.VideoController
+import simulator.control.*
 import simulator.view.*
 import java.io.IOException
 import java.util.logging.Level
@@ -33,13 +30,16 @@ class ServerStarter {
         val messageController = MessageController()
         val clientManager = ClientManager()
         val videoController = VideoController(videoListUrl)
-        val gameController = GameController(videoController, messageController,clientManager)
-        val playerController = gameController.playerController
+        val playerController = PlayerController(       clientManager       )
+        val gameController = GameController(videoController, messageController,playerController)
+
+        playerController.init (gameController::handleRemovalOfPlayerFromTeamAndUpdate)
+        clientManager.init { playerController.triggerUpdate() }
 
         // debug print
         gameController.addEventHandler { println(it) }
         messageController.addEventHandler { println(it) }
-        gameController.playerController.addEventHandler { print(it) }
+        playerController.addEventHandler { print(it) }
 
 
         val flunkyService = FlunkyService(gameController, messageController)

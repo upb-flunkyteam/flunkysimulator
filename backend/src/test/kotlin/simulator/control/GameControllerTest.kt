@@ -19,12 +19,14 @@ internal class GameControllerTest {
     private fun gameController(
         state: GameState,
         players: List<Player>
-    ): GameController {
+    ): Pair<GameController, PlayerController> {
         val messageController = mockk<MessageController>()
         val videoController = mockk<VideoController>()
         val clientManager = mockk<ClientManager>()
-        val gameController = GameController(videoController, messageController, clientManager, state, players)
-        return gameController
+        val playerController = PlayerController(clientManager,players.toMutableList())
+        val gameController = GameController(videoController, messageController, playerController, state)
+        playerController.init (gameController::handleRemovalOfPlayerFromTeamAndUpdate)
+        return (gameController to playerController)
     }
 
     @Test
@@ -44,7 +46,7 @@ internal class GameControllerTest {
         )
 
 
-        val gameController = gameController(state, players)
+        val (gameController,_) = gameController(state, players)
 
         val abgegebenResult = gameController.setAbgegeben("peter1", hans.name, true)
 
@@ -69,7 +71,7 @@ internal class GameControllerTest {
             roundPhase = EnumRoundPhase.TEAM_A_THROWING_PHASE
         )
 
-        val gameController = gameController(state,players)
+        val (gameController,_) = gameController(state,players)
 
         assertEquals(
             EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS,
@@ -85,13 +87,13 @@ internal class GameControllerTest {
         val hans = Player("hans", team = Team.B)
         val gameState = GameState(abgegeben = listOf(hans.name))
 
-        val gameController = gameController( gameState, listOf(hans))
+        val (gameController,playerController) = gameController( gameState, listOf(hans))
 
         assertEquals(
             true,
-            gameController.playerController.setPlayerTeam("hans", EnumTeams.SPECTATOR_TEAMS)
+            playerController.setPlayerTeam("hans", EnumTeams.SPECTATOR_TEAMS)
         )
-        assert(!gameController.gameState.getAbgegeben(hans))
-        assert(gameController.playerController.getPlayer("hans")?.team == Team.Spectator)
+        assertFalse(!gameController.gameState.getAbgegeben(hans))
+        assertEquals(Team.Spectator,playerController.getPlayer("hans")?.team)
     }
 }

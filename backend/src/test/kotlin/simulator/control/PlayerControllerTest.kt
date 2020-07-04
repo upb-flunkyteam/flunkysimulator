@@ -2,21 +2,22 @@ package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
+import io.mockk.impl.annotations.SpyK
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import simulator.model.Player
 import simulator.model.game.Team
 
 internal class PlayerControllerTest{
 
     @Test
     fun dryRun(){
-        val messageController = mockk<MessageController>()
-        val videoController = mockk<VideoController>()
         val clientManager = mockk<ClientManager>()
-        val gameController = GameController(videoController, messageController,clientManager)
-
-        val playerController = gameController.playerController
+        val playerController = PlayerController(clientManager)
+        val dummy = Dummy()
+        playerController.init (dummy::dummy)
 
         val res1 =  playerController.registerPlayer("hans",null)
         assertEquals(PlayerController.LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS,"hans"),
@@ -56,5 +57,12 @@ internal class PlayerControllerTest{
         assertEquals(1, hans!!.wonGames)
         assertEquals(1, lola!!.wonGames)
         assertEquals(0, peter!!.wonGames)
+    }
+
+    class Dummy{
+        fun dummy(player:Player){
+            // just do something so the waring goes away
+            assert(player.name != "")
+        }
     }
 }

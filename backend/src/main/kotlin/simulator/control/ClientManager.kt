@@ -17,6 +17,7 @@ class ClientManager {
     private var clients: Set<Client> = emptySet()
     private var playerToClients: Map<Player, Int> = emptyMap()
     private var idsToAliveChallenges: Map<Int, () -> Boolean> = emptyMap()
+    private lateinit var triggerPlayerUpdate: () -> Unit
 
     private fun getOwner(player: Player): Client? = playerToClients[player]?.let { getClient(it) }
 
@@ -27,6 +28,10 @@ class ClientManager {
             val old = getClient(newClient.id)!!
             clients = clients - old + newClient
         }
+    }
+
+    fun init(triggerPlayerUpdate: () -> Unit){
+        this.triggerPlayerUpdate = triggerPlayerUpdate
     }
 
     init {
@@ -96,10 +101,16 @@ class ClientManager {
             ?: EnumConnectionStatus.CONNECTION_DISCONNECTED
 
     private fun pokeClients() {
+        var allAlive = true
         idsToAliveChallenges.forEach {
             if (!it.value()) {
                 removeClient(it.key)
+                allAlive = false
             }
+        }
+        // connection status changed, update the players
+        if (!allAlive){
+            triggerPlayerUpdate()
         }
     }
 }
