@@ -226,6 +226,10 @@ async function changePlayername(desiredPlayername) {
                     break;
                 case EnumLoginStatus.LOGIN_STATUS_PLAYER_TAKEN:
                     window.alert('Registrierung fehlgeschlagen! Aktive Sitzung für diesen Namen bereits vorhanden.')
+                    if (desiredPlayername === PlayerManager.ownPlayerName){
+                        //this was probatly a missclick or reconnect attempt
+                        PlayerManager.external.processNewState();//make the textbox go away
+                    }
                     break;
                 case EnumLoginStatus.LOGIN_STATUS_EMPTY:
                     window.alert('Registrierung fehlgeschlagen! Dein Benutzername ist leer.');
@@ -263,10 +267,19 @@ function generatePlayerHTML(player,
             .append($('<span class="glyphicon glyphicon-chevron-right smaller-font">'))
             .append(name)
             .append($('<span class="glyphicon glyphicon-chevron-left smaller-font">'))
-        : name;
-    let playerbutton = $("<a href='#'>").addClass("btn namebutton" + turnClass + egoClass + hasAbgegebenClass).html(playerSpan)
+        : $('<span>')
+            .append(name+' ')
+
+    if (player.connectionstatus === EnumConnectionStatus.CONNECTION_DISCONNECTED){
+        playerSpan = playerSpan.append($('<span class="glyphicon glyphicon-ban-circle smaller-font">'))
+    }
+    if (player.connectionstatus === EnumConnectionStatus.CONNECTION_CONNECTED){
+        playerSpan = playerSpan.append($('<span class="glyphicon glyphicon-cloud">'))
+    }
+
+    let playerButton = $("<a href='#'>").addClass("btn namebutton" + turnClass + egoClass + hasAbgegebenClass).html(playerSpan)
     if (!isSpectator) {
-        playerbutton
+        playerButton
             .click(((n) => () => PlayerManager.external.selectThrowingPlayer(n))(name))
             .attr({
                 "data-toggle": "tooltip",
@@ -275,7 +288,7 @@ function generatePlayerHTML(player,
     }
 
     let html = $('<div role="group">').addClass("btn-group btn-group-justified vspace-small playerbuttongroup")
-        .append(playerbutton)
+        .append(playerButton)
         .append($('<div role="group">').addClass("btn-group")
             .append($("<a href='#'>").addClass("btn btn-default dropdown-toggle").attr({
                 "type": "button",
