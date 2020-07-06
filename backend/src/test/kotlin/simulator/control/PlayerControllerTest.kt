@@ -60,9 +60,9 @@ internal class PlayerControllerTest{
     }
 
     class Dummy{
-        fun dummy(player:Player){
-            // just do something so the waring goes away
-            assert(player.name != "")
+        fun dummy(player:String){
+            // just do something so the warning goes away
+            assert(player != "")
         }
     }
 }

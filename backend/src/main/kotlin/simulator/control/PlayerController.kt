@@ -23,14 +23,14 @@ class PlayerController(
 
     private val playerListLock = handlerLock
 
-    private lateinit var handleRemovalOfPlayerCoroutine: (Player) -> Unit
+    private lateinit var handleRemovalOfPlayerCoroutine: (String) -> Unit
 
     /**
      * @param handleRemovalOfPlayer Function is called when a player is removed from a team. This might be relevant for the game
      * state. eg. if they are the trowing player or having the abgegeben status.
      */
-    fun init(handleRemovalOfPlayer: (Player) -> Unit){
-        handleRemovalOfPlayerCoroutine =  {p: Player ->
+    fun init(handleRemovalOfPlayer: (String) -> Unit){
+        handleRemovalOfPlayerCoroutine =  {p: String ->
             GlobalScope.launch {
                 handleRemovalOfPlayer(p)
             }
@@ -106,7 +106,7 @@ class PlayerController(
             val player = getPlayer(name) ?: return false
             players.remove(player)
             triggerUpdate(setOf(player.team))
-            handleRemovalOfPlayerCoroutine(player)
+            handleRemovalOfPlayerCoroutine(player.name)
             return true
         }
     }
@@ -117,7 +117,7 @@ class PlayerController(
             player.team = team.toKotlin()
 
             triggerUpdate(setOf(player.team))
-            handleRemovalOfPlayerCoroutine(player)
+            handleRemovalOfPlayerCoroutine(player.name)
 
             return true
         }

@@ -255,8 +255,8 @@ class GameController(
                 return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_OWN_TEAM
 
             // check if team has won
-            var newState = gameState.setAbgegeben(player, abgegeben)
-            if (playerController.getTeam(player.team).all { newState.getAbgegeben(it) }
+            var newState = gameState.setAbgegeben(player.name, abgegeben)
+            if (playerController.getTeam(player.team).all { newState.getAbgegeben(it.name) }
                 && newState.getStrafbier(player.team) == 0) {
                 newState = newState
                     .setRoundPhase(
@@ -285,7 +285,7 @@ class GameController(
 
         val activeTeamWithIndex = playerController.allPlayers
             .mapIndexed { index, player -> player to index }
-            .filter { p -> p.first.team == team && !gameState.getAbgegeben(p.first) }
+            .filter { p -> p.first.team == team && !gameState.getAbgegeben(p.first.name) }
         // by indexing over all players instead of just one team,
         // we can handle player switching teams
 
@@ -310,11 +310,11 @@ class GameController(
     /**
      * Used by PlayerCotnroller
      */
-    fun handleRemovalOfPlayerFromTeamAndUpdate(player: Player) {
+    fun handleRemovalOfPlayerFromTeamAndUpdate(player: String) {
 
         var newGameState = gameState.setAbgegeben(player, false)
 
-        if (gameState.throwingPlayer == player.name) {
+        if (gameState.throwingPlayer == player) {
             val nextThrowingPlayer = when (gameState.roundPhase){
                 EnumRoundPhase.TEAM_A_THROWING_PHASE -> getNextThrowingPlayer(Team.A)
                 EnumRoundPhase.TEAM_B_THROWING_PHASE -> getNextThrowingPlayer(Team.B)

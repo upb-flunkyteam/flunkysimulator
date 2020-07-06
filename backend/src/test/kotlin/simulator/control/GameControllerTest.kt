@@ -4,6 +4,9 @@ import de.flunkyteam.endpoints.projects.simulator.EnumAbgegebenRespStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumRoundPhase
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import io.mockk.mockk
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -51,7 +54,7 @@ internal class GameControllerTest {
         val abgegebenResult = gameController.setAbgegeben("peter1", hans.name, true)
 
         assertEquals(EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS, abgegebenResult)
-        assert(gameController.gameState.getAbgegeben(hans))
+        assert(gameController.gameState.getAbgegeben(hans.name))
         assertEquals(EnumRoundPhase.TEAM_B_WON_PHASE, gameController.gameState.roundPhase)
     }
 
@@ -78,11 +81,11 @@ internal class GameControllerTest {
             gameController.setAbgegeben("peter1", hans.name, true)
         )
 
-        assert(gameController.gameState.getAbgegeben(hans))
+        assert(gameController.gameState.getAbgegeben(hans.name))
     }
 
     @Test
-    fun `move player to spectator`() {
+    suspend fun `move player to spectator`() {
 
         val hans = Player("hans", team = Team.B)
         val gameState = GameState(abgegeben = listOf(hans.name))
@@ -93,7 +96,8 @@ internal class GameControllerTest {
             true,
             playerController.setPlayerTeam("hans", EnumTeams.SPECTATOR_TEAMS)
         )
-        assertFalse(!gameController.gameState.getAbgegeben(hans))
         assertEquals(Team.Spectator,playerController.getPlayer("hans")?.team)
+        delay(1000) //wait for update coroutine to finish
+        assertFalse(gameController.gameState.getAbgegeben(hans.name))
     }
 }

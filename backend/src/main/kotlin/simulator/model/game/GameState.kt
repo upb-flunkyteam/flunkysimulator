@@ -21,10 +21,8 @@ data class GameState(
         else -> -1
     }
 
-    fun getAbgegeben(player: Player) = getAbgegeben(player.name)
     fun getAbgegeben(player: String) = this.abgegeben.contains(player)
 
-    fun setAbgegeben(player: Player, value: Boolean) = setAbgegeben(player.name, value)
     fun setAbgegeben(player: String, value: Boolean) = if (value)
         this.copy(abgegeben = abgegeben.plus(player))
     else
