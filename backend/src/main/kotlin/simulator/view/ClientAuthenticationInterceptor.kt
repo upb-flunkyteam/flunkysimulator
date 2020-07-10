@@ -1,7 +1,7 @@
 package simulator.view
 
 import io.grpc.*
-import simulator.control.ClientManager
+import simulator.control.ClientsManager
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -9,7 +9,7 @@ import java.util.logging.Logger
 /**
  * A interceptor to handle client secret header.
  */
-class ClientAuthenticationInterceptor(private val clientManager: ClientManager) : ServerInterceptor {
+class ClientAuthenticationInterceptor(private val clientsManager: ClientsManager) : ServerInterceptor {
     override fun <ReqT, RespT> interceptCall(
         call: ServerCall<ReqT, RespT>,
         requestHeaders: Metadata,
@@ -25,7 +25,7 @@ class ClientAuthenticationInterceptor(private val clientManager: ClientManager) 
             return object : ServerCall.Listener<ReqT>() {} //dummy object https://github.com/grpc/grpc-java/issues/3298
         }
 
-        val client = clientManager.getClient(secret)
+        val client = clientsManager.getClient(secret)
         if (client == null){
             call.close(Status.UNAUTHENTICATED.withDescription("unknown secret"), requestHeaders)
             return object : ServerCall.Listener<ReqT>() {} //dummy object https://github.com/grpc/grpc-java/issues/3298

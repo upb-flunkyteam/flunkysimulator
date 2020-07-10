@@ -40,8 +40,9 @@ class MessageService(private val messageController:MessageController)
     }
 
 
-    private val patchNotes = """Version 2.2:
-    - Strafbiere haben auch Videos
-    - Gesamte Infrastruktur auf Docker-Images umgestellt
-    - Infrastruktur umgezogen"""
+    private val patchNotes = """Version 2.3:
+    - Clientauthentifizierung und Zuweisung von Spielern
+    - Clientonlinestatusanzeige
+    - Unterscheidung von Chat- und Systemnachrichten
+    """
 }

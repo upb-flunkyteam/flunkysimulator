@@ -4,11 +4,10 @@ import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
-import simulator.ServerStarter
-import simulator.control.ClientManager
+import simulator.control.ClientsManager
 import java.util.logging.Logger
 
-class ClientService(private val clientManager: ClientManager): ClientServiceGrpc.ClientServiceImplBase(){
+class ClientServiceUnAuth(private val clientsManager: ClientsManager): ClientServiceGrpc.ClientServiceImplBase(){
 
     override fun clientStream(request: ClientStreamReq, responseObserver: StreamObserver<ClientStreamResp>) {
 
@@ -29,15 +28,15 @@ class ClientService(private val clientManager: ClientManager): ClientServiceGrpc
             success
         }
 
-        val client = clientManager.registerClient (aliveChallenge)
+        val client = clientsManager.registerClient (aliveChallenge)
 
         responseObserver.onNext(ClientStreamResp.newBuilder()
-            .setClientRegisterd(ClientRegisterd.newBuilder()
+            .setClientRegistered(ClientRegistered.newBuilder()
                 .setSecret(client.secret)
                 .build())
             .build())
     }
+    private val logger = Logger.getLogger(this::class.simpleName)
 }
 
-private val logger = Logger.getLogger(ClientService::class.simpleName)
 

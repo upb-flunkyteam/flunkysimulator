@@ -1,9 +1,11 @@
 package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumConnectionStatus
+import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.springframework.web.util.HtmlUtils
 import simulator.getRandomString
 import simulator.model.Client
 import simulator.model.Player
@@ -16,17 +18,16 @@ This is not a controller as the other classes in this package because our contro
 responsible for one event handler. This class on the other hand handles multiple client events/streams
 and to distinguish that it is not called a controller.
  */
-
-class ClientManager (private val pokeInterval: Int = 10){
+//TODO send clients players out if changed
+class ClientsManager(private val playerController: PlayerController, private val pokeInterval: Int = 10) {
 
     private val clientLock = ReentrantLock()
 
     private var clients: Set<Client> = emptySet()
-    private var playerToClients: Map<Player, Int> = emptyMap()
+    private var playerToClients: Map<String, Int> = emptyMap()
     private var idsToAliveChallenges: Map<Int, () -> Boolean> = emptyMap()
-    private lateinit var triggerPlayerUpdate: () -> Unit
 
-    private fun getOwner(player: Player): Client? = playerToClients[player]?.let { getClient(it) }
+    private fun getOwner(player: Player): Client? = playerToClients[player.name]?.let { getClient(it) }
 
     private fun getClient(id: Int) = clients.firstOrNull { it.id == id }
 
@@ -35,10 +36,6 @@ class ClientManager (private val pokeInterval: Int = 10){
             val old = getClient(newClient.id)!!
             clients = clients - old + newClient
         }
-    }
-
-    fun init(triggerPlayerUpdate: () -> Unit){
-        this.triggerPlayerUpdate = triggerPlayerUpdate
     }
 
     init {
@@ -52,6 +49,8 @@ class ClientManager (private val pokeInterval: Int = 10){
             }
         }
     }
+
+
 
     fun getClient(secret: String): Client? = clients.firstOrNull { it.secret == secret }
 
@@ -77,9 +76,10 @@ class ClientManager (private val pokeInterval: Int = 10){
         }
     }
 
-    fun registerPlayer(player: Player, client: Client): Boolean {
+    internal fun registerPlayerWithClient(player: Player, client: Client): Boolean {
         clientLock.withLock {
-            playerToClients[player]?.let { oldOwnerId ->
+            //check for old owner
+            playerToClients[player.name]?.let { oldOwnerId ->
                 if (idsToAliveChallenges[oldOwnerId]?.invoke()
                         ?: throw error("Client with id ${oldOwnerId} owns player ${player.name} but doesnt have an alive challenge")
                 )
@@ -88,20 +88,66 @@ class ClientManager (private val pokeInterval: Int = 10){
                     removeClient(oldOwnerId) //guess they are dead, time to move on
             }
 
-            playerToClients = playerToClients.minus(client.players).plus(player to client.id)
-            //TODO allow more than one player?
-            updateClient(client.copy(players = listOf(player)))
+            playerToClients = playerToClients.plus(player.name to client.id)
+            updateClient(client.copy(players = client.players.plus(player)))
 
             return true
         }
     }
 
+    fun registerPlayer(name: String, client: Client): LoginResp {
+
+        if (name.isEmpty())
+            return LoginResp(EnumLoginStatus.LOGIN_STATUS_EMPTY)
+
+        val newName = HtmlUtils.htmlEscape(name.trim())
+
+        val (player, isNew) = playerController.createOrFindPlayer(name)
+        val successfulRegistration = registerPlayerWithClient(player, client)
+
+        return when {
+            isNew -> {
+                if (!successfulRegistration)
+                    throw error("Could not register new player ${player.name} with client ${client.id}")
+                playerController.triggerUpdate(setOf(player.team))
+                LoginResp(
+                    EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN,
+                    newName
+                )
+
+            }
+            !isNew && successfulRegistration -> {
+                playerController.triggerUpdate(setOf(player.team))
+                LoginResp(
+                    EnumLoginStatus.LOGIN_STATUS_SUCCESS,
+                    newName
+                )
+            }
+            else -> {
+                LoginResp(
+                    EnumLoginStatus.LOGIN_STATUS_PLAYER_TAKEN,
+                    newName
+                )
+            }
+        }
+    }
+
+    fun removePlayer(name: String){
+        playerController.getPlayer(name)?.let(this::removePlayer)
+    }
+
     fun removePlayer(player: Player) {
         clientLock.withLock {
             getOwner(player)?.let { client ->
-                updateClient(client.copy(players = client.players.minus(player)))
-                playerToClients = playerToClients.minus(player)
+                removePlayer(client, player)
             }
+        }
+    }
+
+    fun removePlayer(client: Client, player: Player) {
+        clientLock.withLock {
+            updateClient(client.copy(players = client.players.minus(player)))
+            playerToClients = playerToClients.minus(player.name)
         }
     }
 
@@ -119,9 +165,12 @@ class ClientManager (private val pokeInterval: Int = 10){
             }
         }
         // connection status changed, update the players
-        if (!allAlive){
-            triggerPlayerUpdate()
+        if (!allAlive) {
+            playerController.triggerUpdate()
         }
     }
+
     private val logger = Logger.getLogger(this::class.java.name)
+
+    data class LoginResp(val status: EnumLoginStatus, val registeredName: String = "")
 }

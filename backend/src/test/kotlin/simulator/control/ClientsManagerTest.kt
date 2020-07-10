@@ -1,17 +1,16 @@
 package simulator.control
 
-import de.flunkyteam.endpoints.projects.simulator.Client
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import simulator.model.Player
 
-internal class ClientManagerTest {
+internal class ClientsManagerTest {
 
 
     @Test
     fun registerAndGetClient(){
-        val clientManager = ClientManager()
+        val clientManager = ClientsManager()
 
         val client = clientManager.registerClient { true }
 
@@ -23,30 +22,30 @@ internal class ClientManagerTest {
     @Test
     fun registerPlayerRejection() {
 
-        val clientManager = ClientManager()
+        val clientManager = ClientsManager()
         val client = clientManager.registerClient { true }
         val client2 = clientManager.registerClient { true }
 
         val player = Player("peter")
 
-        assertTrue(clientManager.registerPlayer(player,client))
+        assertTrue(clientManager.registerPlayerWithClient(player,client))
 
-        assertFalse(clientManager.registerPlayer(player,client2))
+        assertFalse(clientManager.registerPlayerWithClient(player,client2))
     }
 
 
     @Test
     fun registerPlayerDeadClientKick() {
 
-        val clientManager = ClientManager()
+        val clientManager = ClientsManager()
         val client = clientManager.registerClient { false }
         val client2 = clientManager.registerClient { true }
 
         val player = Player("peter")
 
-        assertTrue(clientManager.registerPlayer(player,client))
+        assertTrue(clientManager.registerPlayerWithClient(player,client))
 
-        assertTrue(clientManager.registerPlayer(player,client2))
+        assertTrue(clientManager.registerPlayerWithClient(player,client2))
 
         val deadClient = clientManager.getClient(client.secret)
 

@@ -12,9 +12,6 @@ option java_package = "de.flunkyteam.endpoints.projects.simulator";
 
 
 service PlayerService {
-
-  rpc RegisterPlayer(RegisterPlayerReq) returns (RegisterPlayerResp);
-
   rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
 
   rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
@@ -53,27 +50,6 @@ message KickPlayerResp{};
 message KickPlayerReq{
   string playerName = 1;
   string targetName = 2;
-}
-
-
-message RegisterPlayerResp{
-  EnumLoginStatus status = 1;
-  string registeredName = 2;
-}
-
-message RegisterPlayerReq{
-  string playerName = 1;
-}
-
-enum EnumLoginStatus{
-  LOGIN_STATUS_UNKNOWN = 0;
-  LOGIN_STATUS_SUCCESS = 1;
-  // The desired name is already taken.
-  LOGIN_STATUS_NAME_TAKEN = 2;
-  // The player is already assigned to a client
-  LOGIN_STATUS_PLAYER_TAKEN = 3;
-  // The name is empty
-  LOGIN_STATUS_EMPTY = 4;
 }
 
 message Player{

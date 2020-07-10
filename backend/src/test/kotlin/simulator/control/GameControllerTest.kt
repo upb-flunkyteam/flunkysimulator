@@ -4,9 +4,7 @@ import de.flunkyteam.endpoints.projects.simulator.EnumAbgegebenRespStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumRoundPhase
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import io.mockk.mockk
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -25,7 +23,7 @@ internal class GameControllerTest {
     ): Pair<GameController, PlayerController> {
         val messageController = mockk<MessageController>()
         val videoController = mockk<VideoController>()
-        val clientManager = mockk<ClientManager>()
+        val clientManager = mockk<ClientsManager>()
         val playerController = PlayerController(clientManager,players.toMutableList())
         val gameController = GameController(videoController, messageController, playerController, state)
         playerController.init (gameController::handleRemovalOfPlayerFromTeamAndUpdate)

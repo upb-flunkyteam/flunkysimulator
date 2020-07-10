@@ -4,7 +4,7 @@ import com.google.protobuf.Empty
 import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.stub.StreamObserver
 import simulator.buildRegisterHandler
-import simulator.control.ClientManager
+import simulator.control.ClientsManager
 import simulator.control.MessageController
 import simulator.control.PlayerController
 import simulator.model.game.Team
@@ -13,28 +13,8 @@ import simulator.model.game.positionalName
 class PlayerService(
     private val playerController: PlayerController,
     private val messageController: MessageController,
-    private val clientManager: ClientManager
+    private val clientsManager: ClientsManager
 ) : PlayerServiceGrpc.PlayerServiceImplBase() {
-
-
-    override fun registerPlayer(request: RegisterPlayerReq, responseObserver: StreamObserver<RegisterPlayerResp>) {
-        val name = request.playerName
-
-        val client = CLIENT_CTX_KEY.get()
-
-        val loginStatus = playerController.registerPlayer(name, client)
-
-        if (loginStatus.status == EnumLoginStatus.LOGIN_STATUS_SUCCESS)
-            messageController.sendLogMessage(request.playerName, "hat sich registriert. Willkommen Athlet!")
-
-        responseObserver.onNext(
-            RegisterPlayerResp.newBuilder()
-                .setStatus(loginStatus.status)
-                .setRegisteredName(loginStatus.registeredName)
-                .build()
-        )
-        responseObserver.onCompleted()
-    }
 
     override fun kickPlayer(request: KickPlayerReq?, responseObserver: StreamObserver<KickPlayerResp>?) {
         val name = request!!.targetName
@@ -78,7 +58,7 @@ class PlayerService(
 
         responseObserver?.onNext(
             PlayerListResp.newBuilder()
-                .addAllPlayers(playerController.allPlayers.map { it.toGRPC(clientManager) })
+                .addAllPlayers(playerController.allPlayers.map { it.toGRPC(clientsManager) })
                 .build()
         )
 
@@ -86,7 +66,7 @@ class PlayerService(
             buildRegisterHandler { _: PlayerController.PlayersEvent ->
                 responseObserver?.onNext(
                     PlayerListResp.newBuilder()
-                        .addAllPlayers(playerController.allPlayers.map { it.toGRPC(clientManager) })
+                        .addAllPlayers(playerController.allPlayers.map { it.toGRPC(clientsManager) })
                         .build()
                 )
             }
@@ -98,7 +78,7 @@ class PlayerService(
 
         responseObserver?.onNext(
             PlayerListResp.newBuilder()
-                .addAllPlayers(playerController.TeamA.map { it.toGRPC(clientManager) })
+                .addAllPlayers(playerController.TeamA.map { it.toGRPC(clientsManager) })
                 .build()
         )
 
@@ -108,7 +88,7 @@ class PlayerService(
                 if (event.updateOf.contains(Team.A))
                     responseObserver?.onNext(
                         PlayerListResp.newBuilder()
-                            .addAllPlayers(playerController.TeamA.map { it.toGRPC(clientManager) })
+                            .addAllPlayers(playerController.TeamA.map { it.toGRPC(clientsManager) })
                             .build()
                     )
             }
@@ -120,7 +100,7 @@ class PlayerService(
 
         responseObserver?.onNext(
             PlayerListResp.newBuilder()
-                .addAllPlayers(playerController.TeamB.map { it.toGRPC(clientManager) })
+                .addAllPlayers(playerController.TeamB.map { it.toGRPC(clientsManager) })
                 .build()
         )
 
@@ -130,7 +110,7 @@ class PlayerService(
                 if (event.updateOf.contains(Team.B))
                     responseObserver?.onNext(
                         PlayerListResp.newBuilder()
-                            .addAllPlayers(playerController.TeamB.map { it.toGRPC(clientManager) })
+                            .addAllPlayers(playerController.TeamB.map { it.toGRPC(clientsManager) })
                             .build()
                     )
             }
@@ -142,7 +122,7 @@ class PlayerService(
 
         responseObserver?.onNext(
             PlayerListResp.newBuilder()
-                .addAllPlayers(playerController.Spectators.map { it.toGRPC(clientManager) })
+                .addAllPlayers(playerController.Spectators.map { it.toGRPC(clientsManager) })
                 .build()
         )
 
@@ -152,7 +132,7 @@ class PlayerService(
                 if (event.updateOf.contains(Team.Spectator))
                     responseObserver?.onNext(
                         PlayerListResp.newBuilder()
-                            .addAllPlayers(playerController.Spectators.map { it.toGRPC(clientManager) })
+                            .addAllPlayers(playerController.Spectators.map { it.toGRPC(clientsManager) })
                             .build()
                     )
             }

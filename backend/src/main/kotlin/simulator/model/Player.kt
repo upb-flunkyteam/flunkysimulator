@@ -1,8 +1,7 @@
 package simulator.model
 
-import de.flunkyteam.endpoints.projects.simulator.EnumConnectionStatus
 import de.flunkyteam.endpoints.projects.simulator.Player
-import simulator.control.ClientManager
+import simulator.control.ClientsManager
 import simulator.model.game.Team
 import simulator.model.game.toGrpc
 
@@ -11,10 +10,10 @@ data class Player(val name: String,
                   var wonGames: Int = 0
 ) {
 
-    fun toGRPC(clientManager: ClientManager) = Player.newBuilder()
+    fun toGRPC(clientsManager: ClientsManager) = Player.newBuilder()
         .setName(name)
         .setWonGames(wonGames.toLong())
-        .setConnectionStatus(clientManager.getConnectionStatus(this))
+        .setConnectionStatus(clientsManager.getConnectionStatus(this))
         .setTeam(team.toGrpc())
         .build()
 }

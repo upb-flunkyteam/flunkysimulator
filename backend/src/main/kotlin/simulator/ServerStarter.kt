@@ -28,24 +28,26 @@ class ServerStarter {
 
 
         val messageController = MessageController()
-        val clientManager = ClientManager()
         val videoController = VideoController(videoListUrl)
-        val playerController = PlayerController(       clientManager       )
+        val playerController = PlayerController()
+        val clientManager = ClientsManager(playerController)
         val gameController = GameController(videoController, messageController,playerController)
 
-        playerController.init (gameController::handleRemovalOfPlayerFromTeamAndUpdate)
-        clientManager.init { playerController.triggerUpdate() }
+        playerController.init {p ->
+            gameController.handleRemovalOfPlayerFromTeamAndUpdate(p)
+            clientManager.removePlayer(p)
+        }
 
         // debug print
-        gameController.addEventHandler { println(it) }
-        messageController.addEventHandler { println(it) }
-        playerController.addEventHandler { print(it) }
+        gameController.addEventHandler { logger.info(it.toString()) }
+        messageController.addEventHandler { logger.info(it.toString()) }
+        playerController.addEventHandler { logger.info(it.toString()) }
 
 
         val flunkyService = FlunkyService(gameController, messageController)
         val playerService = PlayerService(playerController,messageController,clientManager)
         val videoService = VideoService(videoController)
-        val clientService = ClientService(clientManager)
+        val clientService = ClientServiceUnAuth(clientManager)
         val messageService = MessageService(messageController)
 
         val authInterceptor = ClientAuthenticationInterceptor(clientManager)

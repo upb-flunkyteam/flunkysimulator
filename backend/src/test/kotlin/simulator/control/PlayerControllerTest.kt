@@ -2,29 +2,31 @@ package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
-import io.mockk.impl.annotations.SpyK
 import io.mockk.mockk
-import io.mockk.verify
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import simulator.model.Player
 import simulator.model.game.Team
 
 internal class PlayerControllerTest{
 
     @Test
     fun dryRun(){
-        val clientManager = mockk<ClientManager>()
+        val clientManager = mockk<ClientsManager>()
         val playerController = PlayerController(clientManager)
         val dummy = Dummy()
         playerController.init (dummy::dummy)
 
         val res1 =  playerController.registerPlayer("hans",null)
-        assertEquals(PlayerController.LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS,"hans"),
+        assertEquals(
+            ClientsManager.LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, "hans"),
             res1)
 
         val res2 = playerController.registerPlayer("hans",null)
-        assertEquals(PlayerController.LoginResp(EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN,"hans"),
+        assertEquals(
+            ClientsManager.LoginResp(
+                EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN,
+                "hans"
+            ),
             res2)
 
         playerController.registerPlayer("lola",null)
