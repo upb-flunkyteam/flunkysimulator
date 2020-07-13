@@ -1,7 +1,7 @@
 # Flunkyball-Simulator des UPB Flunkyteam
 
-Dieses Projekt ist eine Kombination aus klassischem Javascript und Node.js.
-Gehostet wird die resultierende Seite auf Heroku.
+Dieses Projekt ist eine Kombination aus Kotlin, klassischem Javascript und Node.js.
+Gehostet wird die resultierende Seite in Docker Containern.
 Die Video-Dateien sind zum Schutz der Privatsphäre nicht in diesem Repository gespeichert.
 Das Kotlin backend erfragt eine Liste von Videos und served die URLs an das Frontend
 
