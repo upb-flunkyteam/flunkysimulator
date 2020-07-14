@@ -1,5 +1,6 @@
 package simulator.control
 
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -10,7 +11,8 @@ internal class ClientsManagerTest {
 
     @Test
     fun registerAndGetClient(){
-        val clientManager = ClientsManager()
+        val playerController = mockk<PlayerController>()
+        val clientManager = ClientsManager(playerController)
 
         val client = clientManager.registerClient { true }
 
@@ -21,8 +23,8 @@ internal class ClientsManagerTest {
 
     @Test
     fun registerPlayerRejection() {
-
-        val clientManager = ClientsManager()
+        val playerController = mockk<PlayerController>()
+        val clientManager = ClientsManager(playerController)
         val client = clientManager.registerClient { true }
         val client2 = clientManager.registerClient { true }
 
@@ -36,8 +38,8 @@ internal class ClientsManagerTest {
 
     @Test
     fun registerPlayerDeadClientKick() {
-
-        val clientManager = ClientsManager()
+        val playerController = mockk<PlayerController>()
+        val clientManager = ClientsManager(playerController)
         val client = clientManager.registerClient { false }
         val client2 = clientManager.registerClient { true }
 

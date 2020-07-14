@@ -50,8 +50,8 @@ class ClientsManager(private val playerController: PlayerController, private val
         }
     }
 
-    sealed class ClientEvent{
-        class OwnedPlayersUpdate(val players: List<String>) :ClientEvent()
+    sealed class ClientEvent {
+        class OwnedPlayersUpdate(val players: List<String>) : ClientEvent()
     }
 
     fun getClient(secret: String): Client? = clients.firstOrNull { it.secret == secret }
@@ -61,7 +61,7 @@ class ClientsManager(private val playerController: PlayerController, private val
      */
     fun registerClient(isAliveChallenge: () -> Boolean): Client {
         clientLock.withLock {
-            val client = Client(getRandomString(10),isAliveChallenge)
+            val client = Client(getRandomString(10), isAliveChallenge)
             clients = clients + client
             return client
         }
@@ -80,7 +80,8 @@ class ClientsManager(private val playerController: PlayerController, private val
         clientLock.withLock {
             //check for old owner
             playerToClients[player.name]?.let { oldOwnerId ->
-                if (client.aliveChallenge())
+                if (clients.firstOrNull { it.id == oldOwnerId }
+                        ?.let { c -> c.aliveChallenge() } == true)
                     return false //old owner is alive
                 else
                     removeClient(oldOwnerId) //guess they are dead, time to move on
@@ -130,7 +131,7 @@ class ClientsManager(private val playerController: PlayerController, private val
         }
     }
 
-    fun removePlayer(name: String){
+    fun removePlayer(name: String) {
         playerController.getPlayer(name)?.let(this::removePlayer)
     }
 

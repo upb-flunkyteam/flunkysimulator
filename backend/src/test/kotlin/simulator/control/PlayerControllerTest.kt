@@ -5,33 +5,30 @@ import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import simulator.model.Player
 import simulator.model.game.Team
 
 internal class PlayerControllerTest{
 
     @Test
     fun dryRun(){
-        val clientManager = mockk<ClientsManager>()
-        val playerController = PlayerController(clientManager)
+        val playerController = PlayerController()
         val dummy = Dummy()
         playerController.init (dummy::dummy)
 
-        val res1 =  playerController.registerPlayer("hans",null)
+        val res1 =  playerController.createOrFindPlayer("hans")
         assertEquals(
-            ClientsManager.LoginResp(EnumLoginStatus.LOGIN_STATUS_SUCCESS, "hans"),
+            Player("hans") to true,
             res1)
 
-        val res2 = playerController.registerPlayer("hans",null)
+        val res2 = playerController.createOrFindPlayer("hans")
         assertEquals(
-            ClientsManager.LoginResp(
-                EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN,
-                "hans"
-            ),
+            Player("hans") to false,
             res2)
 
-        playerController.registerPlayer("lola",null)
-        playerController.registerPlayer("peter",null)
-        playerController.registerPlayer("anna",null)
+        playerController.createOrFindPlayer("lola")
+        playerController.createOrFindPlayer("peter")
+        playerController.createOrFindPlayer("anna")
 
         val hans = playerController.getPlayer("hans")
         assertNotNull(hans)
