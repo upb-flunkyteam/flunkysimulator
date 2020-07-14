@@ -25,7 +25,6 @@ class ClientsManager(private val playerController: PlayerController, private val
 
     private var clients: Set<Client> = emptySet()
     private var playerToClients: Map<String, Int> = emptyMap()
-    private var idsToAliveChallenges: Map<Int, () -> Boolean> = emptyMap()
 
     private fun getOwner(player: Player): Client? = playerToClients[player.name]?.let { getClient(it) }
 
@@ -64,7 +63,6 @@ class ClientsManager(private val playerController: PlayerController, private val
         clientLock.withLock {
             val client = Client(getRandomString(10),isAliveChallenge)
             clients = clients + client
-            idsToAliveChallenges = idsToAliveChallenges + (client.id to isAliveChallenge)
             return client
         }
     }
@@ -72,7 +70,6 @@ class ClientsManager(private val playerController: PlayerController, private val
     fun removeClient(id: Int) {
         clientLock.withLock {
             getClient(id)?.let { client ->
-                idsToAliveChallenges = idsToAliveChallenges - id
                 clients = clients - client
                 playerToClients = playerToClients.mapNotNull { if (it.value == id) null else it.toPair() }.toMap()
             }
@@ -83,9 +80,7 @@ class ClientsManager(private val playerController: PlayerController, private val
         clientLock.withLock {
             //check for old owner
             playerToClients[player.name]?.let { oldOwnerId ->
-                if (idsToAliveChallenges[oldOwnerId]?.invoke()
-                        ?: throw error("Client with id ${oldOwnerId} owns player ${player.name} but doesnt have an alive challenge")
-                )
+                if (client.aliveChallenge())
                     return false //old owner is alive
                 else
                     removeClient(oldOwnerId) //guess they are dead, time to move on
@@ -161,9 +156,9 @@ class ClientsManager(private val playerController: PlayerController, private val
     private fun pokeClients() {
         logger.info("Poking clients")
         var allAlive = true
-        idsToAliveChallenges.forEach {
-            if (!it.value()) {
-                removeClient(it.key)
+        clients.forEach {
+            if (!it.aliveChallenge()) {
+                removeClient(it.id)
                 allAlive = false
             }
         }
