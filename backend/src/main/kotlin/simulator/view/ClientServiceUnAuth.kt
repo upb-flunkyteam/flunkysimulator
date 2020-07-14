@@ -4,6 +4,7 @@ import de.flunkyteam.endpoints.projects.simulator.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
+import simulator.buildRegisterHandler
 import simulator.control.ClientsManager
 import java.util.logging.Logger
 
@@ -28,7 +29,20 @@ class ClientServiceUnAuth(private val clientsManager: ClientsManager): ClientSer
             success
         }
 
-        val client = clientsManager.registerClient (aliveChallenge)
+        val client = clientsManager.registerClient(aliveChallenge)
+
+        val handler = buildRegisterHandler<ClientsManager.ClientEvent> { clientEvent: ClientsManager.ClientEvent ->
+            when (clientEvent){
+                is ClientsManager.ClientEvent.OwnedPlayersUpdate ->
+                    responseObserver.onNext(ClientStreamResp.newBuilder()
+                        .setOwnedPlayersUpdated(OwnedPlayersUpdate.newBuilder()
+                            .addAllPlayers(clientEvent.players)
+                            .build())
+                        .build())
+            }
+        }
+
+        client.addEventHandler(handler)
 
         responseObserver.onNext(ClientStreamResp.newBuilder()
             .setClientRegistered(ClientRegistered.newBuilder()

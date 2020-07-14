@@ -1,5 +1,9 @@
 package simulator.model
 
+import de.flunkyteam.endpoints.projects.simulator.AliveChallenge
+import simulator.control.ClientsManager
+import simulator.control.EventControllerBase
+
 private var ids = 1
 
 /***
@@ -7,8 +11,7 @@ private var ids = 1
  */
 data class Client(
     val secret: String,
+    val aliveChallenge: () -> Boolean,
     val players: List<Player> = listOf(),
     val id: Int = ids++
-) {
-
-}
+): EventControllerBase<ClientsManager.ClientEvent>() 

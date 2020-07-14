@@ -23,7 +23,7 @@ class PlayerController(
 
     /**
      * @param handleRemovalOfPlayer Function is called when a player is removed from a team. This might be relevant for the game
-     * state. eg. if they are the trowing player or having the abgegeben status.
+     * state. eg. if they are the trowing player or having the abgegeben status. Currently ClientsManager and GameController are interested.
      */
     fun init(handleRemovalOfPlayer: (String) -> Unit) {
         handleRemovalOfPlayerCoroutine = { p: String ->

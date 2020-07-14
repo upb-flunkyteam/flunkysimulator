@@ -18,7 +18,7 @@ This is not a controller as the other classes in this package because our contro
 responsible for one event handler. This class on the other hand handles multiple client events/streams
 and to distinguish that it is not called a controller.
  */
-//TODO send clients players out if changed
+
 class ClientsManager(private val playerController: PlayerController, private val pokeInterval: Int = 10) {
 
     private val clientLock = ReentrantLock()
@@ -35,6 +35,7 @@ class ClientsManager(private val playerController: PlayerController, private val
         clientLock.withLock {
             val old = getClient(newClient.id)!!
             clients = clients - old + newClient
+            newClient.triggerWithLock(ClientEvent.OwnedPlayersUpdate(newClient.players.map { it.name }))
         }
     }
 
@@ -50,7 +51,9 @@ class ClientsManager(private val playerController: PlayerController, private val
         }
     }
 
-
+    sealed class ClientEvent{
+        class OwnedPlayersUpdate(val players: List<String>) :ClientEvent()
+    }
 
     fun getClient(secret: String): Client? = clients.firstOrNull { it.secret == secret }
 
@@ -59,7 +62,7 @@ class ClientsManager(private val playerController: PlayerController, private val
      */
     fun registerClient(isAliveChallenge: () -> Boolean): Client {
         clientLock.withLock {
-            val client = Client(getRandomString(10))
+            val client = Client(getRandomString(10),isAliveChallenge)
             clients = clients + client
             idsToAliveChallenges = idsToAliveChallenges + (client.id to isAliveChallenge)
             return client
