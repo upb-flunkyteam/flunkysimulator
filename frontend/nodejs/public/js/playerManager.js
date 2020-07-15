@@ -10,8 +10,8 @@ $.get({
 var {Empty} = require('google-protobuf/google/protobuf/empty_pb.js')
 
 const {
-    EnumTeams, EnumConnectionStatus, EnumLoginStatus, KickPlayerReq, KickPlayerResp, Player,
-    PlayerListResp, RegisterPlayerReq, RegisterPlayerResp, ShuffleTeamsReq,
+    EnumTeams, EnumConnectionStatus,  KickPlayerReq, KickPlayerResp, Player,
+    PlayerListResp, ShuffleTeamsReq,
     ShuffleTeamsResp, SwitchTeamReq, SwitchTeamResp
 } = require('./generated/player_service_pb');
 const {PlayerServiceClient} = require('./generated/player_service_grpc_web_pb');
@@ -24,7 +24,6 @@ PlayerManager.ownTeam = EnumTeams.SPECTATOR_TEAMS;
 
 //external functions
 PlayerManager.external = {}
-PlayerManager.external.processNewState = null;
 PlayerManager.external.toggleAbgabe = null;
 PlayerManager.external.reduceStrafbierCount = null;
 PlayerManager.external.selectThrowingPlayer = null;
@@ -63,16 +62,6 @@ jQuery(window).load(function () {
         if (e.keyCode === 13) {
             $(this).trigger("submission");
         }
-    });
-    $('#playernamebutton').click(function () {
-        $('#playername').trigger("submission");
-    });
-    $('#playername').bind("submission", function (e) {
-        changePlayername($('#playername').val());
-    });
-    $('#switchplayerbutton').click(function () {
-        $('#registerform').show();
-        $('#playernamebutton').text('Spielernamen ändern');
     });
 
     $('#shufflebutton').click(function () {
@@ -191,56 +180,6 @@ PlayerManager.kickPlayer = function (targetName) {
     });
 }
 
-async function changePlayername(desiredPlayername) {
-    if (desiredPlayername === '') {
-        console.log("Warning: Cannot register empty player name");
-        return;
-    }
-
-    while (!PlayerManager.external.ClientManager.metadata())
-        await __delay__(1000);
-
-    // Discourage false flag attacks, the player was already registered
-    PlayerManager.ownPlayerName ?
-        PlayerManager.external.MessageManager
-            .sendMessage('hat sich zu ' + desiredPlayername + ' umbenannt', true) : '';
-
-    const request = new RegisterPlayerReq();
-    request.setPlayername(desiredPlayername);
-    console.log(request.toObject());
-    playerService.registerPlayer(request, metadata, function (err, response) {
-        if (err) {
-            console.log(err.code);
-            console.log(err.message);
-        } else {
-            response = response.toObject();
-            console.log(response);
-            switch (response.status) {
-                case EnumLoginStatus.LOGIN_STATUS_SUCCESS:
-                case EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN:
-                    PlayerManager.ownPlayerName = response.registeredname
-                    $('#playername').text(PlayerManager.ownPlayerName);
-                    $('#registerform').hide();
-                    // Force re-evaluation of game state, e.g. do I need to throw
-                    PlayerManager.external.processNewState();
-                    break;
-                case EnumLoginStatus.LOGIN_STATUS_PLAYER_TAKEN:
-                    window.alert('Registrierung fehlgeschlagen! Aktive Sitzung für diesen Namen bereits vorhanden.')
-                    if (desiredPlayername === PlayerManager.ownPlayerName){
-                        //this was probatly a missclick or reconnect attempt
-                        PlayerManager.external.processNewState();//make the textbox go away
-                    }
-                    break;
-                case EnumLoginStatus.LOGIN_STATUS_EMPTY:
-                    window.alert('Registrierung fehlgeschlagen! Dein Benutzername ist leer.');
-                    break;
-                case EnumLoginStatus.LOGIN_STATUS_UNKNOWN:
-                    window.alert('Registrierung fehlgeschlagen!');
-                    break;
-            }
-        }
-    });
-}
 
 function generateSpectatorHTML(player) {
     return generatePlayerHTML(player, false, false, false, true);

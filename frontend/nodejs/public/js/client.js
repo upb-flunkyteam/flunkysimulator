@@ -30,9 +30,6 @@ const {ClientManager} = require('./clientManager')
 const {PlayerManager} = require('./playerManager');
 const {MessageManager} = require('./messageManager');
 
-PlayerManager.external.ClientManager = ClientManager;
-PlayerManager.external.MessageManager = MessageManager;
-PlayerManager.external.processNewState = function(){processNewState(currentGameState, true)};
 PlayerManager.external.toggleAbgabe = toggleAbgabe;
 PlayerManager.external.reduceStrafbierCount = reduceStrafbierCount;
 PlayerManager.external.selectThrowingPlayer = selectThrowingPlayer;
@@ -40,6 +37,14 @@ PlayerManager.external.getThrowingPlayerName = () => {return currentGameState.th
 PlayerManager.external.getStrafbierteamA = () => {return currentGameState.strafbierteama};
 PlayerManager.external.getStrafbierteamB = () => {return currentGameState.strafbierteamb};
 PlayerManager.external.hasAbgegeben = (name) => {return currentGameState.abgegebenList.includes(name)};
+
+PlayerManager.external.ClientManager = ClientManager;
+PlayerManager.external.MessageManager = MessageManager;
+
+ClientManager.external.PlayerManager = PlayerManager;
+ClientManager.external.MessageManager = MessageManager;
+ClientManager.external.processNewState = function(){processNewState(currentGameState, true)};
+
 
 MessageManager.external.playerManager = PlayerManager;
 

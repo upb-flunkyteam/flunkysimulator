@@ -47,8 +47,11 @@ head
                 #spectatorarea
             button#resetbutton.btn.btn-default Spiel neu starten
             button#shufflebutton.btn.btn-default Teams mischen
-            a#switchplayerbutton.btn.btn-default(href="#registerform") Spieler wechseln
+            a#switchplayerbutton.btn.btn-default(href="#registerform") Spieler hinzufügen
             input#lowbandwidthbutton(type="checkbox" data-toggle="toggle" data-on="Videomodus" data-off="Textmodus")
+            #ownplayersarea.statearea
+                h3 Eigene Spieler
+                #ownplayerslistarea
         .col-md-3.col-sm-6
             .statearea
                 h3 Rechtes Team
@@ -61,7 +64,7 @@ head
 #settingsModal.modal
     .modal-content
         span.close &times
-        p#settingscontent settings should be here
+        p#j settings should be here
 
 // Optional JavaScript
 script(src='js/jquery-2.2.4.js' type='text/javascript')
