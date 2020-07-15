@@ -45,7 +45,7 @@ class ClientServiceAuth(
             return
         }
 
-        clientsManager.removePlayer(client,player)
+        clientsManager.removePlayer(client,player.name)
 
         responseObserver.onNext(DeregisterPlayerResp.getDefaultInstance())
         responseObserver.onCompleted()

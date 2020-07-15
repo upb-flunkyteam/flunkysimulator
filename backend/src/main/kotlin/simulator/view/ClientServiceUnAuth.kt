@@ -42,7 +42,7 @@ class ClientServiceUnAuth(private val clientsManager: ClientsManager): ClientSer
             }
         }
 
-        client.addEventHandler(handler)
+        client.clientEvent.addEventHandler(handler)
 
         responseObserver.onNext(ClientStreamResp.newBuilder()
             .setClientRegistered(ClientRegistered.newBuilder()

@@ -26,7 +26,7 @@ class ClientsManager(private val playerController: PlayerController, private val
     private var clients: Set<Client> = emptySet()
     private var playerToClients: Map<String, Int> = emptyMap()
 
-    private fun getOwner(player: Player): Client? = playerToClients[player.name]?.let { getClient(it) }
+    private fun getOwner(player: String): Client? = playerToClients[player]?.let { getClient(it) }
 
     private fun getClient(id: Int) = clients.firstOrNull { it.id == id }
 
@@ -34,7 +34,7 @@ class ClientsManager(private val playerController: PlayerController, private val
         clientLock.withLock {
             val old = getClient(newClient.id)!!
             clients = clients - old + newClient
-            newClient.triggerWithLock(ClientEvent.OwnedPlayersUpdate(newClient.players.map { it.name }))
+            newClient.clientEvent.triggerWithLock(ClientEvent.OwnedPlayersUpdate(newClient.players))
         }
     }
 
@@ -76,10 +76,13 @@ class ClientsManager(private val playerController: PlayerController, private val
         }
     }
 
-    internal fun registerPlayerWithClient(player: Player, client: Client): Boolean {
+    internal fun registerPlayerWithClient(player: String, client: Client): Boolean {
+        if (client.players.contains(player))
+            return true
+
         clientLock.withLock {
             //check for old owner
-            playerToClients[player.name]?.let { oldOwnerId ->
+            playerToClients[player]?.let { oldOwnerId ->
                 if (clients.firstOrNull { it.id == oldOwnerId }
                         ?.let { c -> c.aliveChallenge() } == true)
                     return false //old owner is alive
@@ -87,7 +90,7 @@ class ClientsManager(private val playerController: PlayerController, private val
                     removeClient(oldOwnerId) //guess they are dead, time to move on
             }
 
-            playerToClients = playerToClients.plus(player.name to client.id)
+            playerToClients = playerToClients.plus(player to client.id)
             updateClient(client.copy(players = client.players.plus(player)))
 
             return true
@@ -102,7 +105,7 @@ class ClientsManager(private val playerController: PlayerController, private val
         val newName = HtmlUtils.htmlEscape(name.trim())
 
         val (player, isNew) = playerController.createOrFindPlayer(name)
-        val successfulRegistration = registerPlayerWithClient(player, client)
+        val successfulRegistration = registerPlayerWithClient(player.name, client)
 
         return when {
             isNew -> {
@@ -132,26 +135,22 @@ class ClientsManager(private val playerController: PlayerController, private val
     }
 
     fun removePlayer(name: String) {
-        playerController.getPlayer(name)?.let(this::removePlayer)
-    }
-
-    fun removePlayer(player: Player) {
         clientLock.withLock {
-            getOwner(player)?.let { client ->
-                removePlayer(client, player)
+            getOwner(name)?.let { client ->
+                removePlayer(client, name)
             }
         }
     }
 
-    fun removePlayer(client: Client, player: Player) {
+    fun removePlayer(client: Client, player: String) {
         clientLock.withLock {
             updateClient(client.copy(players = client.players.minus(player)))
-            playerToClients = playerToClients.minus(player.name)
+            playerToClients = playerToClients.minus(player)
         }
     }
 
     fun getConnectionStatus(player: Player): EnumConnectionStatus =
-        getOwner(player)?.let { EnumConnectionStatus.CONNECTION_CONNECTED }
+        getOwner(player.name)?.let { EnumConnectionStatus.CONNECTION_CONNECTED }
             ?: EnumConnectionStatus.CONNECTION_DISCONNECTED
 
     private fun pokeClients() {
