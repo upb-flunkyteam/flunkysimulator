@@ -30,9 +30,9 @@ internal class ClientsManagerTest {
 
         val player = Player("peter")
 
-        assertTrue(clientManager.registerPlayerWithClient(player,client))
+        assertTrue(clientManager.registerPlayerWithClient(player.name,client))
 
-        assertFalse(clientManager.registerPlayerWithClient(player,client2))
+        assertFalse(clientManager.registerPlayerWithClient(player.name,client2))
     }
 
 
@@ -45,9 +45,9 @@ internal class ClientsManagerTest {
 
         val player = Player("peter")
 
-        assertTrue(clientManager.registerPlayerWithClient(player,client))
+        assertTrue(clientManager.registerPlayerWithClient(player.name,client))
 
-        assertTrue(clientManager.registerPlayerWithClient(player,client2))
+        assertTrue(clientManager.registerPlayerWithClient(player.name,client2))
 
         val deadClient = clientManager.getClient(client.secret)
 
