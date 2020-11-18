@@ -9,14 +9,15 @@ TODO
 
 ### Node
 
-Im Ordner frontend/nodejs
+`/frontend/nodejs/generated` Anlegen
 
 Aus Protobuf-Definitionen die commonJS-Bindings generieren
 
-`protoc -I=./protocol  --js_out=import_style=commonjs:./frontend/nodejs/public/js/ --grpc-web_out=mode=grpcwebtext,import_style=commonjs:./frontend/nodejs/public/js/ ./protocol/*.proto`
+Dazu folgendes in Root ausführen: (wenn nicht vorhanden protoc und protoc-gen-grpc-web pligin installieren)
+
+`protoc -I=./protocol  --js_out=import_style=commonjs:./frontend/nodejs/public/js/generated/ --grpc-web_out=mode=grpcwebtext,import_style=commonjs:./frontend/nodejs/public/js/generated/ ./protocol/*.proto`
 
 NodeJS-Dependencies installieren
-
 `npm install`
 
 Backend-Server-URL auswählen
