@@ -17,6 +17,8 @@ const {ClientServiceClient,ClientServiceAuthClient} = require('./generated/clien
 var clientService = null;
 var clientAuthService = null;
 var ownPlayers = [];
+var lastAlivePoke = new Date();
+var debugUpdateRef = null;
 
 export const ClientManager = {};
 ClientManager.external = {};
@@ -74,11 +76,20 @@ function subscribeClientStream() {
             secret = event.secret;
         } else if (response.getEventOneofCase() === EventOneofCase.ALIVECHALLENGE) {
             //alive challenge - do nothing
+            lastAlivePoke = new Date();
+            if (debugUpdateRef === null){
+                debugUpdateRef = window.setInterval( () => {
+                    let debugArea = $('#debuginformationarea');
+                    debugArea.empty();
+                    debugArea
+                        .append($("<span>"))
+                        .append("Last Poked: "+(new Date().getTime()- lastAlivePoke.getTime())/1000);
+                }, 100);
+            }
         } else if (response.getEventOneofCase() === EventOneofCase.OWNEDPLAYERSUPDATED) {
             let event = response.getOwnedplayersupdated().toObject();
             ownPlayers = event.playersList
             updateOwnPlayers();
-
         } else {
             console.log("Unknown client stream event");
         }
