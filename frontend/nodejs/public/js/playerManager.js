@@ -210,11 +210,9 @@ function generatePlayerHTML(player,
             .append(name+' ')
 
     if (player.connectionstatus === EnumConnectionStatus.CONNECTION_DISCONNECTED){
-        playerSpan = playerSpan.append($('<span class="glyphicon glyphicon-flash">'))
+        playerSpan = playerSpan.append($(' <span class="glyphicon glyphicon-flash">'))
     }
-    if (player.connectionstatus === EnumConnectionStatus.CONNECTION_CONNECTED){
-        playerSpan = playerSpan.append($('<span class="glyphicon glyphicon-cloud">'))
-    }
+
 
     let playerButton = $("<a href='#'>").addClass("btn namebutton" + turnClass + egoClass + hasAbgegebenClass).html(playerSpan)
     if (!isSpectator) {
