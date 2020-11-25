@@ -16,20 +16,23 @@ const {ClientServiceClient,ClientServiceAuthClient} = require('./generated/clien
 
 var clientService = null;
 var clientAuthService = null;
+var clientStream = null;
 var ownPlayers = [];
-var lastAlivePoke = new Date();
-var debugUpdateRef = null;
+var lastAlivePoke = new Date();//Date('2000-01-01T01:00:00');
+var lastReconnect = new Date();
+var secret = null;
 
 export const ClientManager = {};
 ClientManager.external = {};
 ClientManager.external.PlayerManager = {};
 ClientManager.external.MessageManager = null;
-PlayerManager.external.processNewState = null;
+ClientManager.external.processNewState = null;
+ClientManager.external.triggerReconnect = null;
 
 jQuery(window).load(function () {
     clientService = new ClientServiceClient(env['BACKEND_URL']);
     clientAuthService = new ClientServiceAuthClient(env['BACKEND_URL']);
-    subscribeClientStream()
+
 
     $('#playernamebutton').click(function () {
         $('#playername').trigger("submission");
@@ -41,9 +44,34 @@ jQuery(window).load(function () {
         $('#registerform').show();
         $('#playernamebutton').text('Spielernamen ändern');
     });
+
+    //connection watchdog
+    let whatchdog = function (){
+        let timeSinceLastPoke = new Date().getTime()- lastAlivePoke.getTime();
+
+        let debugArea = $('#debuginformationarea');
+        debugArea.empty();
+        debugArea
+            .append($("<span>"))
+            .append("Last Poked: "+timeSinceLastPoke/1000);
+
+        if (timeSinceLastPoke > 15 * 1000) {
+            // steams seem dead, reconnect
+            const timeSinceLastReconnect = new Date().getTime() - lastReconnect.getTime();
+            if (timeSinceLastReconnect > 5 * 1000) {
+                lastReconnect = new Date();
+                reconnect()
+                ClientManager.external.triggerReconnect();
+                ClientManager.external.MessageManager
+                    .sendMessage("(debug) trys to reconnect because last poke was " + timeSinceLastPoke / 1000 + " sec ago.", true);
+            }
+        }
+    };
+    window.setInterval( whatchdog, 2000);
+
+    reconnect();
 });
 
-var secret = null
 
 ClientManager.metadata = function() {
     if (secret){
@@ -51,6 +79,7 @@ ClientManager.metadata = function() {
     }else {
         return null
     }}
+
 
 function updateOwnPlayers() {
     let area = $('#ownplayersarea');
@@ -69,23 +98,15 @@ function updateOwnPlayers() {
 
 function subscribeClientStream() {
     const req = new ClientStreamReq()
-    var clientStream = clientService.clientStream(req,{});
+
+    clientStream = clientService.clientStream(req,{});
     clientStream.on('data', (response) => {
         if (response.getEventOneofCase() === EventOneofCase.CLIENTREGISTERED){
-            let event = response.getClientregistered().toObject()
+            let event = response.getClientregistered().toObject();
             secret = event.secret;
         } else if (response.getEventOneofCase() === EventOneofCase.ALIVECHALLENGE) {
             //alive challenge - do nothing
             lastAlivePoke = new Date();
-            if (debugUpdateRef === null){
-                debugUpdateRef = window.setInterval( () => {
-                    let debugArea = $('#debuginformationarea');
-                    debugArea.empty();
-                    debugArea
-                        .append($("<span>"))
-                        .append("Last Poked: "+(new Date().getTime()- lastAlivePoke.getTime())/1000);
-                }, 100);
-            }
         } else if (response.getEventOneofCase() === EventOneofCase.OWNEDPLAYERSUPDATED) {
             let event = response.getOwnedplayersupdated().toObject();
             ownPlayers = event.playersList
@@ -98,6 +119,17 @@ function subscribeClientStream() {
         console.log('Error in clientStream:');
         console.log(response);
     });
+}
+
+function reconnect(){
+    //clean old connection
+    secret = null;
+
+    let prevOwnPlayers = ownPlayers; //copy it to be save
+
+    subscribeClientStream();
+    //reregister players
+    prevOwnPlayers.forEach(player => registerPlayer(player));
 }
 
 function setOwnPlayer(newName) {
@@ -183,4 +215,14 @@ function generateOwnPlayerHTML(playerName){
         .append(playerButton)
 
 
+}
+
+//https://stackoverflow.com/questions/7307983/while-variable-is-not-defined-wait
+function __delay__(timer) {
+    return new Promise(resolve => {
+        timer = timer || 1000;
+        setTimeout(function () {
+            resolve();
+        }, timer);
+    });
 }

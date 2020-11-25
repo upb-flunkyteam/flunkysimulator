@@ -20,7 +20,11 @@ const {
 const {VideoServiceClient} = require('./generated/video_service_grpc_web_pb');
 
 var videoService = null;
+var videoEventStream = null;
 export const VideoManager = {};
+
+VideoManager.lowBandwidth = false;
+var preparedVideos = {};
 
 jQuery(window).load(function () {
     videoService = new VideoServiceClient(env['BACKEND_URL']);
@@ -45,13 +49,12 @@ jQuery(window).load(function () {
 
 });
 
-VideoManager.lowBandwidth = false;
-var preparedVideos = {};
+VideoManager.reconnect = function (){subscribeVideoStream()};
 
 function subscribeVideoStream(){
 
     var videoEventsRequest = new StreamVideoEventsReq();
-    var videoEventStream = videoService.streamVideoEvents(videoEventsRequest, {});
+    videoEventStream = videoService.streamVideoEvents(videoEventsRequest, {});
     videoEventStream.on('data', (response) => {
         processNewVideoEvent(response.getEvent().toObject());
     });

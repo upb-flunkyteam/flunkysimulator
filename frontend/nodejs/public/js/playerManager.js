@@ -35,6 +35,7 @@ PlayerManager.external.hasAbgegeben = (name) => false;
 PlayerManager.external.ClientManager = null;
 PlayerManager.external.MessageManager = null;
 
+var playersStream = null;
 var metadata = {}
 var players = []
 var teamA = []
@@ -118,6 +119,10 @@ PlayerManager.refreshPlayers = function () {
     });
 }
 
+PlayerManager.reconnect = function (){
+    subscribeTeamStreams();
+}
+
 async function subscribeTeamStreams() {
 
     while (!PlayerManager.external.ClientManager.metadata())
@@ -126,7 +131,7 @@ async function subscribeTeamStreams() {
     metadata = PlayerManager.external.ClientManager.metadata()
 
     // I would love to use the team specific streams but js continues to be js :/
-    var playersStream = playerService.streamAllPlayers(new Empty(), metadata);
+    playersStream = playerService.streamAllPlayers(new Empty(), metadata);
     playersStream.on('data', (response) => {
         players = response.getPlayersList().map(p => p.toObject());
         teamA = players.filter(p => p.team === EnumTeams.TEAM_A_TEAMS)

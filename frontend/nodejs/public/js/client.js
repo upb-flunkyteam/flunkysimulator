@@ -44,12 +44,14 @@ PlayerManager.external.MessageManager = MessageManager;
 ClientManager.external.PlayerManager = PlayerManager;
 ClientManager.external.MessageManager = MessageManager;
 ClientManager.external.processNewState = function(){processNewState(currentGameState, true)};
+ClientManager.external.triggerReconnect = reconnectAll;
 
 
 MessageManager.external.playerManager = PlayerManager;
 
 
 var flunkyService = null;
+var stateStream = null;
 var currentTeam = EnumTeams.UNKNOWN_TEAMS;
 var actionButtonsEnabled = true;
 var currentGameState = new GameState().toObject();
@@ -80,9 +82,17 @@ jQuery(window).load(function () {
     initDebugFunction()
 });
 
+//all besides client manager
+function reconnectAll(){
+    subscribeStreams();
+    VideoManager.reconnect();
+    MessageManager.reconnect();
+    PlayerManager.reconnect();
+}
+
 function subscribeStreams() {
     var stateRequest = new StreamStateReq();
-    var stateStream = flunkyService.streamState(stateRequest, {});
+    stateStream = flunkyService.streamState(stateRequest, {});
     stateStream.on('data', (response) => {
         processNewState(response.getState().toObject());
     });

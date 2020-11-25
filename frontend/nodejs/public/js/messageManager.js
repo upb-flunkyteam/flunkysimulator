@@ -35,6 +35,12 @@ jQuery(window).load(function () {
 
     $('#logbox').scrollTop($('#logbox')[0].scrollHeight);
 
+    subscribeStreams();
+});
+
+MessageManager.reconnect = function (){subscribeStreams()}
+
+function subscribeStreams(){
     // subscribe streams
     const streamMessageRequest = new StreamMessageReq();
     const messageStream = messageService.streamMessages(streamMessageRequest, {});
@@ -45,16 +51,16 @@ jQuery(window).load(function () {
         console.log('Error in log stream:');
         console.log(response);
     });
-});
+}
 
 function processNewMessage(message) {
-    console.log("New message: " + message);
-
     let toString = message.sender;
     if ((message.messagetype === EnumMessageType.MESSAGE_TYPE_CHAT))
         toString += ": "+message.content;
     else
         toString += " "+message.content;
+
+    console.log("New message: " + toString);
     appendMessage(toString);
 }
 
@@ -72,7 +78,10 @@ MessageManager.sendMessage = function (content, isLog = false) {
 
     let playerName = MessageManager.external.playerManager.ownPlayerName;
     if (!playerName) {
-        appendMessage("Bitte registriere dich erst mit einem Namen.")
+        console.log("Rejected message because of missing name: "+content);
+        if (!isLog){
+            appendMessage("Bitte registriere dich erst mit einem Namen.")
+        }
         return
     }
     const message = new Message()
