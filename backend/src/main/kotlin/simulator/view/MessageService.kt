@@ -42,7 +42,8 @@ class MessageService(private val messageController:MessageController)
 
     private val patchNotes = """Version 2.3:
     - Clientauthentifizierung und Zuweisung von Spielern
-    - Clientonlinestatusanzeige
+    - Clientonlinestatusanzeige und Wiederverbindungsversuche
     - Unterscheidung von Chat- und Systemnachrichten
+    - Intern auf Servicestruktur umgestellt
     """
 }
