@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package endpoints.flunky.simulator;
+
+option java_multiple_files = true;
+option java_outer_classname = "Client";
+option java_package = "de.flunkyteam.endpoints.projects.simulator";
+
+
+service ClientService{
+  rpc ClientStream(ClientStreamReq) returns (stream ClientStreamResp);
+}
+
+service ClientServiceAuth{
+  rpc RegisterPlayer(RegisterPlayerReq) returns (RegisterPlayerResp);
+  rpc DeregisterPlayer(DeregisterPlayerReq) returns (DeregisterPlayerResp);
+}
+
+message DeregisterPlayerResp{
+}
+message DeregisterPlayerReq{
+  string playerName = 1;
+}
+
+message RegisterPlayerResp{
+  EnumLoginStatus status = 1;
+  string registeredName = 2;
+}
+message RegisterPlayerReq{
+  string playerName = 1;
+}
+enum EnumLoginStatus{
+  LOGIN_STATUS_UNKNOWN = 0;
+  LOGIN_STATUS_SUCCESS = 1;
+  // The desired name is already taken.
+  LOGIN_STATUS_NAME_TAKEN = 2;
+  // The player is already assigned to a client
+  LOGIN_STATUS_PLAYER_TAKEN = 3;
+  // The name is empty
+  LOGIN_STATUS_EMPTY = 4;
+}
+
+message ClientStreamReq{
+}
+
+message ClientStreamResp{
+  oneof event_oneof {
+    ClientRegistered clientRegistered = 1;
+    AliveChallenge aliveChallenge = 2;
+    OwnedPlayersUpdate ownedPlayersUpdated = 3;
+  }
+}
+
+message ClientRegistered{
+  string secret = 1;
+}
+
+message AliveChallenge{}
+
+message OwnedPlayersUpdate{
+  repeated string players = 1;
+}

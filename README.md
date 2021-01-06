@@ -1,7 +1,7 @@
 # Flunkyball-Simulator des UPB Flunkyteam
 
-Dieses Projekt ist eine Kombination aus klassischem Javascript und Node.js.
-Gehostet wird die resultierende Seite auf Heroku.
+Dieses Projekt ist eine Kombination aus Kotlin, klassischem Javascript und Node.js.
+Gehostet wird die resultierende Seite in Docker Containern.
 Die Video-Dateien sind zum Schutz der Privatsphäre nicht in diesem Repository gespeichert.
 Das Kotlin backend erfragt eine Liste von Videos und served die URLs an das Frontend
 
@@ -19,39 +19,11 @@ ffmpeg -i stop.mp4 -c:v libvpx-vp9 -b:v 2M -pass 1 -an -f webm /dev/null &&\
 ffmpeg -i stop.mp4 -c:v libvpx-vp9 -b:v 2M -pass 2 -c:a libopus stop.webm`
 ```
 
-## Frontend lokal starten
+## Frontend 
 
-### Im Docker-Container
+[NodeJS Frontend Readme](./frontend/nodejs/README.md)
 
-TODO
-
-### Node
-
-Im Ordner frontend/nodejs
-
-Aus Protobuf-Definitionen die commonJS-Bindings generieren
-
-`protoc -I=./protocol  --js_out=import_style=commonjs:./frontend/nodejs/public/js/ --grpc-web_out=mode=grpcwebtext,import_style=commonjs:./frontend/nodejs/public/js/ ./protocol/*.proto`
-
-NodeJS-Dependencies installieren
-
-`npm install`
-
-Backend-Server-URL auswählen
-
-`export BACKEND_URL="https://www.example.com:8443"`
-
-Javascript-Ressourcen bauen
-
-`npm run-script build:dev`
-
-NodeJS als lokalen Webserver unter Port 5000 starten
-
-`npm run-script start`
-
-`http://localhost:5000/` im Browser besuchen
-
-### Server
+## Server
 
 Server bauen und starten im *./backend* Verzeichnis
 
@@ -65,6 +37,14 @@ Befehlt um den [grpcWebProxy](https://github.com/improbable-eng/grpc-web/tree/ma
 
 ## Versionsgeschichte
 
+### 2.3:
+- Refactoring in Services insbesondere für Protokoll und Client.
+
+### 2.2:
+- Strafbiere haben auch Videos
+- Gesamte Infrastruktur auf Docker-Images umgestellt
+- Infrastruktur umgezogen
+    
 ### 2.1
 
 - Kleinere Fehlerbehebungen; richtige Teamnamen im Chat

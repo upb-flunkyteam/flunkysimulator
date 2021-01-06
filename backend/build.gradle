@@ -33,6 +33,7 @@ def grpcVersion = '1.28.0' // CURRENT_GRPC_VERSION
 dependencies {
     def kotlinVersion = plugins.findPlugin("org.jetbrains.kotlin.jvm").kotlinPluginVersion
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4"
 
     //grpc

@@ -5,29 +5,20 @@ package endpoints.flunky.simulator;
 import "google/protobuf/empty.proto";
 
 import "game_objects.proto";
-import "video_objects.proto";
 
 option java_multiple_files = true;
-option java_outer_classname = "Protocol";
+option java_outer_classname = "Flunky";
 option java_package = "de.flunkyteam.endpoints.projects.simulator";
 
 
-// A simple Flunkyball API.
-//
-// The API manages throws and teams. Teams contain players.
-service Simulator {
+// A Flunkyball API.
+service FlunkyService {
 
   rpc Throw(ThrowReq) returns (ThrowResp);
 
   rpc Abgegeben(AbgegebenReq) returns (AbgegebenResp);
 
-  rpc RegisterPlayer(RegisterPlayerReq) returns (RegisterPlayerResp);
-
-  rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
-
-  rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
-
-  // resets Strafbier counter, Abgaben, shuffles teams
+  // resets Strafbier counter, Abgaben
   // and plays prepare game clip afterwards
   rpc ResetGame(ResetGameReq) returns (ResetGameResp);
 
@@ -35,13 +26,7 @@ service Simulator {
 
   rpc ModifyStrafbierCount(ModifyStrafbierCountReq) returns (ModifyStrafbierCountResp);
 
-  rpc SendMessage(SendMessageReq) returns (SendMessageResp);
-
   rpc StreamState(StreamStateReq) returns (stream StreamStateResp);
-
-  rpc StreamVideoEvents(StreamVideoEventsReq) returns (stream StreamVideoEventsResp);
-
-  rpc StreamLog(LogReq) returns (stream LogResp);
 
   // Debug rpcs
   rpc HardReset(google.protobuf.Empty) returns (google.protobuf.Empty);
@@ -50,100 +35,39 @@ service Simulator {
 
 }
 
-message LogResp{
-  string content = 1;
-  string sender = 2;
-}
-
-message LogReq{}
-
-message StreamVideoEventsResp{
-  VideoEvent event = 1;
-}
-
-message StreamVideoEventsReq{}
 
 message StreamStateResp{
   GameState state = 1;
 }
-
 message StreamStateReq {}
 
 message SelectThrowingPlayerResp {}
-
 message SelectThrowingPlayerReq{
   string playerName = 1;
   string targetName = 2;
 }
 
 message ModifyStrafbierCountResp{}
-
 message ModifyStrafbierCountReq{
   string playerName = 1;
   EnumTeams targetTeam = 2;
   bool increment = 3;
 }
 
-message SendMessageResp{}
-
-message SendMessageReq{
-  string playerName = 1;
-  string content = 2;
-}
-
 message ResetGameResp {}
-
 message ResetGameReq{
   string playerName = 1;
-}
-
-message SwitchTeamResp{};
-
-message SwitchTeamReq{
-  string playerName = 1;
-  string targetName = 2;
-  EnumTeams targetTeam = 3;
-}
-
-message KickPlayerResp{};
-
-message KickPlayerReq{
-  string playerName = 1;
-  string targetName = 2;
-}
-
-
-message RegisterPlayerResp{
-  EnumLoginStatus status = 1;
-  string registeredName = 2;
-}
-
-message RegisterPlayerReq{
-  string playerName = 1;
-}
-
-enum EnumLoginStatus{
-  LOGIN_STATUS_UNKNOWN = 0;
-  LOGIN_STATUS_SUCCESS = 1;
-  // The desired name is already taken.
-  LOGIN_STATUS_NAME_TAKEN = 2;
-  // The given secret does not match
-  LOGIN_STATUS_SECRET_MISMATCH = 3;
-  // The name is empty
-  LOGIN_STATUS_EMPTY = 4;
 }
 
 
 message AbgegebenResp{
 	EnumAbgegebenRespStatus status = 1;
 };
-
 message AbgegebenReq{
   string playerName = 1;
   string targetName = 2;
   bool setTo = 3;
 }
-
 enum EnumAbgegebenRespStatus{
   ABGEGEBEN_STATUS_UNKNOWN = 0;
   ABGEGEBEN_STATUS_SUCCESS = 1;
@@ -160,11 +84,9 @@ message ThrowReq{
   string playerName = 1;
   EnumThrowStrength strength = 2;
 }
-
 message ThrowResp{
   EnumThrowRespStatus status = 1;
 }
-
 enum EnumThrowRespStatus{
     THROW_STATUS_UNKNOWN = 0;
     THROW_STATUS_SUCCESS = 1;

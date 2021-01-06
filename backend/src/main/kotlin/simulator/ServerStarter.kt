@@ -2,10 +2,9 @@ package simulator
 
 import io.grpc.Server
 import io.grpc.ServerBuilder
-import simulator.control.GameController
-import simulator.control.MessageController
-import simulator.control.VideoController
-import simulator.view.FlunkyServer
+import io.grpc.ServerInterceptors
+import simulator.control.*
+import simulator.view.*
 import java.io.IOException
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -30,17 +29,41 @@ class ServerStarter {
 
         val messageController = MessageController()
         val videoController = VideoController(videoListUrl)
-        val gameController = GameController(videoController, messageController)
-        val flunkyServer = FlunkyServer(gameController, messageController, videoController)
+        val playerController = PlayerController()
+        val clientManager = ClientsManager(playerController)
+        val gameController = GameController(videoController, messageController,playerController)
+
+        playerController.init {p ->
+            gameController.handleRemovalOfPlayerFromTeamAndUpdate(p)
+            clientManager.removePlayer(p)
+        }
 
         // debug print
-        gameController.addEventHandler { println(it) }
-        messageController.addEventHandler { println(it) }
+        gameController.addEventHandler { logger.info(it.toString()) }
+        messageController.addEventHandler { logger.info(it.toString()) }
+        playerController.addEventHandler { logger.info(it.toString()) }
+
+
+        val flunkyService = FlunkyService(gameController, messageController)
+        val playerService = PlayerService(playerController,messageController,clientManager)
+        val videoService = VideoService(videoController)
+        val clientServiceUnAuth = ClientServiceUnAuth(clientManager)
+        val clientServiceAuth = ClientServiceAuth(clientManager,playerController,messageController)
+        val messageService = MessageService(messageController)
+
+        val authInterceptor = ClientAuthenticationInterceptor(clientManager)
 
         server = ServerBuilder.forPort(port)
-            .addService(flunkyServer)
+            .addService(flunkyService)
+            .addService(ServerInterceptors.intercept(playerService,authInterceptor))
+            .addService(videoService)
+            .addService(clientServiceUnAuth)
+            .addService(ServerInterceptors.intercept(clientServiceAuth,authInterceptor))
+            .addService(messageService)
             .build()
             .start()
+
+
         logger.log(Level.INFO, "Server started, listening on {0}", port)
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {

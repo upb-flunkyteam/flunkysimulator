@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package endpoints.flunky.simulator;
+
+import "google/protobuf/empty.proto";
+
+import "game_objects.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "Players";
+option java_package = "de.flunkyteam.endpoints.projects.simulator";
+
+
+service PlayerService {
+  rpc KickPlayer(KickPlayerReq) returns (KickPlayerResp);
+
+  rpc SwitchTeam(SwitchTeamReq) returns (SwitchTeamResp);
+
+  rpc ShuffleTeams(ShuffleTeamsReq) returns (ShuffleTeamsResp);
+
+  rpc StreamAllPlayers(google.protobuf.Empty) returns (stream PlayerListResp);
+
+  rpc StreamTeamAPlayers(google.protobuf.Empty) returns (stream PlayerListResp);
+
+  rpc StreamTeamBPlayers(google.protobuf.Empty) returns (stream PlayerListResp);
+
+  rpc StreamSpectators(google.protobuf.Empty) returns (stream PlayerListResp);
+
+}
+message ShuffleTeamsResp{}
+
+message ShuffleTeamsReq{
+  string playerName = 1;
+}
+
+message PlayerListResp{
+  repeated Player players = 1;
+}
+
+message SwitchTeamResp{};
+
+message SwitchTeamReq{
+  string playerName = 1;
+  string targetName = 2;
+  EnumTeams targetTeam = 3;
+}
+
+message KickPlayerResp{};
+
+message KickPlayerReq{
+  string playerName = 1;
+  string targetName = 2;
+}
+
+message Player{
+  string name = 1;
+  bool abgegeben = 2;
+  EnumTeams team = 3;
+  EnumConnectionStatus connectionStatus = 5;
+  int64 wonGames = 10;
+}
+
+enum EnumConnectionStatus{
+  CONNECTION_UNKNOWN = 0;
+  CONNECTION_CONNECTED = 1;
+  CONNECTION_DISCONNECTED = 2;
+
+}

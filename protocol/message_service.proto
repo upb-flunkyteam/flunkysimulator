@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package endpoints.flunky.simulator;
+
+option java_multiple_files = true;
+option java_outer_classname = "Messages";
+option java_package = "de.flunkyteam.endpoints.projects.simulator";
+
+
+service MessageService {
+
+  rpc SendMessage(SendMessageReq) returns (SendMessageResp);
+
+  rpc StreamMessages(StreamMessageReq) returns (stream StreamMessageResp);
+
+}
+
+message StreamMessageResp{
+  Message message = 1;
+}
+message StreamMessageReq{}
+
+message SendMessageResp{}
+message SendMessageReq{
+  Message message = 1;
+}
+
+message Message{
+  string sender = 1;
+  EnumMessageType messageType = 2;
+  string content = 3;
+}
+
+enum EnumMessageType{
+  MESSAGE_TYPE_UNKNOWN = 0;
+  MESSAGE_TYPE_LOG = 1;
+  MESSAGE_TYPE_CHAT = 2;
+}

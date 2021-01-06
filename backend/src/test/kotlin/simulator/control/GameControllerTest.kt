@@ -3,119 +3,98 @@ package simulator.control
 import de.flunkyteam.endpoints.projects.simulator.EnumAbgegebenRespStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumRoundPhase
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
-import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import org.assertj.core.api.Assertions
-import org.junit.Assert
+import kotlinx.coroutines.delay
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.extension.ExtendWith
 import simulator.model.game.GameState
-import simulator.model.game.Player
+import simulator.model.Player
 import simulator.model.game.Team
 
 
 internal class GameControllerTest {
 
+
+
+    private fun gameController(
+        state: GameState,
+        players: List<Player>
+    ): Pair<GameController, PlayerController> {
+        val messageController = mockk<MessageController>()
+        val videoController = mockk<VideoController>()
+        val playerController = PlayerController(players.toMutableList())
+        val gameController = GameController(videoController, messageController, playerController, state)
+        playerController.init (gameController::handleRemovalOfPlayerFromTeamAndUpdate)
+        return (gameController to playerController)
+    }
+
     @Test
     fun `detect winning team on abgabe`() {
 
-        val hans = Player("hans", team = Team.B, abgegeben = false)
+        val hans = Player("hans", team = Team.B)
+        val player1 = Player("peter1", team = Team.A)
+        val player2 = Player("peter2", team = Team.A)
+        val player3 = Player("peter3", team = Team.B)
+
+        val players = listOf(hans, player1, player2, player3)
+
         val state = GameState(
-            players = listOf(
-                Player("peter0", team = Team.A, abgegeben = true),
-                Player("peter1", team = Team.A, abgegeben = false),
-                Player("peter2", team = Team.B, abgegeben = true),
-                Player("peter3", team = Team.B, abgegeben = true),
-                hans
-            ),
+            abgegeben = listOf(player1.name, player3.name),
             throwingPlayer = hans.name,
             roundPhase = EnumRoundPhase.TEAM_A_THROWING_PHASE
         )
 
 
-        val messageController = mockk<MessageController>()
-        val videoController = mockk<VideoController>()
+        val (gameController,_) = gameController(state, players)
 
-        val gameController = GameController(videoController, messageController, state)
-
-        val abgegebenResult = gameController.setAbgegeben("peter0", hans.name, true)
+        val abgegebenResult = gameController.setAbgegeben("peter1", hans.name, true)
 
         assertEquals(EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS, abgegebenResult)
+        assert(gameController.gameState.getAbgegeben(hans.name))
         assertEquals(EnumRoundPhase.TEAM_B_WON_PHASE, gameController.gameState.roundPhase)
     }
 
     @Test
     fun `regular abgabe`() {
 
-        val hans = Player("hans", team = Team.B, abgegeben = false)
+        val hans = Player("hans", team = Team.B)
+        val player1 = Player("peter1", team = Team.A)
+        val player2 = Player("peter2", team = Team.A)
+        val player3 = Player("peter3", team = Team.B)
+
+        val players = listOf(hans, player1, player2, player3)
+
         val state = GameState(
-            players = listOf(
-                Player("peter0", team = Team.A, abgegeben = true),
-                Player("peter1", team = Team.A, abgegeben = false),
-                Player("peter2", team = Team.B, abgegeben = false),
-                Player("peter3", team = Team.B, abgegeben = true),
-                hans
-            ),
+            abgegeben = listOf(player1.name),
             throwingPlayer = hans.name,
             roundPhase = EnumRoundPhase.TEAM_A_THROWING_PHASE
         )
 
-
-        val messageController = mockk<MessageController>()
-        val videoController = mockk<VideoController>()
-
-        val gameController = GameController(videoController, messageController, state)
+        val (gameController,_) = gameController(state,players)
 
         assertEquals(
             EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_SUCCESS,
-            gameController.setAbgegeben("peter0", hans.name, true)
+            gameController.setAbgegeben("peter1", hans.name, true)
         )
 
-        assertEquals(
-            state.copy(players = state.players.map {
-                if (it == hans) {
-                    hans.copy(abgegeben = true)
-                } else {
-                    it
-                }
-            }),
-            gameController.gameState
-        )
+        assert(gameController.gameState.getAbgegeben(hans.name))
     }
 
     @Test
-    fun `move player to spectator`() {
+    suspend fun `move player to spectator`() {
 
-        val state = GameState(
-            players = listOf(
-                Player("hans", team = Team.B, abgegeben = false)
-            ),
-            throwingPlayer = "hans",
-            roundPhase = EnumRoundPhase.TEAM_B_THROWING_PHASE
-        )
+        val hans = Player("hans", team = Team.B)
+        val gameState = GameState(abgegeben = listOf(hans.name))
 
-        val expectedState = GameState(
-            players = listOf(
-                Player("hans", team = Team.Spectator, abgegeben = false)
-            ),
-            throwingPlayer = null,
-            roundPhase = EnumRoundPhase.TEAM_B_THROWING_PHASE
-        )
-
-
-        val messageController = mockk<MessageController>()
-        val videoController = mockk<VideoController>()
-
-        val gameController = GameController(videoController, messageController, state)
+        val (gameController,playerController) = gameController( gameState, listOf(hans))
 
         assertEquals(
             true,
-            gameController.setPlayerTeam("hans", EnumTeams.SPECTATOR_TEAMS)
+            playerController.setPlayerTeam("hans", EnumTeams.SPECTATOR_TEAMS)
         )
-
-        assertEquals(expectedState, gameController.gameState)
+        assertEquals(Team.Spectator,playerController.getPlayer("hans")?.team)
+        delay(1000) //wait for update coroutine to finish
+        assertFalse(gameController.gameState.getAbgegeben(hans.name))
     }
 }

@@ -1,5 +1,9 @@
 package simulator.control
 
+import kotlinx.coroutines.Delay
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import simulator.ServerStarter
 import simulator.getRandomElement
 import simulator.model.video.VideoInstructions
@@ -17,7 +21,15 @@ import kotlin.concurrent.withLock
 class VideoController(private val videoListUrl: String?) :
     EventControllerBase<VideoEvent>() {
 
-    private var lastVideoListRefresh: Long = 0
+    init {
+        GlobalScope.launch {
+            delay(1000*10)
+            // wait 10 sek otherwise stuff might not be initialized at startup
+            // kinda dirty, I know
+            refreshVideoList()
+            delay(1000*60*10) // 10min
+        }
+    }
 
     private var videoUrls: Map<VideoType, List<String>> = VideoType.values()
         .map { it to listOf<String>() }
@@ -43,11 +55,7 @@ class VideoController(private val videoListUrl: String?) :
         }
     }
 
-    fun refreshVideos() {
-        if (lastVideoListRefresh + 5 * 60 * 1000 > System.currentTimeMillis())
-            return
-
-        lastVideoListRefresh = System.currentTimeMillis()
+    fun refreshVideoList() {
 
         loadVideoUrls()
 
@@ -55,9 +63,8 @@ class VideoController(private val videoListUrl: String?) :
             val videos = videoUrls[it] ?: error("Video Type \"${it}\" not found!")
             if (!videos.contains(preparedVideos[it])) {
                 // video has been deleted or not set => need new one
-                handlerLock.withLock {
-                    setPreparedVideo(videos.getRandomElement(), it)
-                }
+                setPreparedVideo(videos.getRandomElement(), it)
+
             }
         }
     }
@@ -65,13 +72,14 @@ class VideoController(private val videoListUrl: String?) :
     fun getAllPreparedVideoEvents() = preparedVideos.mapNotNull { pair -> pair.value?.let { VideoEvent.PrepareVideo(pair.key,
         it)}}
 
-    /***
-     * DOES NOT LOCK by itself! But requires it to notify clients!
-     */
     private fun setPreparedVideo(url: String?, type: VideoType) {
+        if (url == null)
+            return
+
         preparedVideos[type] = url
-        if (handlerLock.isHeldByCurrentThread && url != null)
-            onEvent(VideoEvent.PrepareVideo(type, url))
+        handlerLock.withLock {
+                onEvent(VideoEvent.PrepareVideo(type, url))
+        }
     }
 
     /***
@@ -141,6 +149,7 @@ class VideoController(private val videoListUrl: String?) :
             .map { it.key to it.value.map { typeToUrl -> typeToUrl.second } }
             .toMap()
     }
+    private val logger = Logger.getLogger(this::class.java.name)
 }
 
 fun main() {
@@ -150,5 +159,3 @@ fun main() {
     a.forEach { println("${it.key}: ${it.value}") }
 }
 
-
-private val logger = Logger.getLogger(ServerStarter::class.java.name)
