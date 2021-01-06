@@ -104,7 +104,7 @@ class ClientsManager(private val playerController: PlayerController, private val
 
         val newName = HtmlUtils.htmlEscape(name.trim())
 
-        val (player, isNew) = playerController.createOrFindPlayer(name)
+        val (player, isNew) = playerController.createOrFindPlayer(newName)
         val successfulRegistration = registerPlayerWithClient(player.name, client)
 
         return when {
