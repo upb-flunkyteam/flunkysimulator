@@ -43,6 +43,10 @@ jQuery(window).load(function () {
     $('#switchplayerbutton').click(function () {
         $('#registerform').show();
         $('#playernamebutton').text('Spielernamen ändern');
+        window.setTimeout(function ()
+        {
+            $('#playername').focus();
+        }, 0);
     });
 
     //connection watchdog
