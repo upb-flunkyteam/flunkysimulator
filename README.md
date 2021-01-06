@@ -39,6 +39,9 @@ Befehlt um den [grpcWebProxy](https://github.com/improbable-eng/grpc-web/tree/ma
 
 ### 2.3:
 - Refactoring in Services insbesondere für Protokoll und Client.
+- Clientauthentifizierung und Zuweisung von Spielern
+- Clientonlinestatusanzeige und Wiederverbindungsversuche
+- Unterscheidung von Chat- und Systemnachrichten
 
 ### 2.2:
 - Strafbiere haben auch Videos
