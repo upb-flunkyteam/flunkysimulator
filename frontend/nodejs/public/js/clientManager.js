@@ -52,13 +52,13 @@ jQuery(window).load(function () {
     //connection watchdog
     let whatchdog = function (){
         let timeSinceLastPoke = new Date().getTime()- lastAlivePoke.getTime();
-/* comment out for release :P
+
         let debugArea = $('#debuginformationarea');
         debugArea.empty();
         debugArea
             .append($("<span>"))
             .append("Last Poked: "+timeSinceLastPoke/1000);
-*/
+
         if (timeSinceLastPoke > 15 * 1000) {
             // steams seem dead, reconnect
             const timeSinceLastReconnect = new Date().getTime() - lastReconnect.getTime();
