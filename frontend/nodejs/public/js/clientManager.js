@@ -33,20 +33,21 @@ jQuery(window).load(function () {
     clientService = new ClientServiceClient(env['BACKEND_URL']);
     clientAuthService = new ClientServiceAuthClient(env['BACKEND_URL']);
 
+    // Get the <span> element that closes the modal
+    // When the user clicks on <span> (x), close the modal
+    $("#close-login").click( function() {
+        closeNewPlayerModal();
+    });
 
-    $('#playernamebutton').click(function () {
-        $('#playername').trigger("submission");
+    $('#player-name-button-modal').click(function () {
+        $('#player-name-modal').trigger("submission");
     });
-    $('#playername').bind("submission", function (e) {
-        registerPlayer($('#playername').val());
+    $('#player-name-modal').bind("submission", function (e) {
+        registerPlayer($('#player-name-modal').val());
     });
+
     $('#switchplayerbutton').click(function () {
-        $('#registerform').show();
-        $('#playernamebutton').text('Spielernamen ändern');
-        window.setTimeout(function ()
-        {
-            $('#playername').focus();
-        }, 0);
+        $('#new-player-modal').show();
     });
 
     //connection watchdog
@@ -138,11 +139,14 @@ function reconnect(){
 
 function setOwnPlayer(newName) {
     ClientManager.external.PlayerManager.ownPlayerName = newName;
-    $('#playername').text(newName);
-    $('#registerform').hide();
+    closeNewPlayerModal()
     // Force re-evaluation of game state, e.g. do I need to throw
     ClientManager.external.processNewState();
     updateOwnPlayers()
+}
+
+function closeNewPlayerModal(){
+    $("#new-player-modal").hide();
 }
 
 async function registerPlayer(desiredPlayername){

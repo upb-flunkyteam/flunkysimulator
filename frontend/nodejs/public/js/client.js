@@ -283,9 +283,9 @@ function initDebugFunction(){
 
     // ---- settings modal ----
     // Get the modal
-    const modal = document.getElementById("settingsModal");
+    const modal = $("#settings-modal")[0];
     // Get the <span> element that closes the modal
-    const span = document.getElementsByClassName("close")[0];
+    const span = $("#close-settings")[0];
 
     window.debug.settings = function(){
         modal.style.display = "block";

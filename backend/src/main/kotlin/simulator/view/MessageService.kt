@@ -41,6 +41,6 @@ class MessageService(private val messageController:MessageController)
 
 
     private val patchNotes = """Version 2.4:
-    - TODO
+    - Neuerspielermaske
     """
 }

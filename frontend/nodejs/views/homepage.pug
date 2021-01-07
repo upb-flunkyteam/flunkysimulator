@@ -26,11 +26,6 @@ head
                 image.strafbier.poster(src='picture/strafbier.png')
                 image.logoposter(src='picture/logoposter.jpg')
             .actionbox.well.vspace
-                #registerform.vspace
-                    .input-group
-                        input#playername.form-control(type="text" placeholder="Spielername" autofocus)
-                        span.input-group-btn
-                            button#playernamebutton.btn.btn-default Spiel beitreten
                 #throwactionbuttons.largetext
                     .btn-group(role='group')
                         button#softthrowbutton.btn.btn-default.throwbutton Vorsichtig werfen
@@ -63,9 +58,18 @@ head
             textarea#logbox.form-control(rows=10 disabled)
             input#chatinput.form-control(type="text" placeholder="Nachricht")
 
-#settingsModal.modal
+#new-player-modal.modal(style="display:block")
     .modal-content
-        span.close &times
+        h2 Willkommen Athlet!
+            span#close-login.close &times
+        .input-group
+            input#player-name-modal.form-control(type="text" placeholder="Spielername")
+            span.input-group-btn
+                button#player-name-button-modal.btn.btn-default(type="submit") Spiel beitreten
+
+#settings-modal.modal
+    .modal-content
+        span#close-settings.close &times
         p#j settings should be here
 
 // Optional JavaScript
