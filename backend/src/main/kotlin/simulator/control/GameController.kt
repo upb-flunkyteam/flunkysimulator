@@ -170,6 +170,10 @@ class GameController(
 
     fun modifyStrafbierCount(team: EnumTeams, increment: Boolean): Boolean {
         gameStateLock.withLock {
+            if (gameState.roundPhase == EnumRoundPhase.RESTING_PHASE){
+                return false;
+            }
+
             val diff = if (increment) 1 else -1
 
             val success = when (team) {
