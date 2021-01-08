@@ -46,6 +46,12 @@ jQuery(window).load(function () {
         registerPlayer($('#player-name-modal').val());
     });
 
+    $('#player-name-modal').keyup(function (e) {
+        if (e.keyCode === 13) {
+            $(this).trigger("submission");
+        }
+    });
+
     $('#switchplayerbutton').click(function () {
         $('#new-player-modal').show();
     });
