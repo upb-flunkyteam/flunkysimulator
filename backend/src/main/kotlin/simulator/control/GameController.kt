@@ -265,8 +265,14 @@ class GameController(
                 newState = newState
                     .setRoundPhase(
                         when (player.team) {
-                            Team.A -> EnumRoundPhase.TEAM_A_WON_PHASE
-                            Team.B -> EnumRoundPhase.TEAM_B_WON_PHASE
+                            Team.A -> {
+                                messageController.sendLogMessage("Server", "Team Links hat gewonnen!")
+                                EnumRoundPhase.TEAM_A_WON_PHASE
+                            }
+                            Team.B -> {
+                                messageController.sendLogMessage("Server", "Team Rechts hat gewonnen!")
+                                EnumRoundPhase.TEAM_B_WON_PHASE
+                            }
                             else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR
                         }
                     )
