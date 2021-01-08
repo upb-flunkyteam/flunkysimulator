@@ -21,7 +21,7 @@ internal class GameControllerTest {
         state: GameState,
         players: List<Player>
     ): Pair<GameController, PlayerController> {
-        val messageController = mockk<MessageController>()
+        val messageController = mockk<MessageController>(relaxed = true)
         val videoController = mockk<VideoController>()
         val playerController = PlayerController(players.toMutableList())
         val gameController = GameController(videoController, messageController, playerController, state)
