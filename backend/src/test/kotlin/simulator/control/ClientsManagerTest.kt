@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import simulator.model.Client
+import simulator.model.Data
 import simulator.model.Player
 
 internal class ClientsManagerTest {
@@ -14,7 +15,7 @@ internal class ClientsManagerTest {
     @Test
     fun registerAndGetClient(){
         val playerController = mockk<PlayerController>()
-        val clientManager = ClientsManager(playerController)
+        val clientManager = ClientsManager(Data(),playerController)
 
         val client = clientManager.registerClient { true }
 
@@ -26,7 +27,7 @@ internal class ClientsManagerTest {
     @Test
     fun registerPlayerRejection() {
         val playerController = mockk<PlayerController>()
-        val clientManager = ClientsManager(playerController)
+        val clientManager = ClientsManager(Data(),playerController)
         val client = clientManager.registerClient { true }
         val client2 = clientManager.registerClient { true }
 
@@ -41,7 +42,7 @@ internal class ClientsManagerTest {
     @Test
     fun registerPlayerDeadClientKick() {
         val playerController = mockk<PlayerController>()
-        val clientManager = ClientsManager(playerController)
+        val clientManager = ClientsManager(Data(),playerController)
         val client = clientManager.registerClient { false }
         val client2 = clientManager.registerClient { true }
 
@@ -58,22 +59,30 @@ internal class ClientsManagerTest {
 
     @Test
     fun switchTeamWithTwoPlayers(){
-        val player1 = Player("p1");
-        val player2 = Player("p2");
+        val player1 = Player("p1")
+        val player2 = Player("p2")
 
-        val playerController = PlayerController(mutableListOf(player1,player2))
-        val clientsManager = ClientsManager(playerController)
-        playerController.init {p ->
-            clientsManager.removePlayer(p)
-        }
+        val data = Data(listOf(player1,player2))
 
-        val client = clientsManager.registerClient { true };
-        clientsManager.registerPlayerWithClient(player1.name,client)
-        clientsManager.registerPlayerWithClient(player2.name,client)
+        val playerController = PlayerController(data)
+        val clientsManager = ClientsManager(data, playerController)
+        playerController.init {p -> }
 
-        playerController.setPlayerTeam(player1.name,EnumTeams.TEAM_A_TEAMS);
+        val clientSecret = clientsManager.registerClient { true }.secret
 
-        assertTrue(client.players.contains(player1.name))
-        assertTrue(client.players.contains(player2.name))
+        fun client() = clientsManager.getClient(clientSecret)!!
+
+        assertTrue(clientsManager.registerPlayerWithClient(player1.name,client()))
+        assertTrue(clientsManager.registerPlayerWithClient(player2.name,client()))
+
+        assertTrue(client().players.contains(player1.name))
+        assertTrue(client().players.contains(player2.name))
+
+        playerController.setPlayerTeam(player1.name,EnumTeams.TEAM_A_TEAMS)
+
+        Thread.sleep(1_000)
+
+        assertTrue(client().players.contains(player1.name))
+        assertTrue(client().players.contains(player2.name))
     }
 }

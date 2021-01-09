@@ -5,6 +5,7 @@ import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import simulator.model.Data
 import simulator.model.Player
 import simulator.model.game.Team
 
@@ -12,7 +13,7 @@ internal class PlayerControllerTest{
 
     @Test
     fun dryRun(){
-        val playerController = PlayerController()
+        val playerController = PlayerController(Data())
         val dummy = Dummy()
         playerController.init (dummy::dummy)
 

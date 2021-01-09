@@ -3,6 +3,7 @@ package simulator.control
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import simulator.model.Data
 import simulator.model.Player
 import simulator.model.game.Team
 import simulator.model.game.toKotlin
@@ -12,7 +13,7 @@ import kotlin.random.Random
 
 
 class PlayerController(
-    private val players: MutableList<Player> = mutableListOf()
+    private val data: Data
 ) : EventControllerBase<PlayerController.PlayersEvent>() {
 
     data class PlayersEvent(val updateOf: Set<Team>)
@@ -32,6 +33,10 @@ class PlayerController(
             }
         }
     }
+
+    var players: List<Player>
+    get() = data.playerList.value
+    set(value) {data.playerList.value=value}
 
     val allPlayers: List<Player>
         get() = players.toList()
@@ -75,7 +80,7 @@ class PlayerController(
         getPlayer(name)?.let { it to false } ?: run {
             val player = Player(name)
             playerListLock.withLock {
-                players.add(player)
+                players = players + player
                 player to true
             }
         }
@@ -83,7 +88,7 @@ class PlayerController(
     fun removePlayer(name: String?): Boolean {
         playerListLock.withLock {
             val player = getPlayer(name) ?: return false
-            players.remove(player)
+            players = players - player
             triggerUpdate(setOf(player.team))
             handleRemovalOfPlayerCoroutine(player.name)
             return true
@@ -124,6 +129,6 @@ class PlayerController(
     }
 
     internal fun reset() {
-        players.clear()
+        players = listOf()
     }
 }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import org.springframework.web.util.HtmlUtils
 import simulator.getRandomString
 import simulator.model.Client
+import simulator.model.Data
 import simulator.model.Player
 import java.util.concurrent.locks.ReentrantLock
 import java.util.logging.Logger
@@ -19,7 +20,11 @@ responsible for one event handler. This class on the other hand handles multiple
 and to distinguish that it is not called a controller.
  */
 
-class ClientsManager(private val playerController: PlayerController, private val pokeInterval: Int = 10) {
+class ClientsManager(
+    private val data: Data,
+    private val playerController: PlayerController,
+    private val pokeInterval: Int = 10
+) {
 
     private val clientLock = ReentrantLock()
 
@@ -46,6 +51,18 @@ class ClientsManager(private val playerController: PlayerController, private val
             while (true) {
                 pokeClients()
                 delay(1000L * pokeInterval)
+            }
+        }
+
+        //register listener on player list to remove removed players from clients
+        data.playerList.addChangeListener { changeEvent ->
+            playerToClients.mapNotNull { entry: Map.Entry<String, Int> ->
+                if (changeEvent.newValue.any { it.name == entry.key })
+                    null
+                else
+                    entry
+            }.forEach { entry ->
+                removePlayer(entry.key)
             }
         }
     }

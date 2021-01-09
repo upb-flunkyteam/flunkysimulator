@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import simulator.model.Data
 import simulator.model.game.GameState
 import simulator.model.Player
 import simulator.model.game.Team
@@ -21,9 +22,10 @@ internal class GameControllerTest {
         state: GameState,
         players: List<Player>
     ): Pair<GameController, PlayerController> {
+        val data = Data(players)
         val messageController = mockk<MessageController>(relaxed = true)
         val videoController = mockk<VideoController>()
-        val playerController = PlayerController(players.toMutableList())
+        val playerController = PlayerController(data)
         val gameController = GameController(videoController, messageController, playerController, state)
         playerController.init (gameController::handleRemovalOfPlayerFromTeamAndUpdate)
         return (gameController to playerController)
