@@ -66,7 +66,6 @@ internal class ClientsManagerTest {
 
         val playerController = PlayerController(data)
         val clientsManager = ClientsManager(data, playerController)
-        playerController.init {p -> }
 
         val clientSecret = clientsManager.registerClient { true }.secret
 

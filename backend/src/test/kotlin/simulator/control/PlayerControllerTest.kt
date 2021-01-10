@@ -14,8 +14,6 @@ internal class PlayerControllerTest{
     @Test
     fun dryRun(){
         val playerController = PlayerController(Data())
-        val dummy = Dummy()
-        playerController.init (dummy::dummy)
 
         val res1 =  playerController.createOrFindPlayer("hans")
         assertEquals(
@@ -54,15 +52,8 @@ internal class PlayerControllerTest{
         assertEquals(1,playerController.TeamB.size)
 
         playerController.registerTeamWin(Team.A)
-        assertEquals(1, hans!!.wonGames)
-        assertEquals(1, lola!!.wonGames)
-        assertEquals(0, peter!!.wonGames)
-    }
-
-    class Dummy{
-        fun dummy(player:String){
-            // just do something so the warning goes away
-            assert(player != "")
-        }
+        assertEquals(1, playerController.getPlayer("hans")!!.wonGames)
+        assertEquals(1, playerController.getPlayer("lola")!!.wonGames)
+        assertEquals(0, playerController.getPlayer("peter")!!.wonGames)
     }
 }

@@ -34,11 +34,7 @@ class ServerStarter {
         val videoController = VideoController(videoListUrl)
         val playerController = PlayerController(data)
         val clientManager = ClientsManager(data,playerController)
-        val gameController = GameController(videoController, messageController,playerController)
-
-        playerController.init {p ->
-            gameController.handleRemovalOfPlayerFromTeamAndUpdate(p)
-        }
+        val gameController = GameController(data,videoController, messageController,playerController)
 
         // debug print
         gameController.addEventHandler { logger.info(it.toString()) }

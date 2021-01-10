@@ -6,8 +6,8 @@ import simulator.model.game.Team
 import simulator.model.game.toGrpc
 
 data class Player(val name: String,
-                  var team : Team = Team.Spectator,
-                  var wonGames: Int = 0
+                  val team : Team = Team.Spectator,
+                  val wonGames: Int = 0
 ) {
 
     fun toGRPC(clientsManager: ClientsManager) = Player.newBuilder()

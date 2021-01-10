@@ -128,7 +128,6 @@ class ClientsManager(
             isNew -> {
                 if (!successfulRegistration)
                     throw error("Could not register new player ${player.name} with client ${client.id}")
-                playerController.triggerUpdate(setOf(player.team))
                 LoginResp(
                     EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN,
                     newName
@@ -136,7 +135,6 @@ class ClientsManager(
 
             }
             !isNew && successfulRegistration -> {
-                playerController.triggerUpdate(setOf(player.team))
                 LoginResp(
                     EnumLoginStatus.LOGIN_STATUS_SUCCESS,
                     newName
@@ -181,7 +179,8 @@ class ClientsManager(
         }
         // connection status changed, update the players
         if (!allAlive) {
-            playerController.triggerUpdate()
+            data.playerList = data.playerList //lets hope this triggers a reconnect
+            //todo do this right. add status to player object?
         }
     }
 

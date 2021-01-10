@@ -85,7 +85,6 @@ class PlayerService(
 
         val handler =
             buildRegisterHandler { event: PlayerController.PlayersEvent ->
-                if (event.updateOf.contains(Team.A))
                     responseObserver?.onNext(
                         PlayerListResp.newBuilder()
                             .addAllPlayers(playerController.TeamA.map { it.toGRPC(clientsManager) })
@@ -107,7 +106,6 @@ class PlayerService(
 
         val handler =
             buildRegisterHandler { event: PlayerController.PlayersEvent ->
-                if (event.updateOf.contains(Team.B))
                     responseObserver?.onNext(
                         PlayerListResp.newBuilder()
                             .addAllPlayers(playerController.TeamB.map { it.toGRPC(clientsManager) })
@@ -129,7 +127,6 @@ class PlayerService(
 
         val handler =
             buildRegisterHandler { event: PlayerController.PlayersEvent ->
-                if (event.updateOf.contains(Team.Spectator))
                     responseObserver?.onNext(
                         PlayerListResp.newBuilder()
                             .addAllPlayers(playerController.Spectators.map { it.toGRPC(clientsManager) })

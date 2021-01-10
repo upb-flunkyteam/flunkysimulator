@@ -26,8 +26,7 @@ internal class GameControllerTest {
         val messageController = mockk<MessageController>(relaxed = true)
         val videoController = mockk<VideoController>()
         val playerController = PlayerController(data)
-        val gameController = GameController(videoController, messageController, playerController, state)
-        playerController.init (gameController::handleRemovalOfPlayerFromTeamAndUpdate)
+        val gameController = GameController(data,videoController, messageController, playerController, state)
         return (gameController to playerController)
     }
 
