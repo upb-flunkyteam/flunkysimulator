@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import simulator.model.Data
 import simulator.model.game.GameState
-import simulator.model.Player
+import simulator.model.game.Player
 import simulator.model.game.Team
 
 

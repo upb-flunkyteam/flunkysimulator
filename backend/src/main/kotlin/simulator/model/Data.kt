@@ -1,5 +1,6 @@
 package simulator.model
 
+import simulator.model.game.Player
 import java.util.concurrent.locks.ReentrantLock
 
 

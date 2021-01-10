@@ -1,8 +1,6 @@
 package simulator.model.game
 
 import de.flunkyteam.endpoints.projects.simulator.EnumRoundPhase
-import simulator.control.PlayerController
-import simulator.model.Player
 
 
 data class GameState(

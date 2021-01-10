@@ -11,7 +11,7 @@ import kotlin.random.Random
 import kotlinx.coroutines.launch
 import simulator.model.Data
 import simulator.model.game.GameState
-import simulator.model.Player
+import simulator.model.game.Player
 
 
 class GameController(
@@ -188,7 +188,7 @@ class GameController(
     fun modifyStrafbierCount(team: EnumTeams, increment: Boolean): Boolean {
         gameStateLock.withLock {
             if (gameState.roundPhase == EnumRoundPhase.RESTING_PHASE){
-                return false;
+                return false
             }
 
             val diff = if (increment) 1 else -1
@@ -283,11 +283,11 @@ class GameController(
                     .setRoundPhase(
                         when (player.team) {
                             Team.A -> {
-                                messageController.sendLogMessage("Server", "Team Links hat gewonnen!")
+                                messageController.sendLogMessage("", "Team Links hat gewonnen!")
                                 EnumRoundPhase.TEAM_A_WON_PHASE
                             }
                             Team.B -> {
-                                messageController.sendLogMessage("Server", "Team Rechts hat gewonnen!")
+                                messageController.sendLogMessage("", "Team Rechts hat gewonnen!")
                                 EnumRoundPhase.TEAM_B_WON_PHASE
                             }
                             else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR

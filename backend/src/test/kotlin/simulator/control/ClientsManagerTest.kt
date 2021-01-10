@@ -5,9 +5,8 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
-import simulator.model.Client
 import simulator.model.Data
-import simulator.model.Player
+import simulator.model.game.Player
 
 internal class ClientsManagerTest {
 
@@ -26,27 +25,28 @@ internal class ClientsManagerTest {
 
     @Test
     fun registerPlayerRejection() {
+        val player = Player("peter")
         val playerController = mockk<PlayerController>()
-        val clientManager = ClientsManager(Data(),playerController)
+        val clientManager = ClientsManager(Data(listOf(player)),playerController)
         val client = clientManager.registerClient { true }
         val client2 = clientManager.registerClient { true }
 
-        val player = Player("peter")
 
-        assertTrue(clientManager.registerPlayerWithClient(player.name,client))
+        assertTrue(clientManager.registerPlayerWithClient(player.name,clientManager.getClient(client.secret)!!))
 
-        assertFalse(clientManager.registerPlayerWithClient(player.name,client2))
+        assertFalse(clientManager.registerPlayerWithClient(player.name,clientManager.getClient(client2.secret)!!))
     }
 
 
     @Test
     fun registerPlayerDeadClientKick() {
+        val player = Player("peter")
+
         val playerController = mockk<PlayerController>()
-        val clientManager = ClientsManager(Data(),playerController)
+        val clientManager = ClientsManager(Data(listOf(player)),playerController)
         val client = clientManager.registerClient { false }
         val client2 = clientManager.registerClient { true }
 
-        val player = Player("peter")
 
         assertTrue(clientManager.registerPlayerWithClient(player.name,client))
 

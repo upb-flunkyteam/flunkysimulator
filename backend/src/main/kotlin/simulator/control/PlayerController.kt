@@ -2,7 +2,7 @@ package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
 import simulator.model.Data
-import simulator.model.Player
+import simulator.model.game.Player
 import simulator.model.game.Team
 import simulator.model.game.toKotlin
 import simulator.shuffleSplitList
