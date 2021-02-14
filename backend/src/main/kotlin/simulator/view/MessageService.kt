@@ -43,5 +43,6 @@ class MessageService(private val messageController:MessageController)
     private val patchNotes = """Version 2.4:
     - Neuerspielermaske
     - Keine Strafbierveränderungen während eines aktiven Wurfs.
+    - Urhebernotiz
     """
 }
