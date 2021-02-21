@@ -15,8 +15,9 @@ Das Kotlin backend erfragt eine Liste von Videos und served die URLs an das Fron
 MP4-Videos in kleinere Webms mit VP9 rekodieren (Siehe [FFMPEG-Wiki](https://trac.ffmpeg.org/wiki/Encode/VP9#twopass))
 
 ```
-ffmpeg -i stop.mp4 -c:v libvpx-vp9 -b:v 2M -pass 1 -an -f webm /dev/null &&\
-ffmpeg -i stop.mp4 -c:v libvpx-vp9 -b:v 2M -pass 2 -c:a libopus stop.webm`
+VIDEO=foldername/filename
+ffmpeg -y -i $VIDEO.mp4 -c:v libvpx-vp9 -b:v 2M -pass 1 -an -f webm /dev/null &&
+ffmpeg -y -i $VIDEO.mp4 -c:v libvpx-vp9 -b:v 2M -pass 2 -c:a libopus $VIDEO.webm
 ```
 
 ## Frontend 
