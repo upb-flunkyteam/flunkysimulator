@@ -1,11 +1,7 @@
 package simulator.model
 
-import de.flunkyteam.endpoints.projects.simulator.AliveChallenge
-import kotlinx.event.SetEvent
-import kotlinx.event.event
 import simulator.control.ClientsManager
 import simulator.control.EventControllerBase
-import java.util.concurrent.locks.ReentrantLock
 
 private var ids = 1
 

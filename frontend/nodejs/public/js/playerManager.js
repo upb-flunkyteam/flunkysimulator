@@ -59,12 +59,6 @@ jQuery(window).load(function () {
         }
     }*/
 
-    $('#playername').keyup(function (e) {
-        if (e.keyCode === 13) {
-            $(this).trigger("submission");
-        }
-    });
-
     $('#shufflebutton').click(function () {
         if (confirm('Möchtest du wirklich die Teams neu mischen?')) {
             PlayerManager.shuffleTeams();

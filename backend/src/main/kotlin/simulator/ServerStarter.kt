@@ -4,6 +4,7 @@ import io.grpc.Server
 import io.grpc.ServerBuilder
 import io.grpc.ServerInterceptors
 import simulator.control.*
+import simulator.model.Data
 import simulator.view.*
 import java.io.IOException
 import java.util.logging.Level
@@ -27,16 +28,13 @@ class ServerStarter {
             logger.log(Level.WARNING, "VIDEO_LIST_URL environment variable is missing.")
 
 
+        val data = Data()
+
         val messageController = MessageController()
         val videoController = VideoController(videoListUrl)
-        val playerController = PlayerController()
-        val clientManager = ClientsManager(playerController)
-        val gameController = GameController(videoController, messageController,playerController)
-
-        playerController.init {p ->
-            gameController.handleRemovalOfPlayerFromTeamAndUpdate(p)
-            clientManager.removePlayer(p)
-        }
+        val playerController = PlayerController(data)
+        val clientManager = ClientsManager(data,playerController)
+        val gameController = GameController(data,videoController, messageController,playerController)
 
         // debug print
         gameController.addEventHandler { logger.info(it.toString()) }

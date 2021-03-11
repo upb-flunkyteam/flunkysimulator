@@ -9,11 +9,13 @@ import simulator.model.video.VideoType
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 import kotlinx.coroutines.launch
+import simulator.model.Data
 import simulator.model.game.GameState
-import simulator.model.Player
+import simulator.model.game.Player
 
 
 class GameController(
+    private val data: Data,
     private val videoController: VideoController,
     private val messageController: MessageController,
     private val playerController: PlayerController,
@@ -32,6 +34,21 @@ class GameController(
         }
 
     private val lastThrowingPlayer: MutableMap<Team, Player> = mutableMapOf()
+
+    init {
+        //register listener on player removals or team switches and later check if they were the thrwing player
+        data.playerList.addChangeListener { changeEvent ->
+            //filter for deleted players or team switches
+            changeEvent.oldValue.mapNotNull { oldPlayer ->
+                if (changeEvent.newValue.any {  oldPlayer.name == it.name && oldPlayer.team == it.team})
+                    null
+                else
+                    oldPlayer
+            }.forEach {
+                handleRemovalOfPlayerFromTeamAndUpdate(it.name)
+            }
+        }
+    }
 
     /**
      * Only relevant when changes do not directly result in a gameState eg. player updates
@@ -170,6 +187,10 @@ class GameController(
 
     fun modifyStrafbierCount(team: EnumTeams, increment: Boolean): Boolean {
         gameStateLock.withLock {
+            if (gameState.roundPhase == EnumRoundPhase.RESTING_PHASE){
+                return false
+            }
+
             val diff = if (increment) 1 else -1
 
             val success = when (team) {
@@ -261,8 +282,14 @@ class GameController(
                 newState = newState
                     .setRoundPhase(
                         when (player.team) {
-                            Team.A -> EnumRoundPhase.TEAM_A_WON_PHASE
-                            Team.B -> EnumRoundPhase.TEAM_B_WON_PHASE
+                            Team.A -> {
+                                messageController.sendLogMessage("", "Team Links hat gewonnen!")
+                                EnumRoundPhase.TEAM_A_WON_PHASE
+                            }
+                            Team.B -> {
+                                messageController.sendLogMessage("", "Team Rechts hat gewonnen!")
+                                EnumRoundPhase.TEAM_B_WON_PHASE
+                            }
                             else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR
                         }
                     )

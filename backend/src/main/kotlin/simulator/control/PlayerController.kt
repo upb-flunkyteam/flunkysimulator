@@ -1,37 +1,25 @@
 package simulator.control
 
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import simulator.model.Player
+import simulator.model.Data
+import simulator.model.game.Player
 import simulator.model.game.Team
 import simulator.model.game.toKotlin
 import simulator.shuffleSplitList
 import kotlin.concurrent.withLock
 import kotlin.random.Random
 
-
 class PlayerController(
-    private val players: MutableList<Player> = mutableListOf()
+    private val data: Data
 ) : EventControllerBase<PlayerController.PlayersEvent>() {
 
-    data class PlayersEvent(val updateOf: Set<Team>)
+    data class PlayersEvent(val players: List<Player>)
 
     private val playerListLock = handlerLock
 
-    private lateinit var handleRemovalOfPlayerCoroutine: (String) -> Unit
-
-    /**
-     * @param handleRemovalOfPlayer Function is called when a player is removed from a team. This might be relevant for the game
-     * state. eg. if they are the trowing player or having the abgegeben status. Currently ClientsManager and GameController are interested.
-     */
-    fun init(handleRemovalOfPlayer: (String) -> Unit) {
-        handleRemovalOfPlayerCoroutine = { p: String ->
-            GlobalScope.launch {
-                handleRemovalOfPlayer(p)
-            }
-        }
-    }
+    var players: List<Player>
+    get() = data.playerList.value
+    set(value) {data.playerList.value=value}
 
     val allPlayers: List<Player>
         get() = players.toList()
@@ -52,11 +40,11 @@ class PlayerController(
             playerListLock.withLock { return players.filter { p -> p.team == Team.Spectator } }
         }
 
-
-    private val all = setOf(Team.A, Team.B, Team.Spectator)
-    fun triggerUpdate(of: Set<Team> = all) {
-        playerListLock.withLock {
-            this.onEvent(PlayersEvent(of))
+    init {
+        data.playerList.addChangeListener { changeEvent ->
+            playerListLock.withLock {
+                this.onEvent(PlayersEvent(changeEvent.newValue))
+            }
         }
     }
 
@@ -75,7 +63,7 @@ class PlayerController(
         getPlayer(name)?.let { it to false } ?: run {
             val player = Player(name)
             playerListLock.withLock {
-                players.add(player)
+                players = players + player
                 player to true
             }
         }
@@ -83,9 +71,7 @@ class PlayerController(
     fun removePlayer(name: String?): Boolean {
         playerListLock.withLock {
             val player = getPlayer(name) ?: return false
-            players.remove(player)
-            triggerUpdate(setOf(player.team))
-            handleRemovalOfPlayerCoroutine(player.name)
+            players = players - player
             return true
         }
     }
@@ -93,20 +79,22 @@ class PlayerController(
     internal fun setPlayerTeam(name: String, team: EnumTeams): Boolean {
         playerListLock.withLock {
             val player = getPlayer(name) ?: return false
-            player.team = team.toKotlin()
+            val newPlayer = player.copy(team = team.toKotlin())
 
-            triggerUpdate(setOf(player.team))
-            handleRemovalOfPlayerCoroutine(player.name)
+            players = players - player + newPlayer
+
 
             return true
         }
     }
 
-    internal fun registerTeamWin(team: Team) = players.forEach {
-        if (it.team == team)
-            it.wonGames += 1
-
-        this.triggerUpdate()
+    internal fun registerTeamWin(team: Team) {
+        players = players.map {
+            if (it.team == team)
+                it.copy(wonGames = it.wonGames+1)
+            else
+                it
+        }
     }
 
 
@@ -118,12 +106,11 @@ class PlayerController(
             val randBool = Random.nextBoolean()
             val teamA = if (randBool) newPlayers1 else newPlayers2
 
-            players.forEach { it.team = if (teamA.contains(it)) Team.A else Team.B }
-            triggerUpdate()
+            players = players.map { it.copy(team = if (teamA.contains(it)) Team.A else Team.B) }
         }
     }
 
     internal fun reset() {
-        players.clear()
+        players = listOf()
     }
 }

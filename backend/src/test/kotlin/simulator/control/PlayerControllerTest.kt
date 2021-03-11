@@ -1,20 +1,17 @@
 package simulator.control
 
-import de.flunkyteam.endpoints.projects.simulator.EnumLoginStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
-import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import simulator.model.Player
+import simulator.model.Data
+import simulator.model.game.Player
 import simulator.model.game.Team
 
 internal class PlayerControllerTest{
 
     @Test
     fun dryRun(){
-        val playerController = PlayerController()
-        val dummy = Dummy()
-        playerController.init (dummy::dummy)
+        val playerController = PlayerController(Data())
 
         val res1 =  playerController.createOrFindPlayer("hans")
         assertEquals(
@@ -53,15 +50,8 @@ internal class PlayerControllerTest{
         assertEquals(1,playerController.TeamB.size)
 
         playerController.registerTeamWin(Team.A)
-        assertEquals(1, hans!!.wonGames)
-        assertEquals(1, lola!!.wonGames)
-        assertEquals(0, peter!!.wonGames)
-    }
-
-    class Dummy{
-        fun dummy(player:String){
-            // just do something so the warning goes away
-            assert(player != "")
-        }
+        assertEquals(1, playerController.getPlayer("hans")!!.wonGames)
+        assertEquals(1, playerController.getPlayer("lola")!!.wonGames)
+        assertEquals(0, playerController.getPlayer("peter")!!.wonGames)
     }
 }

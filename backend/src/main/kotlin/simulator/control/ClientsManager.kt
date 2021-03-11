@@ -8,7 +8,10 @@ import kotlinx.coroutines.launch
 import org.springframework.web.util.HtmlUtils
 import simulator.getRandomString
 import simulator.model.Client
-import simulator.model.Player
+import simulator.model.ConnectionStatus
+import simulator.model.Data
+import simulator.model.game.Player
+import simulator.model.game.update
 import java.util.concurrent.locks.ReentrantLock
 import java.util.logging.Logger
 import kotlin.concurrent.withLock
@@ -19,7 +22,11 @@ responsible for one event handler. This class on the other hand handles multiple
 and to distinguish that it is not called a controller.
  */
 
-class ClientsManager(private val playerController: PlayerController, private val pokeInterval: Int = 10) {
+class ClientsManager(
+    private val data: Data,
+    private val playerController: PlayerController,
+    private val pokeInterval: Int = 10
+) {
 
     private val clientLock = ReentrantLock()
 
@@ -48,6 +55,15 @@ class ClientsManager(private val playerController: PlayerController, private val
                 delay(1000L * pokeInterval)
             }
         }
+
+        //register listener on player list to remove removed players from clients
+        data.playerList.addChangeListener { changeEvent ->
+            playerToClients.filter { entry: Map.Entry<String, Int> ->
+                !changeEvent.newValue.any { it.name == entry.key }
+            }.forEach { entry ->
+                removePlayer(entry.key)
+            }
+        }
     }
 
     sealed class ClientEvent {
@@ -70,6 +86,13 @@ class ClientsManager(private val playerController: PlayerController, private val
     fun removeClient(id: Int) {
         clientLock.withLock {
             getClient(id)?.let { client ->
+
+                data.playerList.value = data.playerList.value.map {
+                    if (client.players.contains(it.name))
+                        it.copy(connectionStatus = ConnectionStatus.Disconnected)
+                    else
+                        it
+                }
                 clients = clients - client
                 playerToClients = playerToClients.mapNotNull { if (it.value == id) null else it.toPair() }.toMap()
             }
@@ -92,6 +115,10 @@ class ClientsManager(private val playerController: PlayerController, private val
 
             playerToClients = playerToClients.plus(player to client.id)
             updateClient(client.copy(players = client.players.plus(player)))
+            //todo deadlock?
+            data.playerList.value = data.playerList.value.update(player) { p: Player ->
+                p.copy(connectionStatus = ConnectionStatus.Connected)
+            }
 
             return true
         }
@@ -111,7 +138,6 @@ class ClientsManager(private val playerController: PlayerController, private val
             isNew -> {
                 if (!successfulRegistration)
                     throw error("Could not register new player ${player.name} with client ${client.id}")
-                playerController.triggerUpdate(setOf(player.team))
                 LoginResp(
                     EnumLoginStatus.LOGIN_STATUS_NAME_TAKEN,
                     newName
@@ -119,7 +145,6 @@ class ClientsManager(private val playerController: PlayerController, private val
 
             }
             !isNew && successfulRegistration -> {
-                playerController.triggerUpdate(setOf(player.team))
                 LoginResp(
                     EnumLoginStatus.LOGIN_STATUS_SUCCESS,
                     newName
@@ -149,22 +174,16 @@ class ClientsManager(private val playerController: PlayerController, private val
         }
     }
 
-    fun getConnectionStatus(player: Player): EnumConnectionStatus =
-        getOwner(player.name)?.let { EnumConnectionStatus.CONNECTION_CONNECTED }
-            ?: EnumConnectionStatus.CONNECTION_DISCONNECTED
 
     private fun pokeClients() {
         logger.info("Poking clients")
         var allAlive = true
         clients.forEach {
             if (!it.aliveChallenge()) {
+                // removing the client updates the players
                 removeClient(it.id)
                 allAlive = false
             }
-        }
-        // connection status changed, update the players
-        if (!allAlive) {
-            playerController.triggerUpdate()
         }
     }
 

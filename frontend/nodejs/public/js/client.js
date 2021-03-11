@@ -185,7 +185,10 @@ function processNewState(state, stale = false) {
     currentGameState = state;
     console.log(currentGameState);
     if (currentGameState.roundphase === EnumRoundPhase.RESTING_PHASE) {
+        $(".disablewhileresting").addClass('disabled');
         return;
+    } else {
+        $(".disablewhileresting").removeClass('disabled');
     }
     currentTeam = EnumTeams.UNKNOWN_TEAMS;
     if (currentGameState.roundphase === EnumRoundPhase.TEAM_A_THROWING_PHASE) {
@@ -256,7 +259,7 @@ function generateStrafbierHTML(number, team) {
 
     html = $('<div role="group">').addClass("btn-group vspace");
     for (var i = 0; i < number; i++) {
-        html.append($('<div>').addClass("btn btn-default reducebutton" + teamclass)
+        html.append($('<div>').addClass("btn btn-default reducebutton" + teamclass + " disablewhileresting")
             .append($("<span>").addClass("glyphicon glyphicon-steinie"))
             .click(((team) => () => reduceStrafbierCount(team))(team))
             .attr({
@@ -265,7 +268,7 @@ function generateStrafbierHTML(number, team) {
             })
         );
     }
-    html.append($("<div>").addClass("btn btn-default increasebutton" + teamclass)
+    html.append($("<div>").addClass("btn btn-default increasebutton" + teamclass + " disablewhileresting")
         .append($("<span>").addClass("glyphicon glyphicon-plus"))
         .append($("<span>").addClass("glyphicon glyphicon-steinie"))
         .click(((team) => () => increaseStrafbierCount(team))(team))
@@ -283,9 +286,9 @@ function initDebugFunction(){
 
     // ---- settings modal ----
     // Get the modal
-    const modal = document.getElementById("settingsModal");
+    const modal = $("#settings-modal")[0];
     // Get the <span> element that closes the modal
-    const span = document.getElementsByClassName("close")[0];
+    const span = $("#close-settings")[0];
 
     window.debug.settings = function(){
         modal.style.display = "block";

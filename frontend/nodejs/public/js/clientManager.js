@@ -33,32 +33,39 @@ jQuery(window).load(function () {
     clientService = new ClientServiceClient(env['BACKEND_URL']);
     clientAuthService = new ClientServiceAuthClient(env['BACKEND_URL']);
 
+    // Get the <span> element that closes the modal
+    // When the user clicks on <span> (x), close the modal
+    $("#close-login").click( function() {
+        closeNewPlayerModal();
+    });
 
-    $('#playernamebutton').click(function () {
-        $('#playername').trigger("submission");
+    $('#player-name-button-modal').click(function () {
+        $('#player-name-modal').trigger("submission");
     });
-    $('#playername').bind("submission", function (e) {
-        registerPlayer($('#playername').val());
+    $('#player-name-modal').bind("submission", function (e) {
+        registerPlayer($('#player-name-modal').val());
     });
+
+    $('#player-name-modal').keyup(function (e) {
+        if (e.keyCode === 13) {
+            $(this).trigger("submission");
+        }
+    });
+
     $('#switchplayerbutton').click(function () {
-        $('#registerform').show();
-        $('#playernamebutton').text('Spielernamen ändern');
-        window.setTimeout(function ()
-        {
-            $('#playername').focus();
-        }, 0);
+        $('#new-player-modal').show();
     });
 
     //connection watchdog
     let whatchdog = function (){
         let timeSinceLastPoke = new Date().getTime()- lastAlivePoke.getTime();
-/* comment out for release :P
+
         let debugArea = $('#debuginformationarea');
         debugArea.empty();
         debugArea
             .append($("<span>"))
             .append("Last Poked: "+timeSinceLastPoke/1000);
-*/
+
         if (timeSinceLastPoke > 15 * 1000) {
             // steams seem dead, reconnect
             const timeSinceLastReconnect = new Date().getTime() - lastReconnect.getTime();
@@ -138,11 +145,14 @@ function reconnect(){
 
 function setOwnPlayer(newName) {
     ClientManager.external.PlayerManager.ownPlayerName = newName;
-    $('#playername').text(newName);
-    $('#registerform').hide();
+    closeNewPlayerModal()
     // Force re-evaluation of game state, e.g. do I need to throw
     ClientManager.external.processNewState();
     updateOwnPlayers()
+}
+
+function closeNewPlayerModal(){
+    $("#new-player-modal").hide();
 }
 
 async function registerPlayer(desiredPlayername){
