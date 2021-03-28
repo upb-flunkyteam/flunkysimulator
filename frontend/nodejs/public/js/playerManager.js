@@ -254,15 +254,14 @@ function generatePlayerHTML(player,
         }
     }
 
-   let kickButton = $("<a href='#' data-toggle='tooltip' title='Spieler kicken'>")
+    let kickButton = $("<a href='#' data-toggle='tooltip' title='Spieler kicken'>")
         .addClass("btn btn-default kickbutton")
         .click(((n) => function () {
             if (confirm(`Möchtest du "${n}" wirklich kicken?`)) {
                 PlayerManager.kickPlayer(n);
             }
         })(name))
-        .append($("<span>").addClass("glyphicon glyphicon-trash-alt"))
-    );
+        .append($("<span>").addClass("glyphicon glyphicon-trash-alt"));
 
     return $('<div role="group">').addClass("btn-group btn-group-justified vspace-small playerbuttongroup")
         .append(playerButton)
