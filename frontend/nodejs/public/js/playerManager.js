@@ -194,26 +194,28 @@ function generatePlayerHTML(player,
     let hasAbgegeben = PlayerManager.external.hasAbgegeben(player.name);
 
     let nameButton = $('<a href="javascript:;">').addClass('btn namebutton');
-    if (player.connectionstatus === EnumConnectionStatus.CONNECTION_DISCONNECTED) {
-        nameButton = nameButton.append($(' <span class="glyphicon glyphicon-flash">'));
-    }
     nameButton.addClass(throwingPlayer ? ' btn-primary' : ' btn-default');
     nameButton.addClass(isHimself ? ' egoplayer' : '');
     nameButton.addClass(hasAbgegeben ? ' disabled' : '');
     // Highlight the ego player with arrows
-    isHimself
-        ? nameButton.html($('<span>')
+    let nameHTML = $("");
+    nameHTML = isHimself
+        ? $('<span>')
             .append($('<span class="glyphicon glyphicon-chevron-right smaller-font">'))
             .append(name)
-            .append($('<span class="glyphicon glyphicon-chevron-left smaller-font">')))
-        : nameButton.html($('<span>')
-            .append(name + ' '));
+            .append($('<span class="glyphicon glyphicon-chevron-left smaller-font">'))
+        : $('<span>')
+            .append(name + ' ');
+    if (player.connectionstatus === EnumConnectionStatus.CONNECTION_DISCONNECTED) {
+        nameHTML.append($(' <span class="glyphicon glyphicon-flash">'));
+    }
+    nameButton.html(nameHTML);
     if (!isSpectator) {
         nameButton
             .click(((n) => () => PlayerManager.external.selectThrowingPlayer(n))(name))
             .attr({
                 "data-toggle": "tooltip",
-                "title": "Zum Werfer machen"
+                "title": "Spieler zum Werfer machen"
             });
     }
 
@@ -240,17 +242,16 @@ function generatePlayerHTML(player,
     let abgabeButton = $('');
     if (!isSpectator) {
         if (hasAbgegeben) {
-            abgabeButton = $("<a href='javascript:;' data-toggle='tooltip' title='Strafbier übernehmen'>")
+            abgabeButton = $("<a href='javascript:;' data-toggle='tooltip' title='Spieler zurück ins Match holen'>")
                 .addClass("btn btn-default abgebenbutton")
                 .click(((n) => () => PlayerManager.external.toggleAbgabe(n))(name))
-                .append($("<span>").addClass("glyphicon glyphicon-refresh")
+                .append($("<span>").addClass("glyphicon glyphicon-repeat")
                 );
         } else {
-            abgabeButton = ($("<a href='javascript:;' data-toggle='tooltip' title='Abgabe abnehmen'>")
+            abgabeButton = $("<a href='javascript:;' data-toggle='tooltip' title='Abgabe abnehmen'>")
                     .addClass("btn btn-default abgebenbutton")
                     .click(((n) => () => PlayerManager.external.toggleAbgabe(n))(name))
-                    .append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
-            );
+                    .append($("<span>").addClass("glyphicon glyphicon-ok-circle"));
         }
     }
 
@@ -261,10 +262,10 @@ function generatePlayerHTML(player,
                 PlayerManager.kickPlayer(n);
             }
         })(name))
-        .append($("<span>").addClass("glyphicon glyphicon-trash-alt"));
+        .append($("<span>").addClass("glyphicon glyphicon-trash"));
 
     return $('<div role="group">').addClass("btn-group btn-group-justified vspace-small playerbuttongroup")
-        .append(playerButton)
+        .append(nameButton)
         .append(switchButton)
         .append(abgabeButton)
         .append(kickButton);
