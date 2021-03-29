@@ -10,7 +10,7 @@ $.get({
 var {Empty} = require('google-protobuf/google/protobuf/empty_pb.js')
 
 const {
-    EnumTeams, EnumConnectionStatus,  KickPlayerReq, KickPlayerResp, Player,
+    EnumTeams, EnumConnectionStatus, KickPlayerReq, KickPlayerResp, Player,
     PlayerListResp, ShuffleTeamsReq,
     ShuffleTeamsResp, SwitchTeamReq, SwitchTeamResp
 } = require('./generated/player_service_pb');
@@ -113,7 +113,7 @@ PlayerManager.refreshPlayers = function () {
     });
 }
 
-PlayerManager.reconnect = function (){
+PlayerManager.reconnect = function () {
     subscribeTeamStreams();
 }
 
@@ -194,8 +194,8 @@ function generatePlayerHTML(player,
     let hasAbgegeben = PlayerManager.external.hasAbgegeben(player.name);
 
     let nameButton = $('<a href="javascript:;">').addClass('btn namebutton');
-    if (player.connectionstatus === EnumConnectionStatus.CONNECTION_DISCONNECTED){
-        nameHtml = nameHtml.append($(' <span class="glyphicon glyphicon-flash">'))
+    if (player.connectionstatus === EnumConnectionStatus.CONNECTION_DISCONNECTED) {
+        nameButton = nameButton.append($(' <span class="glyphicon glyphicon-flash">'));
     }
     nameButton.addClass(throwingPlayer ? ' btn-primary' : ' btn-default');
     nameButton.addClass(isHimself ? ' egoplayer' : '');
@@ -205,9 +205,9 @@ function generatePlayerHTML(player,
         ? nameButton.html($('<span>')
             .append($('<span class="glyphicon glyphicon-chevron-right smaller-font">'))
             .append(name)
-            .append($('<span class="glyphicon glyphicon-chevron-left smaller-font">')));
+            .append($('<span class="glyphicon glyphicon-chevron-left smaller-font">')))
         : nameButton.html($('<span>')
-            .append(name+' '));
+            .append(name + ' '));
     if (!isSpectator) {
         nameButton
             .click(((n) => () => PlayerManager.external.selectThrowingPlayer(n))(name))
@@ -218,24 +218,24 @@ function generatePlayerHTML(player,
     }
 
     let switchButton = $('<div role="group">').addClass("btn-group")
-            .append($("<a href='javascript:;'>").addClass("btn btn-default dropdown-toggle").attr({
-                "type": "button",
-                "data-toggle": "dropdown",
-                "data-toggle-second": "tooltip",
-                "aria-haspopup": "true",
-                "aria-expanded": "false",
-                "title": "Spieler in ein anderes Team verschieben",
-            }).append($("<span>").addClass("glyphicon glyphicon-transfer")))
-            .append($("<ul>").addClass("dropdown-menu")
-                .append($("<li>")
-                    .append($("<a href='javascript:;'>").addClass("switchteamabutton").text("Linkes Team"))
-                    .click(((n) => () => PlayerManager.switchTeam(EnumTeams.TEAM_A_TEAMS, n))(name)))
-                .append($("<li>")
-                    .append($("<a href='javascript:;'>").addClass("switchteambbutton").text("Rechtes Team"))
-                    .click(((n) => () => PlayerManager.switchTeam(EnumTeams.TEAM_B_TEAMS, n))(name)))
-                .append($("<li>")
-                    .append($("<a href='javascript:;'>").addClass("switchspectatorbutton").text("Vestibül"))
-                    .click(((n) => () => PlayerManager.switchTeam(EnumTeams.SPECTATOR_TEAMS, n))(name)))));
+        .append($("<a href='javascript:;'>").addClass("btn btn-default dropdown-toggle").attr({
+            "type": "button",
+            "data-toggle": "dropdown",
+            "data-toggle-second": "tooltip",
+            "aria-haspopup": "true",
+            "aria-expanded": "false",
+            "title": "Spieler in ein anderes Team verschieben",
+        }).append($("<span>").addClass("glyphicon glyphicon-transfer")))
+        .append($("<ul>").addClass("dropdown-menu")
+            .append($("<li>")
+                .append($("<a href='javascript:;'>").addClass("switchteamabutton").text("Linkes Team"))
+                .click(((n) => () => PlayerManager.switchTeam(EnumTeams.TEAM_A_TEAMS, n))(name)))
+            .append($("<li>")
+                .append($("<a href='javascript:;'>").addClass("switchteambbutton").text("Rechtes Team"))
+                .click(((n) => () => PlayerManager.switchTeam(EnumTeams.TEAM_B_TEAMS, n))(name)))
+            .append($("<li>")
+                .append($("<a href='javascript:;'>").addClass("switchspectatorbutton").text("Vestibül"))
+                .click(((n) => () => PlayerManager.switchTeam(EnumTeams.SPECTATOR_TEAMS, n))(name))));
 
     let abgabeButton = $('');
     if (!isSpectator) {
@@ -243,13 +243,13 @@ function generatePlayerHTML(player,
             abgabeButton = $("<a href='javascript:;' data-toggle='tooltip' title='Strafbier übernehmen'>")
                 .addClass("btn btn-default abgebenbutton")
                 .click(((n) => () => PlayerManager.external.toggleAbgabe(n))(name))
-                .append($("<span>").addClass("glyphicon glyphicon-refresh"))
-            );
+                .append($("<span>").addClass("glyphicon glyphicon-refresh")
+                );
         } else {
             abgabeButton = ($("<a href='javascript:;' data-toggle='tooltip' title='Abgabe abnehmen'>")
-                .addClass("btn btn-default abgebenbutton")
-                .click(((n) => () => PlayerManager.external.toggleAbgabe(n))(name))
-                .append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
+                    .addClass("btn btn-default abgebenbutton")
+                    .click(((n) => () => PlayerManager.external.toggleAbgabe(n))(name))
+                    .append($("<span>").addClass("glyphicon glyphicon-ok-circle"))
             );
         }
     }

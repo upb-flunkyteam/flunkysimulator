@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.11
+FROM node:lts-alpine3.11 as build
 
 COPY frontend/nodejs /frontend
 COPY protocol /proto
@@ -15,6 +15,7 @@ RUN protoc -I=/proto \
 
 WORKDIR /frontend
 RUN npm install && npm run-script build
+
 ENV BACKEND_URL none
 ENTRYPOINT npm run-script start
 EXPOSE 5000
