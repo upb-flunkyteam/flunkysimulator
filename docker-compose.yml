@@ -7,6 +7,8 @@ services:
       dockerfile: docker/backend/Dockerfile
     ports:
       - "11049:11049"
+    environment:
+      - VIDEO_LIST_URL=<videolist url>
   backendproxy:
     container_name: backendproxy
     command: [ "--backend_addr=backend:11049" ]
