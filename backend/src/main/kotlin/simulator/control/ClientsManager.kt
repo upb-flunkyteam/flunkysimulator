@@ -14,6 +14,7 @@ import simulator.model.game.Player
 import simulator.model.game.update
 import java.util.concurrent.locks.ReentrantLock
 import java.util.logging.Logger
+import java.util.logging.Level
 import kotlin.concurrent.withLock
 
 /*
@@ -188,6 +189,7 @@ class ClientsManager(
     }
 
     private val logger = Logger.getLogger(this::class.java.name)
+    logger.setLevel(Level.WARNING)
 
     data class LoginResp(val status: EnumLoginStatus, val registeredName: String = "")
 }
