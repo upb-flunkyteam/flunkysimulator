@@ -49,7 +49,7 @@ docker run -e BACKEND_URL=https://<server domain>:8443 -p 80:5000 frontend
 
 # Geplante Versionen
 
-- Version 1: anything to play (Done by Jan)
+- Version 1: anything to play (by @ApolloLV)
 - Version 2: Distributed Client-Server Game with solid technical base and very loose Rule enforcement to allow easy
   recovering from faulty game states.
 - Version 3: Enforcing Rules and extra features.
