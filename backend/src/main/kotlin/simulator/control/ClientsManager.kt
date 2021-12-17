@@ -188,8 +188,10 @@ class ClientsManager(
         }
     }
 
-    private val logger = Logger.getLogger(this::class.java.name)
-    logger.setLevel(Level.WARNING)
+    private val logger = Logger.getLogger(this::class.java.name).let {
+        it.level = Level.WARNING
+        it
+    }
 
     data class LoginResp(val status: EnumLoginStatus, val registeredName: String = "")
 }
