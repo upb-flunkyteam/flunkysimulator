@@ -1,0 +1,4 @@
+- listener für change registrieren
+- listner entfernen
+- wenn es einen change gibt listner informieren
+	- thread save

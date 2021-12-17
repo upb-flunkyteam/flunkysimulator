@@ -1,0 +1,1 @@
+grpcwebproxy-v0.15.0-win64.exe --allow_all_origins --server_http_max_write_timeout=1h --run_tls_server=false --backend_addr=localhost:11049
