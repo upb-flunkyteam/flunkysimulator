@@ -68,10 +68,11 @@ ffmpeg -y -i $VIDEO.mp4 -c:v libvpx-vp9 -b:v 2M -pass 2 -c:a libopus $VIDEO.webm
 
 ## Versionsgeschichte
 
-### Version 2.5:
+### 2.5:
 - Hinzufügen von Siegesfeiervideos (Danke Basti)
+- Stoppuhrbefehl ".stoppuhr ${"$"}Sekunden${"$"}"
 
-### Version 2.4:
+### 2.4:
 - Mehrere Spieler in einem Browsertab über die "Spieler hinzufügen"-Funktion
 - Keine Strafbierveränderungen während eines aktiven Wurfs
 - Urhebernotiz hinzugefügt
