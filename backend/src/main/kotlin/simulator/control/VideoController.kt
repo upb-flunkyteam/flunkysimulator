@@ -139,6 +139,7 @@ class VideoController(private val videoListUrl: String?) :
                 "preparation" -> VideoType.Setup
                 "stop" -> VideoType.Stop
                 "strafbier" -> VideoType.Strafbier
+                "win" -> VideoType.Celebration
                 else -> {
                     logger.log(Level.WARNING, "Unknown Video path type $path")
                     return@mapNotNull  null
