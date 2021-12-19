@@ -302,6 +302,7 @@ class GameController(
                             else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR
                         }
                     )
+                    .setThrowingPlayer(null)
                 playerController.registerTeamWin(player.team)
             }
 
