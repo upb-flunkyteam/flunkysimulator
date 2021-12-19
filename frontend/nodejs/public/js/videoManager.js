@@ -191,6 +191,8 @@ function getPosterByType(videotype, mirrored) {
             return $('.poster.stop');
         case EnumVideoType.STRAFBIER_VIDEOTYPE:
             return $('.poster.strafbier');
+        case EnumVideoType.CELEBRATION_VIDEOTYPE:
+            return $('.poster.celebration');
         case 'throw':
             return $('.poster.throw');
         default:
@@ -212,6 +214,8 @@ function getVideoByType(videotype) {
             return $('.video.stop');
         case EnumVideoType.STRAFBIER_VIDEOTYPE:
             return $('.video.strafbier');
+        case EnumVideoType.CELEBRATION_VIDEOTYPE:
+            return $('.video.celebration');
         default:
             return null;
     }
