@@ -232,14 +232,22 @@ function processNewState(state, stale = false) {
         document.title = title;
         // Remove annoying flashing
         $('.actionbox').removeClass('flashingbackground');
-        // Update the box displaying who is currently throwing
-        throwingText = '<b>' + currentGameState.throwingplayer + '</b> wirft';
-        if (currentTeam === EnumTeams.TEAM_A_TEAMS) {
+        if (currentGameState.roundphase == EnumRoundPhase.TEAM_A_WON_PHASE) {
             $('#throwingplayer').addClass('text-left').removeClass('text-right');
-            throwingText = '<span class="glyphicon glyphicon-chevron-left"></span>' + throwingText;
-        } else {
+            throwingText = '<b> Team Links hat gewonnen!'
+        } else if (currentGameState.roundphase == EnumRoundPhase.TEAM_B_WON_PHASE) {
             $('#throwingplayer').addClass('text-right').removeClass('text-left');
-            throwingText = throwingText + '<span class="glyphicon glyphicon-chevron-right"></span>';
+            throwingText = '<b> Team Rechts hat gewonnen!'
+        } else {
+            // Update the box displaying who is currently throwing
+            throwingText = '<b>' + currentGameState.throwingplayer + '</b> wirft';
+            if (currentTeam === EnumTeams.TEAM_A_TEAMS) {
+                $('#throwingplayer').addClass('text-left').removeClass('text-right');
+                throwingText = '<span class="glyphicon glyphicon-chevron-left"></span>' + throwingText;
+            } else {
+                $('#throwingplayer').addClass('text-right').removeClass('text-left');
+                throwingText = throwingText + '<span class="glyphicon glyphicon-chevron-right"></span>';
+            }
         }
         $('#throwingplayer').html(throwingText);
         $('#throwactionbuttons').hide();

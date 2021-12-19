@@ -284,15 +284,25 @@ class GameController(
                         when (player.team) {
                             Team.A -> {
                                 messageController.sendLogMessage("", "Team Links hat gewonnen!")
+                                videoController.playVideos(listOf(
+                                    VideoInstructions(
+                                        VideoType.Celebration,
+                                    )))
                                 EnumRoundPhase.TEAM_A_WON_PHASE
                             }
                             Team.B -> {
                                 messageController.sendLogMessage("", "Team Rechts hat gewonnen!")
+                                videoController.playVideos(listOf(
+                                    VideoInstructions(
+                                        VideoType.Celebration,
+                                        mirrored = true
+                                    )))
                                 EnumRoundPhase.TEAM_B_WON_PHASE
                             }
                             else -> return EnumAbgegebenRespStatus.ABGEGEBEN_STATUS_ERROR
                         }
                     )
+                    .setThrowingPlayer(null)
                 playerController.registerTeamWin(player.team)
             }
 

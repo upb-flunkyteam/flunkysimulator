@@ -62,9 +62,9 @@ jQuery(window).load(function () {
 
         let debugArea = $('#debuginformationarea');
         debugArea.empty();
-        debugArea
-            .append($("<span>"))
-            .append("Last Poked: "+timeSinceLastPoke/1000);
+        // debugArea
+        //     .append($("<span>"))
+        //     .append("Last Poked: "+timeSinceLastPoke/1000);
 
         if (timeSinceLastPoke > 15 * 1000) {
             // steams seem dead, reconnect

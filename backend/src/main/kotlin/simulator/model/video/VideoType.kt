@@ -3,7 +3,7 @@ package simulator.model.video
 import de.flunkyteam.endpoints.projects.simulator.EnumVideoType
 
 enum class VideoType {
-    Setup, Hit, CloseMiss, Miss, Stop, Strafbier
+    Setup, Hit, CloseMiss, Miss, Stop, Strafbier, Celebration
 }
 
 fun VideoType.toGrpc(): EnumVideoType = when (this){
@@ -13,4 +13,5 @@ fun VideoType.toGrpc(): EnumVideoType = when (this){
     VideoType.Miss -> EnumVideoType.MISS_VIDEOTYPE
     VideoType.Stop -> EnumVideoType.STOP_VIDEOTYPE
     VideoType.Strafbier -> EnumVideoType.STRAFBIER_VIDEOTYPE
+    VideoType.Celebration -> EnumVideoType.CELEBRATION_VIDEOTYPE
 }

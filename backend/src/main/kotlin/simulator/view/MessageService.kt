@@ -40,9 +40,7 @@ class MessageService(private val messageController:MessageController)
     }
 
 
-    private val patchNotes = """Version 2.4:
-    - Mehrere Spieler in einem Browsertab über die "Spieler hinzufügen"-Funktion
-    - Keine Strafbierveränderungen während eines aktiven Wurfs
-    - Urhebernotiz hinzugefügt
+    private val patchNotes = """Version 2.5:
+    - Hinzufügen von Siegesfeiervideos (Danke Basti)
     """
 }
