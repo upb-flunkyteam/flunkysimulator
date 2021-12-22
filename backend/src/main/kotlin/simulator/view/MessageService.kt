@@ -43,5 +43,6 @@ class MessageService(private val messageController:MessageController)
     private val patchNotes = """Version 2.5:
     - Hinzufügen von Siegesfeiervideos (Danke Basti)
     - Stoppuhrbefehl ".stoppuhr ${"$"}Sekunden${"$"}"
+    - Schere-Stein-Papier-Minispiel .ssp
     """
 }

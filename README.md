@@ -71,6 +71,7 @@ ffmpeg -y -i $VIDEO.mp4 -c:v libvpx-vp9 -b:v 2M -pass 2 -c:a libopus $VIDEO.webm
 ### 2.5:
 - Hinzufügen von Siegesfeiervideos (Danke Basti)
 - Stoppuhrbefehl ".stoppuhr ${"$"}Sekunden${"$"}"
+- Schere-Stein-Papier-Minispiel .ssp
 
 ### 2.4:
 - Mehrere Spieler in einem Browsertab über die "Spieler hinzufügen"-Funktion
