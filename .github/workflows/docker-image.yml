@@ -3,8 +3,6 @@ name: Publish Docker
 on:
   push:    
     branches: [ 'master', 'develop' ]
-  pull_request:
-    branches: [ 'master' ]
 
 jobs:
   docker:
@@ -32,7 +30,7 @@ jobs:
         with:
           push: true
           tags: upbflunkyteamdev/flunkysimulator-frontend:dev
-          file: docker/frontend
+          file: docker/frontend/Dockerfile
       - name: Build and push
         id: docker_build_d_bp
         if: ${{ github.ref == 'refs/heads/develop' }}
@@ -40,7 +38,7 @@ jobs:
         with:
           push: true
           tags: upbflunkyteamdev/flunkysimulator-backendproxy:dev
-          file: docker/backendproxy
+          file: docker/backendproxy/
       - name: Build and push
         id: docker_build_d_b
         if: ${{ github.ref == 'refs/heads/develop' }}
@@ -48,7 +46,7 @@ jobs:
         with:
           push: true
           tags: upbflunkyteamdev/flunkysimulator-backend:dev
-          file: docker/backend
+          file: docker/backend/Dockerfile
           
       - name: Build and push
         id: docker_build_m_f
