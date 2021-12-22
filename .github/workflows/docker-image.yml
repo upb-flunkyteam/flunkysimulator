@@ -38,7 +38,7 @@ jobs:
         with:
           push: true
           tags: upbflunkyteamdev/flunkysimulator-backendproxy:dev
-          file: docker/backendproxy/
+          file: docker/backendproxy/Dockerfile
       - name: Build and push
         id: docker_build_d_b
         if: ${{ github.ref == 'refs/heads/develop' }}
@@ -55,7 +55,7 @@ jobs:
         with:
           push: true
           tags: upbflunkyteamdev/flunkysimulator-frontend:latest
-          file: docker/frontend
+          file: docker/frontend/Dockerfile
       - name: Build and push
         id: docker_build_m_bp
         if: ${{ github.ref == 'refs/heads/master' }}
@@ -63,7 +63,7 @@ jobs:
         with:
           push: true
           tags: upbflunkyteamdev/flunkysimulator-backendproxy:latest
-          file: docker/backendproxy
+          file: docker/backendproxy/Dockerfile
       - name: Build and push
         id: docker_build_m_b
         if: ${{ github.ref == 'refs/heads/master' }}
@@ -71,5 +71,5 @@ jobs:
         with:
           push: true
           tags: upbflunkyteamdev/flunkysimulator-backend:latest
-          file: docker/backend
+          file: docker/backend/Dockerfile
         
