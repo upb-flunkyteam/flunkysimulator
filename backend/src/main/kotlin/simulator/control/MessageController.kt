@@ -96,7 +96,7 @@ class MessageController : EventControllerBase<MessageController.MessageEvent>() 
             val text = message.content.substring(".ssp".length).trim().lowercase()
             when {
                 state == State.DONE && text.startsWith("start") -> {
-                    roundsToWin = ((text.substring(".ssp start".length)
+                    roundsToWin = ((text.substring("start".length)
                         .replace('[', ' ')
                         .replace(']', ' ')
                         .trim())
