@@ -62,9 +62,9 @@ jQuery(window).load(function () {
 
         let debugArea = $('#debuginformationarea');
         debugArea.empty();
-        debugArea
-            .append($("<span>"))
-            .append("Last Poked: "+timeSinceLastPoke/1000);
+        // debugArea
+        //     .append($("<span>"))
+        //     .append("Last Poked: "+timeSinceLastPoke/1000);
 
         if (timeSinceLastPoke > 15 * 1000) {
             // steams seem dead, reconnect
@@ -222,13 +222,9 @@ function generateOwnPlayerHTML(playerName){
             "title": "Spieler aktivieren"
         });
 
-
-
     return $('<div role="group">')
         .addClass("btn-group btn-group-justified vspace-small playerbuttongroup")
         .append(playerButton)
-
-
 }
 
 //https://stackoverflow.com/questions/7307983/while-variable-is-not-defined-wait

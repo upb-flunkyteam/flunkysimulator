@@ -7,18 +7,23 @@ services:
       dockerfile: docker/backend/Dockerfile
     ports:
       - "11049:11049"
+    environment:
+      - VIDEO_LIST_URL=<videolist url>
   backendproxy:
     container_name: backendproxy
+    command: [ "--backend_addr=backend:11049" ]
+    ports:
+      - 8080:8080
     build:
       context: .
       dockerfile: docker/backendproxy/Dockerfile
-    network_mode: host
-    ports:
-      - "8080:8080"
   frontend:
     container_name: frontend
+    environment:
+      - BACKEND_URL=http://localhost:8080
+    #     - BACKEND_URL=<server url>:8443
+    ports:
+      - 80:5000
     build:
       context: .
       dockerfile: docker/frontend/Dockerfile
-    ports:
-      - "80:5000"

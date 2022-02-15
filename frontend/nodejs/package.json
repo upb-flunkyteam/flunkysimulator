@@ -15,12 +15,12 @@
     "dependencies": {
         "express": "^4.17.1",
         "path": "^0.12.7",
-        "pug": "^2.0.4"
+        "pug": "^3.0.1"
     },
     "devDependencies": {
         "@grpc/proto-loader": "^0.3.0",
         "google-protobuf": "^3.6.1",
-        "grpc": "^1.24.3",
+        "grpc": "^1.24.9",
         "grpc-web": "^1.0.0",
         "webpack": "^4.42.1",
         "webpack-cli": "^3.3.11"

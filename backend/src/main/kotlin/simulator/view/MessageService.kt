@@ -40,9 +40,9 @@ class MessageService(private val messageController:MessageController)
     }
 
 
-    private val patchNotes = """Version 2.4:
-    - Neuerspielermaske
-    - Keine Strafbierveränderungen während eines aktiven Wurfs.
-    - Urhebernotiz
+    private val patchNotes = """Version 2.5:
+    - Hinzufügen von Siegesfeiervideos (Danke Basti)
+    - Stoppuhrbefehl ".stoppuhr ${"$"}Sekunden${"$"}"
+    - Schere-Stein-Papier-Minispiel .ssp
     """
 }

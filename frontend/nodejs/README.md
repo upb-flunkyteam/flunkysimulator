@@ -3,10 +3,6 @@
 
 ##Lokal starten
 
-### Im Docker-Container
-
-TODO
-
 ### Node
 
 `/frontend/nodejs/generated` Anlegen

@@ -3,6 +3,7 @@ package simulator.control
 import de.flunkyteam.endpoints.projects.simulator.EnumAbgegebenRespStatus
 import de.flunkyteam.endpoints.projects.simulator.EnumRoundPhase
 import de.flunkyteam.endpoints.projects.simulator.EnumTeams
+import io.mockk.justRun
 import io.mockk.mockk
 import kotlinx.coroutines.delay
 import org.junit.jupiter.api.Test
@@ -25,6 +26,7 @@ internal class GameControllerTest {
         val data = Data(players)
         val messageController = mockk<MessageController>(relaxed = true)
         val videoController = mockk<VideoController>()
+        justRun { videoController.playVideos(any()) }
         val playerController = PlayerController(data)
         val gameController = GameController(data,videoController, messageController, playerController, state)
         return (gameController to playerController)
